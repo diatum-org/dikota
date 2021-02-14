@@ -1,0 +1,9 @@
+    PhoneNumber:
+      type: object
+      properties:
+        phone:
+          type: string
+        phoneSms:
+          type: boolean
+        category:
+          type: string

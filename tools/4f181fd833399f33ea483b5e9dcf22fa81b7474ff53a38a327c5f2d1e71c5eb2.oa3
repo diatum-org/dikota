@@ -1,0 +1,7 @@
+    SocialLink:
+      type: object
+      properties:
+        link:
+          type: string
+        category:
+          type: string

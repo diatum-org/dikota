@@ -1,0 +1,271 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" [title]="name">
+   <NavigationButton *ngIf="!this.applySave"></NavigationButton>
+   <NavigationButton *ngIf="this.applySave" text="Back" visibility="collapsed"></NavigationButton>
+   <ActionItem *ngIf="this.applySave" ios.systemIcon="1" ios.position="left" width="48" height="48" (tap)="onBack()"></ActionItem>
+   <ActionItem *ngIf="applyText=='DELETE'" ios.systemIcon="16" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
+   <ActionItem *ngIf="applyText=='SAVE'" ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" [text]="name" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+    <Label col="2" [text]="applyText" fontWeight="Bold" fontSize="12" horizontalAlignment="right" verticalAlignment="center"
+        translateX="-16" (tap)="onApply()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout background="#FFFFFF">
+  <ScrollView>
+    <StackLayout>
+
+      <StackLayout *ngIf="isEmailAddress()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto,auto,auto" paddingBottom="16">
+          <TextField row="0" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Email Address" fontSize="16"
+              [text]="attr.email" (textChange)="updateEmail($event.value)" autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD"
+              marginTop="8" marginBottom="8"></TextField>
+          <Image row="0"src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearEmail()" width="24" height="24"></Image>
+          <TextField row="1" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Category" fontSize="16"
+              [text]="attr.category" (textChange)="updateCategory($event.value)" autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD"
+              marginTop="8" marginBottom="8"></TextField>
+          <Image row="1"src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearEmail()" width="24" height="24"></Image>
+          <StackLayout row="2" orientation="horizontal">
+            <Label class="text" fontSize="12" text="Example:"></Label>
+            <Label class="link" fontSize="12" paddingLeft="16" text="Personal" (tap)="updateCategory('Personal')"></Label>
+            <Label class="link" fontSize="12" paddingLeft="16" text="Work" (tap)="updateCategory('Work')"></Label>
+          </StackLayout>
+        </GridLayout>
+      </StackLayout>
+
+      <StackLayout *ngIf="isPhoneNumber()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto,auto,auto" columns="*,auto,auto,auto" paddingBottom="16">
+          <TextField col="0" colSpan="2" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Phone Number"
+              fontSize="16" [text]="attr.phone" (textChange)="updatePhone($event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD" marginTop="8" marginBottom="8"></TextField>
+          <Image col="1" src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearPhone()" width="24" height="24"></Image>
+          <Label col="2" class="text" text="Text" paddingLeft="16" paddingRight="8" verticalAlignment="center"></Label>
+          <Image *ngIf="!isSms(attr.phoneSms)" col="3" src="~/assets/unchecked.png" (tap)="updateSms('phoneSms', true)" width="24" height="24"></Image>
+          <Image *ngIf="isSms(attr.phoneSms)" col="3" src="~/assets/checked.png" horizontalAlignment="right" (tap)="updateSms('phoneSms', false)"
+              width="24" height="24"></Image>
+          <TextField row="1" col="0" colSpan="2" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Category"
+              fontSize="16" [text]="attr.category" (textChange)="updateCategory($event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD" marginTop="8" marginBottom="8"></TextField>
+          <Image row="1" col="1" src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearCategory()" width="24" height="24"></Image>
+          <StackLayout row="2" col="0" colSpan="2" orientation="horizontal">
+            <Label class="text" fontSize="12" text="Example:"></Label>
+            <Label class="link" fontSize="12" paddingLeft="16" text="Mobile" (tap)="updateCategory('Mobile')"></Label>
+            <Label class="link" fontSize="12" paddingLeft="16" text="Home" (tap)="updateCategory('Home')"></Label>
+            <Label class="link" fontSize="12" paddingLeft="16" text="Work" (tap)="updateCategory('Work')"></Label>
+          </StackLayout>
+        </GridLayout>
+      </StackLayout>
+
+      <StackLayout *ngIf="isHomeAddress()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Your Name / Mailing Name" fontSize="16" 
+              [text]="attr.name" (textChange)="updateWorkField('name', $event.value)" autocapitalizationType="words" borderBottomWidth="1" 
+              borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('name')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" columns="*,auto,auto,auto" paddingBottom="16">
+          <TextField col="0" colSpan="4" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Phone Number" fontSize="16"
+              [text]="attr.phoneNumber" (textChange)="updateWorkField('phoneNumber', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image *ngIf="!isSms(attr.phoneNumberSms)" col="1" src="~/assets/unchecked.png" verticalAlignment="center" (tap)="updateSms('phoneNumberSms', true)" 
+              width="24" height="24"></Image>
+          <Image *ngIf="isSms(attr.phoneNumberSms)" col="1" src="~/assets/checked.png" horizontalAlignment="right" (tap)="updateSms('phoneNumberSms', false)" 
+              width="24" height="24"></Image>
+          <Label col="2" text="Text" paddingLeft="4" paddingRight="16" class="text" verticalAlignment="center"></Label>
+          <Image col="3" src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('phoneNumber')" width="24" height="24"></Image>
+        </GridLayout>
+        <StackLayout borderRadius="8" borderColor="#888888" borderWidth="1" paddingTop="16" paddingBottom="16" paddingLeft="16" paddingRight="16">
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Street Number / PO Box" fontSize="16" 
+                [text]="attr.streetPo" (textChange)="updateWorkField('streetPo', $event.value)" autocapitalizationType="words"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('streetPo')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="City / Town" fontSize="16"
+                [text]="attr.cityTown" (textChange)="updateWorkField('cityTown', $event.value)" autocapitalizationType="words"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('cityTown')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Province / State / County"
+                [text]="attr.provinceStateCounty" fontSize="16" (textChange)="updateWorkField('provinceStateCounty', $event.value)" 
+                autocapitalizationType="words" borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('provinceStateCounty')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Postal Code" fontSize="16"
+                [text]="attr.postalCode" (textChange)="updateWorkField('postalCode', $event.value)" autocapitalizationType="words"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('postalCode')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Country" fontSize="16"
+                [text]="attr.country" (textChange)="updateWorkField('country', $event.value)" autocapitalizationType="words"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearWorkField('country')" width="24" height="24"></Image>
+          </GridLayout>
+        </StackLayout>
+      </StackLayout>
+     
+      <StackLayout *ngIf="isBusinessCard()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Company Name" fontSize="16" 
+              [text]="attr.companyName" (textChange)="updateField('companyName', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('companyName')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Your Professional Name" fontSize="16" 
+              autocapitalizationType="none" [text]="attr.professionName" (textChange)="updateField('professionName', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('professionName')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Title" fontSize="16"
+              autocapitalizationType="none" [text]="attr.title" (textChange)="updateField('title', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('title')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" columns="*,24,64,24" paddingBottom="16">
+          <TextField col="0" colSpan="4" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Main Phone" fontSize="16" 
+              autocapitalizationType="none" [text]="attr.mainPhone" (textChange)="updateField('mainPhone', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image *ngIf="!isSms(attr.mainPhoneSms)" col="1" src="~/assets/unchecked.png" (tap)="updateSms('mainPhoneSms', true)" width="24" height="24"></Image>
+          <Image *ngIf="isSms(attr.mainPhoneSms)" col="1" src="~/assets/checked.png" (tap)="updateSms('mainPhoneSms', false)" width="24" height="24"></Image>
+          <Label col="2" text="Text" paddingLeft="4" paddingRight="16" class="text" verticalAlignment="center"></Label>
+          <Image col="3" src="~/assets/clear.png" verticalAlignment="center" (tap)="clearField('mainPhone')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" columns="*,24,64,24" paddingBottom="16">
+          <TextField col="0" colSpan="4" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Direct Phone" fontSize="16" 
+              autocapitalizationType="none" [text]="attr.directPhone" (textChange)="updateField('directPhone', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image *ngIf="!isSms(attr.directPhoneSms)" col="1" src="~/assets/unchecked.png" (tap)="updateSms('directPhoneSms', true)" width="24" height="24"></Image>
+          <Image *ngIf="isSms(attr.directPhoneSms)" col="1" src="~/assets/checked.png" (tap)="updateSms('directPhoneSms', false)" width="24" height="24"></Image>
+          <Label col="2" text="Text" paddingLeft="4" paddingRight="16" class="text" verticalAlignment="center"></Label>
+          <Image col="3" src="~/assets/clear.png" (tap)="clearField('directPhone')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" columns="*,24,64,24" paddingBottom="16">
+          <TextField col="0" colSpan="4" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Mobile Phone" fontSize="16" 
+              autocapitalizationType="none" [text]="attr.mobilePhone" (textChange)="updateField('mobilePhone', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image *ngIf="!isSms(attr.mobilePhoneSms)" col="1" src="~/assets/unchecked.png" (tap)="updateSms('mobilePhoneSms', true)" width="24" height="24"></Image>
+          <Image *ngIf="isSms(attr.mobilePhoneSms)" col="1" src="~/assets/checked.png" (tap)="updateSms('mobilePhoneSms', false)" width="24" height="24"></Image>
+          <Label col="2" text="Text" paddingLeft="4" paddingRight="16" class="text" verticalAlignment="center"></Label>
+          <Image col="3" src="~/assets/clear.png" verticalAlignment="center" (tap)="clearField('mobilePhone')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Email" fontSize="16" 
+              autocapitalizationType="none" [text]="attr.email" (textChange)="updateField('email', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('email')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Website" fontSize="16"
+              autocapitalizationType="none" [text]="attr.website" (textChange)="updateField('website', $event.value)"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/xmark.png" horizontalAlignment="right" (tap)="clearField('website')" width="24" height="24"></Image>
+        </GridLayout>
+
+        <GridLayout height="96" paddingTop="8" paddingBottom="8">
+          <TextView color="#51515E" style.placeholderColor="#A1A1AE" autocorrect="false" hint="Company Description" autocapitalizationType="sentences" fontSize="16" 
+              (textChange)="updateField('companyDescription', $event.value)" [text]="attr.companyDescription" paddingLeft="8" paddingRight="16"
+              paddingTop="4" paddingBottom="4" borderRadius="4" borderWidth="1" borderColor="#DDDDDD"></TextView>
+          <Image src="~/assets/x.png" width="16" height="16" horizontalAlignment="right" verticalAlignment="bottom"
+              (tap)="clearField('companyDescription')" translateY="-4" translateX="-4"></Image>
+        </GridLayout>
+
+        <StackLayout borderRadius="4" borderWidth="1" borderColor="#DDDDDD" marginTop="16" paddingLeft="16" paddingRight="16">
+          <GridLayout rows="auto" paddingBottom="16" paddingTop="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Street Number / PO Box" fontSize="16" 
+                verticalAlignment="center" autocapitalizationType="words" [text]="attr.streetPo" (textChange)="updateField('streetPo', $event.value)"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" verticalAlignment="center" (tap)="clearField('streetPo')" 
+                width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="City / Town" fontSize="16"
+                autocapitalizationType="words" [text]="attr.cityTown" (textChange)="updateField('cityTown', $event.value)"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('cityTown')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="State / Province / County" fontSize="16" 
+                autocapitalizationType="words" [text]="attr.provinceStateCounty" (textChange)="updateField('provinceStateCounty', $event.value)"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('provinceStateCounty')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Postal Code" fontSize="16"
+                autocapitalizationType="words" [text]="attr.postalCode" (textChange)="updateField('postalCode', $event.value)"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('postalCode')" width="24" height="24"></Image>
+          </GridLayout>
+          <GridLayout rows="auto" paddingBottom="16">
+            <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Country" fontSize="16"
+                autocapitalizationType="words" [text]="attr.country" (textChange)="updateField('country', $event.value)"
+                borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+            <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('country')" width="24" height="24"></Image>
+          </GridLayout>
+        </StackLayout>
+
+      </StackLayout>
+
+      <StackLayout *ngIf="isWebsite()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Name" fontSize="16" 
+              [text]="attr.name" (textChange)="updateField('name', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('name')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="URL" fontSize="16" 
+              [text]="attr.url" (textChange)="updateField('url', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('url')" width="24" height="24"></Image>
+        </GridLayout>
+      </StackLayout>
+
+      <StackLayout *ngIf="isSocialLink()" paddingLeft="32" paddingRight="32">
+        <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Username" fontSize="16"
+              [text]="attr.link" (textChange)="updateField('link', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('link')" width="24" height="24"></Image>
+        </GridLayout>
+        <GridLayout rows="auto" paddingBottom="16">
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="App Name (Instagram, Xbox, Skype)" 
+              fontSize="16" [text]="attr.category" (textChange)="updateField('category', $event.value)" autocapitalizationType="none"
+              borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+          <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('category')" width="24" height="24"></Image>
+        </GridLayout>
+      </StackLayout>
+
+      <StackLayout padding="32">
+        <GridLayout paddingTop="8" borderBottomWidth="1" borderColor="#DDDDDD">
+          <Label text="Labels:" fontWeight="Bold" class="text" fontSize="16"></Label>
+        </GridLayout>
+        <GridLayout *ngFor="let l of labels" height="32" borderBottomWidth="1" borderColor="#EEEEEE" (tap)="toggleSelected(l.labelId)">
+          <Label class="text" [text]="l.label.name" fontSize="16" verticalAlignment="center" horizontalAlgignment="left"></Label>
+          <Image *ngIf="isSelected(l.labelId)" src="~/assets/checked.png" width="32" height="32" verticalAlignment="center"
+              horizontalAlignment="right"></Image>
+          <Image *ngIf="!isSelected(l.labelId)" src="~/assets/unchecked.png" width="32" height="32" verticalAlignment="center"
+              horizontalAlignment="right"></Image>
+        </GridLayout>
+      </StackLayout>
+
+      <StackLayout height="256"></StackLayout>
+
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

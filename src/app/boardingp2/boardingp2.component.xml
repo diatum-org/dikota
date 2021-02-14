@@ -1,0 +1,65 @@
+<GridLayout rows="auto,*,auto" background="#FFFFFF" (swipe)="onSwipe($event)" paddingTop="32">
+  <StackLayout row="0">
+    <Label text="Adding new contacts works like friending on social media." fontSize="18" textWrap="true"
+        fontWeight="Bold" paddingLeft="16" paddingRight="16" class="text" paddingBottom="16"></Label>
+    <GridLayout columns="auto,*,auto" rows="auto" paddingTop="32" paddingLeft="16" paddingRight="16">
+      <Image col="0" src="~/assets/boardAccept.png" width="64"></Image>
+      <StackLayout col="1" orientation="horizontal" verticalAlignment="top" horizontalAlignment="left" padding="8">
+        <Label class="text" fontSize="15" text="You"></Label>
+        <Label class="text" fontSize="15" fontWeight="Bold" text=" Request "></Label>
+        <Image src="~/assets/boardRight.png" width="16"></Image>
+      </StackLayout>
+      <StackLayout col="1" orientation="horizontal" verticalAlignment="bottom" horizontalAlignment="right" padding="8">
+        <Label class="text" fontSize="15" text="  "></Label>
+        <Image src="~/assets/boardLeft.png" width="16"></Image>
+        <Label class="text" fontSize="15" text=" They"></Label>
+        <Label class="text" fontSize="15" fontWeight="Bold" text=" Accept"></Label>
+      </StackLayout>
+      <Image col="2" src="~/assets/boardRequest.png" width="64"></Image>
+    </GridLayout>
+  </StackLayout>
+
+  <ScrollView row="1" (swipe)="onSwipe($event)">
+    <StackLayout backgroundColor="#CBD8EF" verticalAlignment="center" (tap)="onMore(!more)"
+          paddingLeft="16" paddingRight="16">
+      <StackLayout orientation="horizontal" horizontalAlignment="center" verticalAlignment="center"
+            paddingTop="16" paddingBottom="16">
+        <Label text="Reduces " class="text" fontSize="18" fontWeight="Bold"></Label>
+        <Label text="Platform Anxiety!" class="link" fontSize="18" fontWeight="Bold"></Label>
+      </StackLayout>
+
+      <Label *ngIf="more" text="The fear and anxiety that comes from:" verticalAlignment="center" fontStyle="italic" class="text" 
+          fontSize="16" paddingBottom="8"></Label>
+      <StackLayout *ngIf="more" orientation="horizontal" paddingBottom="4">
+        <Label text="-" class="text" fontSize="16" verticalAlignment="top" paddingRight="8"></Label>
+        <Label text="accidently friending on a social media site someone doesn't use or think is very cool." class="text" 
+            textWrap="true" fontSize="16"></Label>
+      </StackLayout>
+      <StackLayout *ngIf="more" orientation="horizontal" paddingBottom="4">
+        <Label text="-" class="text" fontSize="16" verticalAlignment="top" paddingRight="8"></Label>
+        <Label text="requesting a new friend on multiple sites and appearing too needy and not casual at all." class="text" 
+            textWrap="true" fontSize="16"></Label>
+      </StackLayout>
+      <StackLayout *ngIf="more" orientation="horizontal" paddingBottom="4">
+        <Label text="-" class="text" fontSize="16" verticalAlignment="top" paddingRight="8"></Label>
+        <Label text="adding a contact on social media, when you don't even use social media." class="text" 
+            textWrap="true" fontSize="16"></Label>
+      </StackLayout>
+      <StackLayout *ngIf="more" orientation="horizontal" paddingBottom="24">
+        <Label text="-" class="text" fontSize="16" verticalAlignment="top" paddingRight="8"></Label>
+        <Label text="the thought of losing touch when someone quits a site or charges their phone number." class="text" 
+            textWrap="true" fontSize="16"></Label>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <StackLayout row="2" orientation="horizontal" horizontalAlignment="center" paddingBottom="16">
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(0)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(1)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" backgroundColor="#CBD8EF"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(3)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(4)"></Label>
+  </StackLayout>
+
+</GridLayout>
+

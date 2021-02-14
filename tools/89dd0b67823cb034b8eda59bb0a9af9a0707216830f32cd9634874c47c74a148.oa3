@@ -1,0 +1,22 @@
+    Home:
+      type: object
+      properties:
+        name:
+          type: string
+        phoneNumber:
+          type: string
+        phoneNumberSms:
+          type: boolean
+        homeAddress:
+          type: object
+          properties:
+            streetPo:
+              type: string
+            cityTown:
+              type: string
+            provinceStateCounty:
+              type: string
+            postalCode:
+              type: string
+            country:
+              type: string

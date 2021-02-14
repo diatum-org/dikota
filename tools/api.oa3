@@ -1,0 +1,112 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+info:
+  description:
+    An interface to a emigo app of distributed nodes for personal storage.
+  version: "1.0.4"
+  title: Digital Archive Emigo App Server API
+  contact:
+    email: rosborne@coredb.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+
+  /dummy:
+    get:
+      responses:
+        '400':
+          description: access denied
+          
+components:
+  schemas:
+
+    PhysicalAddress:
+      type: object
+      properties:
+        street_po:
+          type: string
+        city_town:
+          type: string
+        province_state_county:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+          
+    EmailAddress:
+      type: object
+      properties:
+        email:
+          type: string
+        category:
+          type: string
+          
+    PhoneNumber:
+      type: object
+      properties:
+        phone:
+          type: string
+        category:
+          type: string
+          
+    SocialLink:
+      type: object
+      properties:
+        link:
+          type: string
+        category:
+          type: string
+          
+    Home:
+      type: object
+      properties:
+        name:
+          type: string
+        phoneNumber:
+          type: string
+        physicalAddress:
+          type: object
+          properties:
+            street_po:
+              type: string
+            city_town:
+              type: string
+            province_state_county:
+              type: string
+            postal_code:
+              type: string
+            country:
+              type: string
+          
+    Work:
+      type: object
+      properties:
+        name:
+          type: string
+        companyName:
+          type: string
+        position:
+          type: string
+        description:
+          type: string
+        phoneNumber:
+          type: string
+        emailAddress:
+          type: string
+        physicalAddress:
+          type: object
+          properties:
+            street_po:
+              type: string
+            city_town:
+              type: string
+            province_state_county:
+              type: string
+            postal_code:
+              type: string
+            country:
+              type: string
+          

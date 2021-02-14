@@ -1,0 +1,38 @@
+    BusinessCard:
+      type: object
+      properties:
+        companyName:
+          type: string
+        professionName:
+          type: string
+        title:
+          type: string
+        mainPhone:
+          type: string
+        mainPhoneSms:
+          type: string
+        directPhone:
+          type: string
+        directPhoneSms:
+          type: string
+        mobilePhone:
+          type: string
+        mobilePhoneSms:
+          type: string
+        email:
+          type: string
+        website:
+          type: string
+        companyDescription:
+          type: string
+        streetPo:
+          type: string
+        cityTown:
+          type: string
+        provinceStateCounty:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+

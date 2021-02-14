@@ -1,0 +1,91 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Edit Public Info">
+   <NavigationButton *ngIf="!isSet()"></NavigationButton>
+   <NavigationButton *ngIf="isSet()" text="Back" visibility="collapsed"></NavigationButton>
+   <ActionItem *ngIf="isSet()" ios.systemIcon="1" ios.position="left" width="48" height="48" (tap)="onBack()"></ActionItem>
+   <ActionItem *ngIf="isSavable()" ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onSave()"></ActionItem>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" text="Edit Public Info" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+    <Label *ngIf="isSavable()" col="2" text="SAVE" fontWeight="Bold" fontSize="12" horizontalAlignment="right" verticalAlignment="center"
+        translateX="-16" (tap)="onSave()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout background="#FFFFFF" [rows]="getScreenGrid()">
+  <ScrollView row="0">
+    <StackLayout paddingTop="16">
+      <GridLayout rows="auto" paddingLeft="32" paddingRight="32" paddingBottom="16">
+        <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="your name" autocapitalizationType="words"
+            fontSize="20" (textChange)="onUpdateName($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
+            [text]="name" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onFocus()" (blur)="onBlur()"></TextField>
+        <Image src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right"
+            (tap)="onClearName()"></Image>
+      </GridLayout>
+
+      <GridLayout rows="auto" paddingLeft="32" paddingRight="32" paddingBottom="16">
+        <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="your username" autocapitalizationType="none"
+            fontSize="18" (textChange)="onUpdateHandle($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
+            [text]="handle" borderBottomWidth="1" [borderColor]="handleColor" (focus)="onFocus()" (blur)="onBlur()"></TextField>
+        <Label *ngIf="ready&&!alpha" color="#71717E" fontSize="12" text="(use letters)" horizontalAlignment="right" paddingRight="32"></Label>
+        <Label *ngIf="ready&&alpha&&!available" color="#71717E" fontSize="12" text="(not available)" horizontalAlignment="right" paddingRight="32"></Label>
+        <Image src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right" verticalAlignment="center"
+            (tap)="onClearHandle()"></Image>
+      </GridLayout>
+
+      <GridLayout rows="auto" paddingLeft="32" paddingRight="32" paddingBottom="16">
+        <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="your location" autocapitalizationType="words"
+            fontSize="18" (textChange)="onUpdateLocation($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
+            [text]="location" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onFocus()" (blur)="onBlur()"></TextField>
+        <Image src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right" verticalAlignment="center"
+            (tap)="onClearLocation()"></Image>
+      </GridLayout>
+
+      <GridLayout height="128" paddingLeft="32" paddingRight="32">
+        <TextView color="#51515E" style.placeholderColor="#A1A1AE" autocorrect="false" hint="your description..." autocapitalizationType="sentences"
+            fontSize="16" (textChange)="onUpdateDescription($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
+            [text]="description" borderWidth="1" borderColor="#DDDDDD" (focus)="onFocus()" (blur)="onBlur()"></TextView>
+        <Image src="~/assets/x.png" width="16" height="16" horizontalAlignment="right" verticalAlignment="bottom"
+            (tap)="onClearDescription()" translateY="-4" translateX="-4"></Image>
+      </GridLayout>
+
+      <StackLayout paddingTop="32" paddingBottom="8" backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8"
+          borderBottomWidth="2" paddingLeft="16" marginTop="16" marginLeft="16" marginRight="16" marginTop="32">
+
+        <Label textWrap="true" fontSize="16">
+          <FormattedString>
+            <Span class="text" text="Who can view your public profile in the User Directory?"></Span>
+            <Span class="grey" text=" This will allow other users to find you." fontStyle="italic"></Span>
+          </FormattedString>
+        </Label>
+
+        <StackLayout *ngIf="isSearchable()" orientation="horizontal" horizontalAlignment="center" paddingBottom="16" (tap)="setSearchable(false)">
+          <Label text="No one" class="text" fontSize="14" verticalAlignment="center" paddingRight="8"></Label>
+          <Image src="~/assets/slideron.png" height="32" verticalAlignment="center"></Image>
+          <Label text="Everyone" class="link" fontSize="14" verticalAlignment="center" paddingLeft="8"></Label>
+        </StackLayout>
+        <StackLayout *ngIf="!isSearchable()" orientation="horizontal" horizontalAlignment="center" paddingBottom="16" (tap)="setSearchable(true)">
+          <Label text="No one" class="link" fontSize="14" verticalAlignment="center" paddingRight="8"></Label>
+          <Image src="~/assets/slideroff.png" height="32" verticalAlignment="center"></Image>
+          <Label text="Everyone" class="text" fontSize="14" verticalAlignment="center" paddingLeft="8"></Label>
+        </StackLayout>
+
+        <Label class="text" textWrap="true" fontSize="16" paddingTop="16" text="Who can send you contact requests?"></Label>
+
+        <StackLayout *ngIf="isAvailable()" orientation="horizontal" horizontalAlignment="center" paddingBottom="16" (tap)="setAvailable(false)">
+          <Label text="No one" class="text" fontSize="14" verticalAlignment="center" paddingRight="8"></Label>
+          <Image src="~/assets/slideron.png" height="32" verticalAlignment="center"></Image>
+          <Label text="Everyone" class="link" fontSize="14" verticalAlignment="center" paddingLeft="8"></Label>
+        </StackLayout>
+        <StackLayout *ngIf="!isAvailable()" orientation="horizontal" horizontalAlignment="center" paddingBottom="16" (tap)="setAvailable(true)">
+          <Label text="No one" class="link" fontSize="14" verticalAlignment="center" paddingRight="8"></Label>
+          <Image src="~/assets/slideroff.png" height="32" verticalAlignment="center"></Image>
+          <Label text="Everyone" class="text" fontSize="14" verticalAlignment="center" paddingLeft="8"></Label>
+        </StackLayout>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>
+

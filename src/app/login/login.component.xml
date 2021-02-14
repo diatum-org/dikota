@@ -1,0 +1,41 @@
+<GridLayout backgroundColor="#FFFFFF" [rows]="getScreenGrid()">
+  <GridLayout row="0" rows="*,auto,*,auto,*,auto,*,auto" paddingRight="32" paddingLeft="32">
+
+    <StackLayout row="1" paddingTop="32">
+      <Image height="64" src="~/assets/logo.png"></Image>
+      <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="8"></ActivityIndicator>
+    </StackLayout>
+
+    <StackLayout row="3">
+      <GridLayout rows="auto" paddingBottom="16">
+        <Image src="~/assets/login.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
+        <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" [hint]="hint"
+            autocapitalizationType="none" fontSize="16" paddingLeft="32" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
+            (returnPress)="onLoginSet()" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+      </GridLayout>    
+      <GridLayout rows="auto" paddingBottom="16">
+        <Image src="~/assets/password.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
+        <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Password" [secure]="!show" 
+            fontSize="16" paddingLeft="32" (textChange)="onUpdatePassword($event.value)" returnKeyType="go" (returnPress)="onPasswordSet()"
+            autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"></TextField>
+        <Image *ngIf="!show" src="~/assets/view.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="center"
+            (tap)="onShow(true)"></Image>
+        <Image *ngIf="show" src="~/assets/look.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="center"
+            (tap)="onShow(false)"></Image>
+      </GridLayout>
+      <Label fontSize="16" fontWeight="Bold" text="LOGIN" paddingBottom="16" paddingTop="8" textAlignment="center" 
+          [color]="loginColor" (tap)="onLogin()"></Label>
+    </StackLayout>
+
+    <GridLayout row="5" rows="*,*">
+      <Label row="0" fontSize="16" textAlignment="center" verticalAlignment="bottom" color="#2C508F" (tap)="onReset()"
+          paddingBottom="32" text="Forgot Your Password?"></Label>
+      <Label row="1" fontSize="16" textAlignment="center" color="#2C508F" (tap)="onCreate()">
+        <Span text="Create a New Account" fontWeight="Bold"></Span>
+      </Label>
+    </GridLayout>
+
+    <Label row="7" class="text-light" height="32" [text]="version" fontSize="12" verticalAlignment="center" horizontalAlignment="center"></Label>
+    
+  </GridLayout>
+</GridLayout>

@@ -1,0 +1,30 @@
+    Work:
+      type: object
+      properties:
+        name:
+          type: string
+        companyName:
+          type: string
+        position:
+          type: string
+        description:
+          type: string
+        phoneNumber:
+          type: string
+        phoneNumberSms:
+          type: boolean
+        emailAddress:
+          type: string
+        workAddress:
+          type: object
+          properties:
+            streetPo:
+              type: string
+            cityTown:
+              type: string
+            provinceStateCounty:
+              type: string
+            postalCode:
+              type: string
+            country:
+              type: string

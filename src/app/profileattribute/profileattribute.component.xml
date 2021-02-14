@@ -1,0 +1,58 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Add Info">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" text="Add Info" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="*,auto" background="#FFFFFF">
+  <ScrollView>
+    <StackLayout padding="32">
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddPhone()">
+        <Label class="text" text="Phone" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddEmail()">
+        <Label class="text"text="Email" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddHome()">
+        <Label class="text" text="Address" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddBusinessCard()">
+        <Label class="text" text="Business Card" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddWebsite()">
+        <Label class="text" text="Website" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout backgroundColor="#F0F4F8" borderRadius="8" borderColor="#E0E4E8" borderBottomWidth="2"
+          height="48" marginBottom="8" (tap)="onAddSocialLink()">
+        <Label class="text" text="Social & Messaging" fontSize="16" horizontalAlignment="center" verticalAlignment="center"></Label>
+      </GridLayout>
+
+    </StackLayout>
+  </ScrollView>
+
+  <StackLayout row="1" paddingLeft="16" paddingRight="16" paddingBottom="32" paddingTop="16">
+    <Label class="text" fontWeight="Bold" fontSize="15" text="Something Missing?"></Label>
+    <Label textWrap="true" fontSize="15" (tap)="onRequest()">
+      <FormattedString>
+        <Span class="text" text="Please let us know what other information you'd like to include in your profile at "></Span>
+        <Span class="link" text="requests@diatum.org"></Span>
+      </FormattedString>
+    </Label>
+  </StackLayout>
+</GridLayout>

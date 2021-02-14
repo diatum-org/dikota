@@ -1,0 +1,41 @@
+<GridLayout rows="auto,*,auto" background="#FFFFFF" (swipe)="onSwipe($event)">
+  <StackLayout row="0" paddingTop="32">
+    <Image src="~/assets/logo.png" horizontalAlignment="center" height="48"></Image>
+    <Label text="Dikota works like a contact app, but with more superpowers, and even more on the way!" 
+        paddingLeft="16" paddingRight="16" class="text" paddingTop="16" textWrap="true" fontSize="18" fontWeight="Bold"></Label>
+  </StackLayout>
+
+  <ScrollView row="1" (swipe)="onSwipe($event)">
+    <StackLayout verticalAlignment="center">
+      <StackLayout *ngIf="!more" backgroundColor="#CBD8EF" paddingLeft="16" paddingRight="16" marginTop="16" paddingTop="16" paddingBottom="32">
+        <Image src="~/assets/diatum.png" horizontalAlignment="center" height="48"></Image>
+        <Label textWrap="true" paddingTop="8" (tap)="onMore()">
+          <Span text="The Dikota app was created by Diatum, a nonprofit with big ideas to safeguard your data and privacy. "
+              class="text" fontSize="18"></Span>
+          <Span class="link" text="More" fontWeight="Bold" (tap)="onMore()"></Span>
+        </Label>
+      </StackLayout>
+
+      <StackLayout *ngIf="more" backgroundColor="#CBD8EF" paddingLeft="16" paddingRight="16" paddingTop="16" paddingBottom="32">
+        <Image src="~/assets/diatum.png" horizontalAlignment="center" height="48" marginBottom="16"></Image>
+        <Label text="Diatum's mission as a nonprofit corporation is to safeguard your data and digital identity, empower privacy rights, encourage responsible digital citizenship, conduct scientific research and promote technology innovation and competition." class="text" fontSize="16" textWrap="true" paddingTop="8"></Label>
+        <Label text="If that seems like a big idea for 'just a contact app', we hope you stick with us for the ride to see where we're headed." class="text" fontSize="16" textWrap="true" paddingTop="8"></Label>
+        <Label text="For now, we appreciate your status as extra-early-adopter to iron out the details of our app and helping to make it shine." class="text" fontSize="16" textWrap="true" paddingTop="8"></Label>
+        <Label textWrap="true" (tap)="onView()" paddingTop="8">
+          <Span class="text" text="Learn more about our project at "></Span>
+          <Span class="link" text="diatum.org."></Span>
+        </Label>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <StackLayout row="2" orientation="horizontal" horizontalAlignment="center" paddingBottom="16">
+     <Label width="16" height="16" margin="12" borderRadius="8" backgroundColor="#CBD8EF"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(1)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(2)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(3)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(4)"></Label>
+  </StackLayout>
+
+</GridLayout>
+

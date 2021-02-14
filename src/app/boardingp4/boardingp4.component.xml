@@ -1,0 +1,26 @@
+<GridLayout rows="*,auto" background="#FFFFFF" (swipe)="onSwipe($event)" paddingTop="32">
+  <ScrollView row="0" (swipe)="onSwipe($event)">
+    <StackLayout paddingLeft="16" paddingRight="16">
+      <Label text="What else is important to know?" class="text" paddingBottom="16" textWrap="true" fontSize="18" fontWeight="Bold"></Label>
+      <Label class="text" fontSize="16" textWrap="true" paddingTop="16">
+        <Span text="Username: " fontWeight="Bold"></Span>
+        <Span text="Your username helps people find you and will work similar to an email address in the future. Other users can search for and see it, so choose wisely. You can change it at any time." class="text"></Span>
+      </Label>
+      <Label class="text" fontSize="16" textWrap="true" paddingTop="16">
+        <Span text="Changing your Profile Information: " fontWeight="Bold"></Span>
+        <Span text="When you change your profile information, like your phone number or email, it automatically updates in all of your contacts' phones - no need for you to do anything." class="text"></Span>
+      </Label>
+      <Label fontSize="16" textWrap="true" paddingTop="16">
+        <Span class="text" text="Data & Privacy: " fontWeight="Bold"></Span>
+        <Span class="text" text="You own your data, not us - we'll keep it safe and secure but never sell, analyze, or make money from you or your data. Learn more about our project at " class="text"></Span>
+        <Span class="link" text="diatum.org"></Span>
+      </Label>
+    </StackLayout>
+  </ScrollView>
+
+  <StackLayout row="1" orientation="horizontal" horizontalAlignment="center" paddingBottom="16">
+    <Label class="link" text="FINISH" fontWeight="Bold" (tap)="onFinish()"></Label>
+  </StackLayout>
+
+</GridLayout>
+

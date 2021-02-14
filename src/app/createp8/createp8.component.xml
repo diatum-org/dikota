@@ -1,0 +1,44 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Terms of Service & Data Policy">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-4" (tap)="onBack()"></Image>
+    <Label col="1" text="Terms of Service & Data Policy" fontWeight="Bold" fontSize="16" horizontalAlignment="left" 
+        verticalAlignment="center" paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="*,auto" background="#FFFFFF">
+  <ScrollView>
+    <StackLayout orientation="vertical" paddingTop="32">
+    
+      <Label class="text" fontSize="16" paddingLeft="16" paddingRight="16"
+          textWrap="true" text="By creating an account, you agree to the Dikota Terms of Service and Privacy Policy."></Label>
+
+      <GridLayout columns="*,*" rows="*" paddingLeft="32" paddingRight="32" paddingTop="16" paddingBottom="8">
+        <Label col="0" text="CANCEL" textAlignment="center" fontSize="16" fontWeight="Bold" color="#888888" borderWidth="2" borderColor="#DDDDDD" 
+            height="32" paddingTop="4" borderRigthWidth="1" (tap)="onCancel()"></Label>
+        <Label col="1" text="I AGREE" textAlignment="center" fontSize="16" fontWeight="Bold" [color]="agreeColor" borderWidth="2" borderColor="#DDDDDD" 
+            height="32" paddingTop="4" borderLeftWidth="0" (tap)="onAgree()"></Label>
+      </GridLayout>
+
+      <ActivityIndicator color="#1172FE" [busy]="busy"></ActivityIndicator>
+
+      <Label color="#565663" fontSize="16" fontWeight="Bold" fontStyle="italic" textAlignment="center" 
+          paddingBottom="8" text="Before you tap Agree..."></Label>
+
+      <Label color="#565663" fontSize="16" textAlignment="left" paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" textWrap="true" 
+          text="The Dikota app has a unique set of terms and data policies that sets us apart from other apps you've downloaded before. You might consider taking a quick look to see why we think we're so special."></Label>
+    
+      <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" paddingTop="16" paddingBottom="12" text="Terms of Service" (tap)="onTerms()"></Label>
+
+      <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" paddingTop="12" paddingBottom="16" text="Data Policy" (tap)="onData()"></Label>
+
+    </StackLayout>
+  </ScrollView>
+  <StackLayout row="1" borderColor="#888888" borderTopWidth="1">
+    <Label class="text-light" fontSize="12" textAlignment="center" text="For advanced users" paddingTop="4" paddingBottom="8"></Label>
+    <Label class="link" fontSize="16" text="Agree, but use existing identity" textAlignment="center" paddingBottom="16" (tap)="onAttach()"></Label>
+  </StackLayout>
+</GridLayout>

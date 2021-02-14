@@ -1,0 +1,52 @@
+<GridLayout rows="auto,*,auto" background="#FFFFFF" (swipe)="onSwipe($event)">
+
+  <Label row="0" text="Labelling categorizes your contacts, and controls what information they can or can't see about you."
+      paddingTop="32" paddingLeft="16" paddingRight="16" textWrap="true" class="text" fontSize="18" fontWeight="Bold"></Label>
+  
+  <StackLayout row="1" verticalAlignment="top" paddingTop="32" paddingLeft="16" paddingRight="16">
+    <StackLayout orientation="horizontal" paddingLeft="32" paddingTop="24">
+      <Image src="~/assets/boardLabel.png" width="18"></Image>
+      <Label text=" Work " class="red" fontSize="16" fontWeight="Bold"></Label>
+      <Label text="contacts can see my:" class="text" fontSize="16"></Label>
+    </StackLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Work Email" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Work Phone" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Company Name" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+    <StackLayout orientation="horizontal" paddingLeft="32" paddingTop="24">
+      <Image src="~/assets/boardLabel.png" width="18"></Image>
+      <Label text=" Friend " class="red" fontSize="16" fontWeight="Bold"></Label>
+      <Label text="contacts can see my:" class="text" fontSize="16"></Label>
+    </StackLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Personal Email" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Mobile Phone" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+    <GridLayout rows="auto" columns="2*,auto,*" paddingLeft="48" paddingRight="48">
+      <Label col="0" text="Home Address" class="text" fontSize="15"></Label>
+      <Image col="1" src="~/assets/boardChecked.png" width="32"></Image>
+    </GridLayout>
+  </StackLayout>
+
+  <StackLayout row="2" orientation="horizontal" horizontalAlignment="center" paddingBottom="16">
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(0)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(1)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(2)"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" backgroundColor="#CBD8EF"></Label>
+     <Label width="16" height="16" margin="12" borderRadius="8" borderColor="#CBD8EF" borderWidth="1" (tap)="onNext(4)"></Label>
+  </StackLayout>
+
+</GridLayout>
+

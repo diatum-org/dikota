@@ -1,0 +1,72 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Search For New Contacts">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" colSpan="2" text="Search For New Contacts" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="96,*" background="#FFFFFF">
+
+  <GridLayout *ngIf="!nearby" row="0" rows="*,*">
+    <GridLayout row="0" columns="*,*" backgroundColor="#F0F8FF">
+      <Label col="0" text="User Directory" horizontalAlignment="center" verticalAlignment="center" class="text" fontSize="16"
+          borderBottomWidth="1" borderColor="#909097"></Label>
+      <Label col="1" text="Search Nearby" horizontalAlignment="center" verticalAlignment="center" class="text" fontSize="16"
+          (tap)="onNearby()"></Label>
+    </GridLayout>
+    <GridLayout row="1" backgroundColor="#F0F8FF" paddingLeft="32" paddingRight="32">
+      <TextField row="0" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Search" fontSize="16" 
+          autocapitalizationType="none" verticalAlignment="middle" [text]="search" (textChange)="onSetSearch($event.value)"
+          (returnPress)="onApplySearch()" borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+      <Image row="0" src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right" (tap)="onClearSearch()"></Image>
+      <ActivityIndicator color="#1172FE" [busy]="busy" width="32" height="32" horizontalAlignment="center"></ActivityIndicator>
+    </GridLayout>
+  </GridLayout>
+
+  <GridLayout *ngIf="nearby" row="0" rows="*,*">
+    <GridLayout row="0" columns="*,*" backgroundColor="#F0F8FF">
+      <Label col="0" text="User Directory" horizontalAlignment="center" verticalAlignment="center" class="text" fontSize="16"
+          (tap)="onDirectory()"></Label>
+      <Label col="1" text="Search Nearby" horizontalAlignment="center" verticalAlignment="center" class="text" fontSize="16"
+          borderBottomWidth="1" borderColor="#909097"></Label>
+    </GridLayout>
+    <GridLayout row="1" rows="*,*" columns="auto,*,auto" backgroundColor="#F0F8FF"
+        paddingLeft="8" paddingRight="8">
+      <Image row="0" col="0" src="~/assets/gps.png" verticalAlginment="center"></Image>
+      <Label row="0" col="1" class="text" text="Location Service" verticalAlignment="center" paddingLeft="8"></Label>
+      <StackLayout *ngIf="location" row="0" col="2" orientation="horizontal" (tap)="onLocation(false)">
+        <Label text="OFF" class="text" verticalAlignment="center" paddingRight="8"></Label>
+        <Image src="~/assets/slideron.png" verticalAlignment="center"></Image>
+        <Label text="ON" class="link" verticalAlignment="center" paddingLeft="8"></Label>
+      </StackLayout>
+      <StackLayout *ngIf="!location" row="0" col="2" orientation="horizontal" (tap)="onLocation(true)">
+        <Label text="OFF" class="link" verticalAlignment="center" paddingRight="8"></Label>
+        <Image src="~/assets/slideroff.png" verticalAlignment="center"></Image>
+        <Label text="ON" class="text" verticalAlignment="center" paddingLeft="8"></Label>
+      </StackLayout>
+      <Label row="1" col="0" colSpan="3" horizontalAlignment="center" verticalAlignment="center"
+          class="text" text="Automatic shutoff after 5 minutes" fontStyle="italic" fontSize="12"></Label>
+    </GridLayout>
+  </GridLayout>
+
+  <ScrollView row="1">
+    <StackLayout>
+      <StackLayout *ngIf="noLocation && nearby" padding="8">
+        <Label class="text" fontWeight="Bold" horizontalAlignment="center" text="We didn't find any results"></Label>
+        <Label class="text" padding="8" fontSize="14" horizontalAlignment="center" textWrap="true"
+            text="Please make sure everyone's Location feature is turned on and try again."></Label>
+      </StackLayout>
+      <StackLayout *ngIf="noDirectory && !nearby" padding="8">
+        <Label class="text" fontWeight="Bold" horizontalAlignment="center" text="We didn't find any results"></Label>
+        <Label class="text" padding="8" fontSize="14" horizontalAlignment="center" textWrap="true"
+            text="Please make sure everything is spelled correctly and try again."></Label>
+      </StackLayout>
+      <StackLayout #res></StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>
+

@@ -1,0 +1,26 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Create a Label">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" text="Create a Label" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="auto,*,auto" background="#FFFFFF" paddingLeft="32" paddingRight="32" paddingTop="32">
+  <TextField row="0" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Label Name" fontSize="16" 
+      autocapitalizationType="words" [text]="name" (textChange)="onSetName($event.value)" borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+  <Image row="0" src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right" (tap)="onClear()"></Image>
+  <ScrollView row="1">
+    <StackLayout>
+      <Label text="suggested:" class="text" fontStyle="italic" fontSize="14" paddingTop="8" paddingBottom="8"></Label>
+      <Label *ngFor="let s of suggested" class="text" fontSize="16" paddingTop="8" paddingBottom="8" [text]="s" (tap)="onSuggest(s)"></Label>
+    </StackLayout>
+  </ScrollView>
+  <ActivityIndicator row="1" color="#1172FE" [busy]="busy" marginTop="32" width="32" height="32"></ActivityIndicator>
+  <Label row="2" [color]="color" text="CREATE" fontSize="16" verticalAlignment="middle" textAlignment="center" 
+      paddingBottom="32" fontWeight="Bold" (tap)="onCreate()"></Label>
+</GridLayout>
+

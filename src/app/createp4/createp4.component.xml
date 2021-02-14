@@ -1,0 +1,19 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Permissions">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-4" (tap)="onBack()"></Image>
+    <Label col="1" text="Permissions" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="64,*,*,64" paddingLeft="16" paddingRight="16" background="#FFFFFF">
+  <StackLayout row="1">
+    <Label class="text" text="Because we're on a mission to empower your privacy rights, we've tried to make the permissions clearer and more specific than the vague descriptions normally used in apps." textWrap="true" fontSize="15" verticalAlignment="top"></Label>
+    <Label class="text" text="The following are the permissions we ask for with the Dikota app." textWrap="true" fontSize="15" verticalAlignment="top" paddingTop="8"></Label>
+  </StackLayout>
+  <Label row="3" class="link" text="NEXT" fontWeight="Bold" verticalAlignment="top" horizontalAlignment="center" (tap)="onNext()"></Label>
+</GridLayout>
+

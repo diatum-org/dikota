@@ -1,0 +1,6 @@
+export class Environment {
+  public static REGISTRY="https://registry.diatum.net:8443/app";
+  public static EMIGO="https://dikota.diatum.net:8443/app";
+  public static DB="";
+  public static ENV="";
+}

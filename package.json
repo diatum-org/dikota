@@ -1,0 +1,52 @@
+{
+  "nativescript": {
+    "id": "org.diatum.dikota",
+    "tns-android": {
+      "version": "6.2.0"
+    },
+    "tns-ios": {
+      "version": "6.2.0"
+    }
+  },
+  "description": "NativeScript Application",
+  "license": "SEE LICENSE IN <your-license-filename>",
+  "repository": "<fill-your-repository-here>",
+  "dependencies": {
+    "@angular/animations": "~8.2.0",
+    "@angular/common": "~8.2.0",
+    "@angular/compiler": "~8.2.0",
+    "@angular/core": "~8.2.0",
+    "@angular/forms": "~8.2.0",
+    "@angular/http": "~8.0.0-beta.10",
+    "@angular/platform-browser": "~8.2.0",
+    "@angular/platform-browser-dynamic": "~8.2.0",
+    "@angular/router": "~8.2.0",
+    "base-64": "^0.1.0",
+    "google-libphonenumber": "^3.2.10",
+    "nativescript-angular": "^8.20.3",
+    "nativescript-bitmap-factory": "^1.8.1",
+    "nativescript-camera": "^4.5.0",
+    "nativescript-clipboard": "^1.2.0",
+    "nativescript-geolocation": "^5.1.0",
+    "nativescript-imagepicker": "^7.0.0",
+    "nativescript-menu": "^1.1.3",
+    "nativescript-ngx-shadow": "^6.5.0",
+    "nativescript-sha": "^1.0.3",
+    "nativescript-sqlite": "^2.6.3",
+    "nativescript-theme-core": "~1.0.6",
+    "nativescript-toolbox": "^3.0.1",
+    "reflect-metadata": "~0.1.12",
+    "rxjs": "^6.4.0",
+    "tns-core-modules": "^6.2.1",
+    "utf8": "^3.0.0",
+    "zone.js": "^0.9.1"
+  },
+  "devDependencies": {
+    "@angular/compiler-cli": "~8.2.0",
+    "@ngtools/webpack": "~8.2.0",
+    "nativescript-dev-webpack": "^1.3.0",
+    "typescript": "~3.5.3"
+  },
+  "gitHead": "f28dbc60d74dd2cef4b645afd8fdd63bbb12c73e",
+  "readme": "NativeScript Application"
+}

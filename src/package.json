@@ -1,0 +1,8 @@
+{
+  "main": "main.js",
+  "discardUncaughtJsExceptions": true,
+  "android": {
+    "v8Flags": "--expose_gc",
+    "markingMode": "none"
+  }
+}

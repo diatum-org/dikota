@@ -1,0 +1,16 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Saved Profiles">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" text="Saved Profiles" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout background="#FFFFFF">
+  <ScrollView>
+    <StackLayout #res paddingTop="16"></StackLayout>
+  </ScrollView>
+</GridLayout>

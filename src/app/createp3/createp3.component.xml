@@ -1,0 +1,51 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Password">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-4" (tap)="onBack()"></Image>
+    <Label col="1" text="Password" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout background="#FFFFFF" [rows]="getScreenGrid()">
+  <GridLayout rows="*,auto,*,auto,*,auto,*" paddingLeft="32" paddingRight="32">
+
+    <GridLayout row="1" rows="32,32,32,32">
+      
+      <Label *ngIf="pass1!=null&&pass1!=''" row="0" color="#909097" text="Password" fontSize="16" verticalAlignment="bottom"></Label>
+      <TextField row="1" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Password" fontSize="16" verticalAlignment="top" 
+          textWrap="true" [secure]="!show1" [text]="pass1" (textChange)="onSetPassword($event.value)" borderBottomWidth="1" borderColor="#DDDDDD" 
+          (focus)="onFocus()" (blur)="onBlur()" paddingTop="4"></TextField>
+      <Image *ngIf="!show1" row="1" src="~/assets/view.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="top"
+          (tap)="show1=true"></Image>
+      <Image *ngIf="show1" row="1" src="~/assets/look.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="top"
+          (tap)="show1=false"></Image>
+
+      <Label *ngIf="pass2!=null&&pass2!=''" row="2" color="#909097" text="Password Again" fontSize="16" verticalAlignment="bottom"></Label>
+      <TextField row="3" color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Password Again" fontSize="16" verticalAlignment="top" 
+          textWrap="true" [secure]="!show2" [text]="pass2" (textChange)="onSetPasswordAgain($event.value)" borderBottomWidth="1" borderColor="#DDDDDD" 
+          (focus)="onFocus()" (blur)="onBlur()" paddingTop="4"></TextField>
+      <Image *ngIf="!show2" row="4" src="~/assets/view.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="top"
+          (tap)="show2=true"></Image>
+      <Image *ngIf="show2" row="4" src="~/assets/look.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="top"
+          (tap)="show2=false"></Image>
+    
+    </GridLayout>
+    
+    <Label row="3" [color]="nextColor" text="NEXT" fontWeight="Bold" fontSize="16" verticalAlignment="top" textAlignment="center" (tap)="onNext()"></Label>
+    
+    <StackLayout row="5" verticalAlignment="middle" horizontalAlignment="center">
+      <Label color="#888888" text="Must Contain:" fontSize="16" fontWeight="Bold" 
+          paddingBottom="8" textAlignment="center"></Label>
+      <Label [color]="lowerColor" text="- Lower case character (abc)" fontSize="14"></Label>
+      <Label [color]="upperColor" text="- Upper case character (ABC)" fontSize="14"></Label>
+      <Label [color]="numColor" text="- Numeric character (123)" fontSize="14"></Label>
+      <Label [color]="specialColor" text="- Special character (!@#$%)" fontSize="14"></Label>
+      <Label [color]="countColor" text="- At least 8 characters" fontSize="14"></Label>
+      <Label [color]="matchColor" text="- Matching passwords" fontSize="14"></Label>
+      <Label *ngIf="badChar" class="red" text="- No other characters" fontSize="14"></Label>
+    </StackLayout>
+  </GridLayout>
+</GridLayout>

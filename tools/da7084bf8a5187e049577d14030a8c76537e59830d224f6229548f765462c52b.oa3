@@ -1,0 +1,7 @@
+    EmailAddress:
+      type: object
+      properties:
+        email:
+          type: string
+        category:
+          type: string

@@ -1,0 +1,160 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text">
+  <ActionItem *ngIf="!notify" icon="res://ic_menu" ios.position="left" (tap)="onMainMenu()"></ActionItem>
+  <ActionItem *ngIf="notify" icon="res://ic_nenu" ios.position="left" (tap)="onMainMenu()"></ActionItem>
+  <GridLayout width="128">
+    <Image *ngIf="!searchSet&&search==null" src="~/assets/search.png" width="18" height="18" (tap)="onSearchSet()"></Image>
+    <Label *ngIf="!searchSet&&search!=null" [text]="search" fontSize="18" horizontalAlignment="center" verticalAlignment="center"
+        (tap)="onSearchClear()" paddingLeft="16" paddingRight="16"></Label>
+    <TextField *ngIf="searchSet" autocorrect="false" fontSize="16" autocapitalizationType="none" 
+        [text]="filter" (textChange)="onSearchUpdate($event.value)" textAlignment="center"
+        (returnPress)="searchSet=false" (blur)="searchSet=false" (loaded)="$event.object.focus()"></TextField>
+  </GridLayout>
+  <ActionItem icon="res://ic_label" ios.position="right" width="48" height="48" (tap)="onLabelMenu()"></ActionItem>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED">
+  <GridLayout height="48" columns="48,*,48">
+    <Image *ngIf="!notify" col="0" width="48" height="48" src="~/assets/iburger.png" translateX="-16" (tap)="onMainMenu()"></Image>
+    <Image *ngIf="notify" col="0" width="48" height="48" src="~/assets/nburger.png" translateX="-16" (tap)="onMainMenu()"></Image>
+    <Image *ngIf="!searchSet&&search==null" col="1" width="36" height="36" translateX="-4" src="~/assets/isearch.png" (tap)="onSearchSet()"></Image>
+    <Label *ngIf="!searchSet&&search!=null" col="1" [text]="search" fontSize="18" horizontalAlignment="center" verticalAlignment="center"
+        (tap)="onSearchClear()" paddingLeft="16" paddingRight="16"></Label>
+    <TextField *ngIf="searchSet" col="1" autocorrect="false" fontSize="16" autocapitalizationType="none" 
+        [text]="search" (textChange)="onSearchUpdate($event.value)" marginLeft="32" marginRight="32" textAlignment="center"
+        (returnPress)="searchSet=false" (blur)="searchSet=false" (loaded)="$event.object.focus()"></TextField>
+    <Image col="2" width="48" height="48" src="~/assets/ilabel.png" (tap)="onLabelMenu()"></Image>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout columns="60,*,44,16" rows="*,32" background="#FFFFFF">
+
+  <ScrollView #scr col="0" colSpan="3" row="0" rowSpan="2" scrollBarIndicatorVisible="false" (scroll)="onScroll($event.scrollY)">
+    <StackLayout paddingTop="16" paddingRight="24">
+      <Label *ngIf="count==0" class="text" text="You're all set!" paddingLeft="16" paddingTop="32" paddingBottom="32" fontSize="18" fontWeight="Bold"></Label>
+      <Label *ngIf="count==0" class="link" text="1. Take a tour" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onTour()"></Label>
+      <Label *ngIf="count==0" class="text" text="Learn more about using Dikota" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="count==0" class="link" text="2. Finish completing your profile" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onProfile()"></Label>
+      <Label *ngIf="count==0" class="text" text="Add your name, a photo and contact details, and add your profile to the User Directory so people can find you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="count==0" class="link" text="3. Create Labels" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onCreateEdit()"></Label>
+      <Label *ngIf="count==0" class="text" text="Labels determine what info your contacts can see about you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="count==0" class="link" text="4. Find and connect with friends" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onSearch()"></Label>
+      <Label *ngIf="count==0" class="text" text="Search the directory or nearby" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <StackLayout #res paddingBottom="32"></StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <GridLayout #bar col="3" row="0" rowSpan="2" rows="*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*" (touch)="onTouch($event)">
+    <Label #top text="A" row="0" [fontSize]="getScrollSize(0)" [fontWeight]="getScrollWeight(0)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label #nxt text="B" row="1" [fontSize]="getScrollSize(1)" [fontWeight]="getScrollWeight(1)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="C" row="2" [fontSize]="getScrollSize(2)" [fontWeight]="getScrollWeight(2)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="D" row="3" [fontSize]="getScrollSize(3)" [fontWeight]="getScrollWeight(3)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="E" row="4" [fontSize]="getScrollSize(4)" [fontWeight]="getScrollWeight(4)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="F" row="5" [fontSize]="getScrollSize(5)" [fontWeight]="getScrollWeight(5)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="G" row="6" [fontSize]="getScrollSize(6)" [fontWeight]="getScrollWeight(6)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="H" row="7" [fontSize]="getScrollSize(7)" [fontWeight]="getScrollWeight(7)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="I" row="8" [fontSize]="getScrollSize(8)" [fontWeight]="getScrollWeight(8)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="J" row="9" [fontSize]="getScrollSize(9)" [fontWeight]="getScrollWeight(9)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="K" row="10" [fontSize]="getScrollSize(10)" [fontWeight]="getScrollWeight(10)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="L" row="11" [fontSize]="getScrollSize(11)" [fontWeight]="getScrollWeight(11)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="M" row="12" [fontSize]="getScrollSize(12)" [fontWeight]="getScrollWeight(12)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="N" row="13" [fontSize]="getScrollSize(13)" [fontWeight]="getScrollWeight(13)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="O" row="14" [fontSize]="getScrollSize(14)" [fontWeight]="getScrollWeight(14)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="P" row="15" [fontSize]="getScrollSize(15)" [fontWeight]="getScrollWeight(15)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="Q" row="16" [fontSize]="getScrollSize(16)" [fontWeight]="getScrollWeight(16)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="R" row="17" [fontSize]="getScrollSize(17)" [fontWeight]="getScrollWeight(17)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="S" row="18" [fontSize]="getScrollSize(18)" [fontWeight]="getScrollWeight(18)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="T" row="19" [fontSize]="getScrollSize(19)" [fontWeight]="getScrollWeight(19)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="U" row="20" [fontSize]="getScrollSize(20)" [fontWeight]="getScrollWeight(20)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="V" row="21" [fontSize]="getScrollSize(21)" [fontWeight]="getScrollWeight(21)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="W" row="22" [fontSize]="getScrollSize(22)" [fontWeight]="getScrollWeight(22)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="X" row="23" [fontSize]="getScrollSize(23)" [fontWeight]="getScrollWeight(23)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="Y" row="24" [fontSize]="getScrollSize(24)" [fontWeight]="getScrollWeight(24)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+    <Label text="Z" row="25" [fontSize]="getScrollSize(25)" [fontWeight]="getScrollWeight(25)" verticalAlignment="center" horizontalAlignment="center" class="text"></Label>
+  </GridLayout>
+
+  <GridLayout *ngIf="leftMenuVisible||rightMenuVisible" col="0" colSpan="4" row="0" rowSpan="2" (tap)="onScreenTap()"></GridLayout>
+
+  <GridLayout #lmu translateX="-1000" col="0" colSpan="2" row="0" rowSpan="2">
+    <GridLayout shadow="16" backgroundColor="#FFFFFF" androidElevation="16" marginRight="16">
+      <ScrollView>
+        <StackLayout translateX="32" paddingTop="32" paddingBottom="32" (swipe)="onMainSwipe($event)">
+          <StackLayout orientation="horizontal" paddingBottom="16">
+            <GridLayout height="48" (tap)="onProfile()">
+              <Image width="48" height="48" horizontalAlignment="left" (loaded)="onImageLoaded($event)"></Image>
+              <Image src="~/assets/mask.png" width="48" heigt="48" horizontalAlignment="left"></Image>
+              <StackLayout horizontalAlignment="left" paddingTop="4" translateX="60" paddingRight="92">
+                <Label *ngIf="name==null" text="<your name>" class="text" fontStyle="italic"></Label>
+                <Label *ngIf="name!=null" [text]="name"  class="text" fontWeight="Bold"></Label>
+                <Label text="View Your Profile" class="link" fontSize="14" fontWeight="Bold"></Label>
+              </StackLayout>
+            </GridLayout>
+          </StackLayout>
+          <Label text="Search for New Contacts" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onSearch()"></Label>
+          <StackLayout orientation="horizontal">
+            <Label text="Connection Updates" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onPending()"></Label>
+            <Image *ngIf="notify" src="~/assets/circle.png" width="12" heigt="12" horizontalAlignment="left" verticalAlignment="middle"></Image>
+          </StackLayout>
+          <Label text="Saved Profiles" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onSaved()"></Label>
+          <Label text="Labels" class="text" fontSize="16" fontWeight="Bold" paddingTop="16" (tap)="onCreateEdit()"></Label>
+          <Label text="Settings & Privacy" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onSettings()"></Label>
+          <Label text="About" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onAbout()"></Label>
+          <Label text="Log Out" class="text" fontWeight="Bold" fontSize="16" paddingTop="16" (tap)="onLogout()"></Label>
+        </StackLayout>
+      </ScrollView>
+    </GridLayout>
+  </GridLayout>
+
+  <GridLayout #rmu translateX="1000" col="1" colSpan="3" row="0" rowSpan="2">
+    <GridLayout shadow="16" backgroundColor="#FFFFFF" androidElevation="16" marginLeft="16">
+      <ScrollView>
+        <StackLayout paddingLeft="16" paddingRight="16" paddingTop="16" paddingBottom="16" (swipe)="onLabelSwipe($event)">
+          <Label text="My Labels" class="text" fontWeight="Bold" fontSize="15" paddingBottom="8" 
+              borderColor="#DDDDDD" borderBottomWidth="1"></Label>
+          <StackLayout *ngFor="let l of labels" orientation="horizontal" paddingTop="8" paddingBottom="8" (tap)="onLabel(l.labelId)">
+            <Image *ngIf="!isLabeled(l.labelId)" src="~/assets/dlabel.png" width="18" height="18"></Image>
+            <Image *ngIf="isLabeled(l.labelId)" src="~/assets/rlabel.png" width="18" height="18"></Image>
+            <Label *ngIf="!isLabeled(l.labelId)" [text]="l.label.name" class="text" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+            <Label *ngIf="isLabeled(l.labelId)" [text]="l.label.name" class="red" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+          </StackLayout>
+          <StackLayout orientation="horizontal" paddingTop="8" paddingBottom="8" borderColor="#DDDDDD" borderTopWidth="1" (tap)="onLabel(null)">
+            <Image *ngIf="!isLabeled(null)||savedProfiles" src="~/assets/dlabel.png" width="18" height="18"></Image>
+            <Image *ngIf="isLabeled(null)&&!savedProfiles" src="~/assets/rlabel.png" width="18" height="18"></Image>
+            <Label *ngIf="!isLabeled(null)||savedProfiles" text="All Contacts" class="text" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+            <Label *ngIf="isLabeled(null)&&!savedProfiles" text="All Contacts" class="red" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+          </StackLayout>
+          <StackLayout orientation="horizontal" paddingTop="8" paddingBottom="8" (tap)="onLabel('')">
+            <Image *ngIf="!isLabeled('')" src="~/assets/dlabel.png" width="18" height="18"></Image>
+            <Image *ngIf="isLabeled('')" src="~/assets/rlabel.png" width="18" height="18"></Image>
+            <Label *ngIf="!isLabeled('')" text="No Label" class="text" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+            <Label *ngIf="isLabeled('')" text="No Label" class="red" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+          </StackLayout>
+        </StackLayout>
+      </ScrollView>
+    </GridLayout>
+  </GridLayout>
+
+  <GridLayout *ngIf="sync!=null" col="0" colSpan="3" row="0" rowSpan="2" background="#FFFFFF">
+    <Label class="text" fontSize="18" horizontalAlignment="center" verticalAlignment="center">
+      <Span text="Importing Contact: "></Span>
+      <Span [text]="sync"></Span>
+    </Label>
+  </GridLayout>
+
+  <GridLayout *ngIf="nodeAlert||registryAlert" col="0" colspan="3" columns="16,*" row="1" height="32"
+      paddingLeft="16" paddingRight="16">
+    <GridLayout col="1" columns="32,*" opacity="0.9" background="#FFFFFF" borderColor="#888888" 
+        borderTopWidth="1" borderLeftWidth="1" borderRightWidth="1" borderRadius="6">
+      <Image col="0" width="16" height="16" src="~/assets/alert.png"></Image>
+      <Label col="1" class="text" height="16" paddingLeft="8" fontSize="14" [text]="alertMsg"
+        verticalAlignment="middle"></Label>
+    </GridLayout>
+  </GridLayout>
+
+  <GridLayout *ngIf="syncProgress!=null" colSpan="4" rowSpan="2" backgroundColor="#FFFFFF">
+    <StackLayout verticalAlignment="center" padding="16" height="128">
+      <Label class="text" horizontalAlignment="center" fontSize="18" text="Importing" paddingBottom="8"></Label>
+      <Progress [value]="syncProgress" maxValue="100"></Progress>
+    </StackLayout>
+  </GridLayout>
+
+</GridLayout>
+

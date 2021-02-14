@@ -1,0 +1,45 @@
+<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Label Settings">
+  <NavigationButton></NavigationButton>
+</ActionBar>
+<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
+  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
+    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
+    <Label col="1" text="Label Settings" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
+        paddingLeft="8"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="48,48,*" background="#FFFFFF">
+  <Label row="0" class="text" [text]="name" fontWeight="Bold" fontSize="18" verticalAlignment="center" horizontalAlignment="center"></Label>
+  <Image row="0" src="~/assets/vmenu.png" height="40" horizontalAlignment="right" veriticalAlignment="middle" (tap)="onMenu($event)"></Image>
+  <Label row="1" class="text" text="Contacts can view your:" backgroundColor="#F8F8FA" color="#686868" fontWeight="Bold" fontSize="17"
+      verticalAlignment="center" paddingLeft="32" paddingRight="32" paddingTop="12" paddingBottom="12"></Label>
+  <ActivityIndicator row="1" color="#1172FE" [busy]="busy" width="32" height="32" marginRight="32"
+      verticalAlignment="center" horizontalAlignment="right"></ActivityIndicator>
+  <ScrollView row="2">
+    <StackLayout>
+      <GridLayout *ngFor="let a of attributes" rows="*,*" columns="*,64" height="56" paddingLeft="32" paddingRight="32">
+        <Label col="0" row="0" class="text" [text]="getAttributeType(a)" fontSize="16" fontWeight="Bold" verticalAlignment="bottom"></Label>
+        <Label col="0" row="1" class="text" [text]="getDetail(a)" fontSize="14" verticalAlignment="top"></Label>
+        <Image *ngIf="isSelected(a)" col="1" rowSpan="2" src="~/assets/checked.png" width="32" height="32" verticalAlignment="center"
+            horizontalAlignment="right" (tap)="clearSelected(a)"></Image>
+        <Image *ngIf="!isSelected(a)" col="1" rowSpan="2" src="~/assets/unchecked.png" width="32" height="32" verticalAlignment="center"
+            horizontalAlignment="right" (tap)="setSelected(a)"></Image>
+      </GridLayout>
+      <StackLayout fontSize="16" backgroundColor="#F8F8FA" paddingLeft="32" paddingRight="32" borderRadius="4"
+          paddingTop="8" paddingBottom="8" marginBottom="8">
+        <GridLayout>
+          <Label class="text" fontWeight="Bold" text="Public Info is Visible to All Contacts"></Label>
+          <Image horizontalAlignment="right" verticalAlignment="middle" width="32" height="32" src="~/assets/dcheck.png"></Image>
+        </GridLayout>
+        <Label class="text" paddingTop="4" text="Profile Image"></Label>
+        <Label class="text" paddingTop="4" text="Name"></Label>
+        <Label class="text" paddingTop="4" text="Username"></Label>
+        <Label class="text" paddingTop="4" text="Location"></Label>
+        <Label class="text" paddingTop="4" text="Description"></Label>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>
+
+
