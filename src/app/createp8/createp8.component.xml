@@ -9,8 +9,24 @@
   </GridLayout>
 </ActionBar>
 
-<GridLayout rows="*,auto" background="#FFFFFF">
-  <ScrollView>
+<GridLayout rows="auto,*" background="#FFFFFF">
+  <StackLayout row="0">
+
+    <GridLayout rows="auto" paddingBottom="16" paddingTop="32">
+      <Image src="~/assets/login.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
+      <TextField color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Username"
+          autocapitalizationType="none" fontSize="16" paddingLeft="32" (textChange)="onUpdateUsername($event.value)" returnKeyType="next"
+          borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+    </GridLayout>
+    <GridLayout rows="auto" paddingBottom="16">
+      <Image src="~/assets/password.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
+      <TextField  color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Access Code"
+          autocapitalizationType="none" fontSize="16" paddingLeft="32" (textChange)="onUpdateCode($event.value)" returnKeyType="next"
+          borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
+    </GridLayout>
+
+  </StackLayout>
+  <ScrollView row="1">
     <StackLayout orientation="vertical" paddingTop="32">
     
       <Label class="text" fontSize="16" paddingLeft="16" paddingRight="16"
@@ -37,8 +53,4 @@
 
     </StackLayout>
   </ScrollView>
-  <StackLayout row="1" borderColor="#888888" borderTopWidth="1">
-    <Label class="text-light" fontSize="12" textAlignment="center" text="For advanced users" paddingTop="4" paddingBottom="8"></Label>
-    <Label class="link" fontSize="16" text="Agree, but use existing identity" textAlignment="center" paddingBottom="16" (tap)="onAttach()"></Label>
-  </StackLayout>
 </GridLayout>

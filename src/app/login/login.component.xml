@@ -27,11 +27,9 @@
           [color]="loginColor" (tap)="onLogin()"></Label>
     </StackLayout>
 
-    <GridLayout row="5" rows="*,*">
-      <Label row="0" fontSize="16" textAlignment="center" verticalAlignment="bottom" color="#2C508F" (tap)="onReset()"
-          paddingBottom="32" text="Forgot Your Password?"></Label>
-      <Label row="1" fontSize="16" textAlignment="center" color="#2C508F" (tap)="onCreate()">
-        <Span text="Create a New Account" fontWeight="Bold"></Span>
+    <GridLayout row="5">
+      <Label fontSize="16" textAlignment="center" color="#2C508F" (tap)="onCreate()">
+        <Span text="Attach an Identity" fontWeight="Bold"></Span>
       </Label>
     </GridLayout>
 

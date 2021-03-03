@@ -12,11 +12,12 @@
 <GridLayout columns="60,*" rows="*,auto,auto" background="#FFFFFF">
   <ScrollView col="0" colSpan="2" row="0">
     <StackLayout #stk>
-      <GridLayout #img rows="24,24,192" columns="*,192,*" paddingTop="16" paddingLeft="16" paddingRight="8">
+      <GridLayout rows="24,24,192" columns="*,192,*" paddingTop="16" paddingLeft="16" paddingRight="8">
         <Label col="0" colSpan="3" row="0" class="text" text="View My Profile As Label" fontSize="16" horizontalAlignment="center"></Label>
         <Label col="0" colSpan="3" row="1" class="text" [text]="labelName" fontSize="16" horizontalAlignment="center" fontWeight="Bold"></Label>
         <Image col="2" row="0" rowSpan="2" src="~/assets/tlabel.png" horizontalAlignment="right" width="48" height="48" 
             (tap)="showLabelMenu()" verticalAlignment="top"></Image>
+        <Image col="1" row="2" (loaded)="onImageLoaded($event)"></Image>
       </GridLayout>
 
       <Label *ngIf="name!=null" [text]="name" class="text" fontSize="20" fontWeight="Bold" horizontalAlignment="center" paddingTop="8"></Label>
@@ -207,9 +208,9 @@
               borderColor="#DDDDDD" borderBottomWidth="1"></Label>
           <StackLayout *ngFor="let l of labels" orientation="horizontal" paddingTop="8" paddingBottom="8" (tap)="onLabel(l)">
             <Image *ngIf="!isSelected(l.labelId)" src="~/assets/dlabel.png" width="18" height="18"></Image>
-            <Label *ngIf="!isSelected(l.labelId)" [text]="l.label.name" class="text" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+            <Label *ngIf="!isSelected(l.labelId)" [text]="l.name" class="text" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
             <Image *ngIf="isSelected(l.labelId)" src="~/assets/rlabel.png" width="18" height="18"></Image>
-            <Label *ngIf="isSelected(l.labelId)" [text]="l.label.name" class="red" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
+            <Label *ngIf="isSelected(l.labelId)" [text]="l.name" class="red" fontWeight="Bold" fontSize="14" paddingLeft="16"></Label>
           </StackLayout>
           <StackLayout orientation="horizontal" paddingTop="8" paddingBottom="8" (tap)="onLabel(null)"
               borderColor="#DDDDDD" borderTopWidth="1">

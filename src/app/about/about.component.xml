@@ -24,7 +24,7 @@
           padding="16" (tap)="onNotice()"></Label>
     </StackLayout>
   </ScrollView>
-  <Label row="1" text="App Version: {{ version }}" class="text" fontSize="12" horizontalAlignment="left" 
+  <Label row="1" text="Version: {{ version }}" class="text" fontSize="12" horizontalAlignment="left" 
       paddingLeft="16" paddingBottom="16"></Label>
 </GridLayout>
 

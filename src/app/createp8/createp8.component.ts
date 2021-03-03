@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { Subscription } from 'rxjs';
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import { device, screen, platformNames } from 'tns-core-modules/platform';
+import { isIOS, device, screen, platformNames } from 'tns-core-modules/platform';
 import * as utils from "tns-core-modules/utils/utils";
 
 import { AppSettings } from "../app.settings";
 
+import { EmigoUtil } from "../emigoUtil";
 import { AttributeUtil } from "../attributeUtil";
 import { getEmigoObject } from "../appdb/emigo.util";
 import { IdentityService } from "../appdb/identity.service";
@@ -15,7 +16,7 @@ import { EmigoService } from "../appdb/emigo.service";
 
 import { CreateService } from "../service/create.service";
 import { DikotaService } from "../service/dikota.service";
-import { MonitorService } from "../service/monitor.service";
+import { EntryService } from '../service/entry.service';
 
 import { Emigo } from "../appdb/emigo";
 
@@ -34,42 +35,54 @@ export class CreateP8Component implements OnInit, OnDestroy {
   public agreeColor: string = "#888888";
   public busy: boolean = false;
   private sub: Subscription[];
+  private username: string;
+  private code: string;
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
       private createService: CreateService,
-      private monitorService: MonitorService,
       private emigoService: EmigoService,
       private identityService: IdentityService,
       private registryService: RegistryService,
+      private entryService: EntryService,
       private dikotaService: DikotaService) { 
     this.sub = [];
-    this.iOS = (device.os == "iOS");
+    this.iOS = isIOS;
   }
 
   ngOnInit(): void {
-    this.interval = setInterval(() => {
-      this.checkAvailability();
-    }, 15000);
-    this.checkAvailability();
   }
 
   ngOnDestroy(): void {
-    if(this.interval != null) {
-      clearInterval(this.interval);
-    }
   }
 
   onBack() {
     this.router.back();
   }
 
-  onCancel() {
-    this.router.navigate(["/login"], { clearHistory: true });
+  onUpdateUsername(value: string) {
+    this.username = value;
+    this.updateButton();
   }
 
-  onAttach() {
-    this.router.navigate(["/createp9"], { clearHistory: false });
+  onUpdateCode(value: string) {
+    this.code = value;
+    this.updateButton();
+  }
+
+  public updateButton() {
+    if(this.username != null && this.username != "" && this.code != null && this.code != "") {
+      this.agreeFlag = true;
+      this.agreeColor = "#2C508F"
+    }
+    else {
+      this.agreeFlag = false;
+      this.agreeColor = "#888888"
+    }
+  }
+
+  onCancel() {
+    this.router.navigate(["/login"], { clearHistory: true });
   }
 
   onData() {
@@ -80,73 +93,62 @@ export class CreateP8Component implements OnInit, OnDestroy {
     utils.openUrl("https://diatum.org/terms-of-service");
   }
 
-  private checkAvailability() {
-    this.dikotaService.getAvailable().then(n => {
-      if(n > 0) {
-        this.agreeFlag = true;
-        this.agreeColor = "#2C508F";
-      }
-      else {
-        this.agreeFlag = false;
-        this.agreeColor = "#888888";
-      }
-    }).catch(err => {
-      console.log("DikotaService.getAvailable failed");
-    });
-  }
-
   onAgree() {
 
-    // only can proceed if slots available
+    // only can proceed when username and code set
     if(!this.agreeFlag) {
       return;
     }
-
     this.busy = true;
-    let phone: string = this.createService.getPhoneNumber();
-    let e164: string = this.dikotaService.getE164(phone);
-    let email: string = this.createService.getEmailAddress();
+
+    // construct registry url
+    let registry: string;
+    let address: string[] = this.username.split("@");
+    if(address.length > 1) {
+      registry = "https://registry." + address[1] + "/app";
+    }
+    else {
+      registry = AppSettings.REGISTRY;
+    }
+
     // client side hash to mitigate compromised reused pass
     var SHA256 = require('nativescript-toolbox/crypto-js/sha256');
     let pass = SHA256("dikota:" + this.createService.getPassword());
-    this.dikotaService.createAccount(e164, email, pass).then(l => {
-      this.identityService.setRegistry(l.account.node, l.account.token, AppSettings.REGISTRY).then(m => {
-        let emigo: Emigo = getEmigoObject(m);
-        this.registryService.setMessage(emigo.registry, m).then(() => {
-          this.busy = false;
-        
-          let context: AppContext = { emigoId: emigo.emigoId, registry: emigo.registry, token: l.account.token,
-              appNode: l.service.node, appToken: l.service.token, serviceToken: l.token };
-         
-          this.dikotaService.setToken(l.token); 
-          this.emigoService.setEmigo(context.emigoId, context.registry, context.token, AttributeUtil.getSchemas(), 
-              context.appNode, context.appToken).then(p => {
-            this.emigoService.setAppContext(context).then(() => {
-              this.monitorService.start();
-              this.router.navigate(["/home"], { clearHistory: true });
-            }).catch(err => {
-              console.log("EmigoService.setAppContext failed");
-              dialogs.alert({ message: "internal error [EmigoService.setAppContext]", okButtonText: "ok" });
-            });
-          }).catch(err => {
-            console.log("EmigoService.setEmigo failed");
-            dialogs.alert({ message: "internal error [EmigoService.setEmigo]", okButtonText: "ok" });
-          });
 
+    // attach to specified account
+    this.registryService.getIdentity(registry, address[0]).then(m => {
+      let e: Emigo = getEmigoObject(m);
+
+      this.dikotaService.attachAccount(pass, e.emigoId, e.node, this.code).then(l => {
+
+        let context: AppContext = { emigoId: l.account.emigoId, registry: registry, token: l.account.token,
+            appNode: l.service.node, appToken: l.service.token, serviceToken: l.token };
+
+        this.dikotaService.setToken(l.token);
+        this.emigoService.setEmigo(context.emigoId, context.registry, context.token, context.appNode, context.appToken,
+            AttributeUtil.getSchemas(), [], null, EmigoUtil.getSearchableEmigo, s => {}).then(p => {
+          this.entryService.init();
+          this.emigoService.setAppContext(context).then(() => {
+            this.router.navigate(["/home"], { clearHistory: true });
+          }).catch(err => {
+            console.log("EmigoService.setAppContext failed");
+            dialogs.alert({ message: "internal error [EmigoService.setAppContext]", okButtonText: "ok" });
+          });
         }).catch(err => {
-          this.busy = false;
-          console.log("RegistryService.setMessage failed");
-          dialogs.alert({ message: "failed to update registry", okButtonText: "ok" });
+          console.log("EmigoService.setEmigo failed");
+          dialogs.alert({ message: "internal error [EmigoService.setEmigo]", okButtonText: "ok" });
         });
+
       }).catch(err => {
         this.busy = false;
-        console.log("IdentityService.setRegistry failed");
-        dialogs.alert({ message: "failed to set account registry", okButtonText: "ok" });
+        console.log("DikotaService.attachAccount failed");
+        dialogs.alert({ message: "failed to create account", okButtonText: "ok" });
       });
     }).catch(err => {
       this.busy = false;
-      console.log("DikotaService.createAccount failed");
-      dialogs.alert({ message: "failed to create account", okButtonText: "ok" });
+      console.log("RegistryService.getIdentity failed");
+      dialogs.alert({ message: "failed to locate account", okButtonText: "ok" });
     });
+
   }
 }

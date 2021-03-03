@@ -1,16 +1,14 @@
 <ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" [title]="name">
-   <NavigationButton *ngIf="!this.applySave"></NavigationButton>
-   <NavigationButton *ngIf="this.applySave" text="Back" visibility="collapsed"></NavigationButton>
-   <ActionItem *ngIf="this.applySave" ios.systemIcon="1" ios.position="left" width="48" height="48" (tap)="onBack()"></ActionItem>
-   <ActionItem *ngIf="applyText=='DELETE'" ios.systemIcon="16" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
-   <ActionItem *ngIf="applyText=='SAVE'" ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
+   <NavigationButton text="Back" visibility="collapsed"></NavigationButton>
+   <ActionItem ios.systemIcon="1" ios.position="left" width="48" height="48" (tap)="onBack()"></ActionItem>
+   <ActionItem ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
 </ActionBar>
 <ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
   <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
     <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
     <Label col="1" [text]="name" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
         paddingLeft="8"></Label>
-    <Label col="2" [text]="applyText" fontWeight="Bold" fontSize="12" horizontalAlignment="right" verticalAlignment="center"
+    <Label col="2" text="SAVE" fontWeight="Bold" fontSize="12" horizontalAlignment="right" verticalAlignment="center"
         translateX="-16" (tap)="onApply()"></Label>
   </GridLayout>
 </ActionBar>
@@ -256,7 +254,7 @@
           <Label text="Labels:" fontWeight="Bold" class="text" fontSize="16"></Label>
         </GridLayout>
         <GridLayout *ngFor="let l of labels" height="32" borderBottomWidth="1" borderColor="#EEEEEE" (tap)="toggleSelected(l.labelId)">
-          <Label class="text" [text]="l.label.name" fontSize="16" verticalAlignment="center" horizontalAlgignment="left"></Label>
+          <Label class="text" [text]="l.name" fontSize="16" verticalAlignment="center" horizontalAlgignment="left"></Label>
           <Image *ngIf="isSelected(l.labelId)" src="~/assets/checked.png" width="32" height="32" verticalAlignment="center"
               horizontalAlignment="right"></Image>
           <Image *ngIf="!isSelected(l.labelId)" src="~/assets/unchecked.png" width="32" height="32" verticalAlignment="center"

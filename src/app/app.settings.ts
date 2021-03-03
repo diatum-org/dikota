@@ -1,7 +1,7 @@
 import { Environment } from './environment'
 
 export class AppSettings {
-  public static VER="0.1.1.75";
+  public static VER="0.1.2.81";
   
   public static REGISTRY=Environment.REGISTRY;
   public static EMIGO=Environment.EMIGO;

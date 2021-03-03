@@ -55,7 +55,7 @@
 
   <ScrollView row="1">
     <StackLayout>
-      <StackLayout *ngIf="noLocation && nearby" padding="8">
+      <StackLayout *ngIf="noLocation && nearby && isEmpty()" padding="8">
         <Label class="text" fontWeight="Bold" horizontalAlignment="center" text="We didn't find any results"></Label>
         <Label class="text" padding="8" fontSize="14" horizontalAlignment="center" textWrap="true"
             text="Please make sure everyone's Location feature is turned on and try again."></Label>

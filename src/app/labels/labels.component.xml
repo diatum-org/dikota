@@ -17,7 +17,7 @@
       <StackLayout *ngFor="let l of labels" orientation="horizontal" paddingTop="12" paddingBottom="12" paddingLeft="16" paddingRight="16"
             (tap)="onLabel(l)">
         <Image src="~/assets/glabel.png" width="18" height="18"></Image>
-        <Label [text]="l.label.name" class="text" fontWeight="Bold" fontSize="16" paddingLeft="16"></Label>
+        <Label [text]="l.name" class="text" fontWeight="Bold" fontSize="16" paddingLeft="16"></Label>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingTop="12" paddingBottom="12" paddingLeft="16" paddingRight="16" 
             borderColor="#DDDDDD" borderTopWidth="1" (tap)="onCreate()">

@@ -6,6 +6,7 @@ import { HttpUrlEncodingCodec } from '@angular/common/http';
 import { ShareMessage } from './shareMessage';
 import { ShareStatus } from './shareStatus';
 import { ShareEntry } from './shareEntry';
+import { ShareView } from './shareView';
 
 @Injectable()
 export class ShareService {
@@ -16,8 +17,13 @@ export class ShareService {
     this.headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
   }
 
+  public getConnectionViews(url: string, token: string): Promise<ShareView[]> {
+    return this.httpClient.get<ShareView[]>(url + "/share/connections/view?token=" + token, 
+        { headers: this.headers, observe: 'body' }).toPromise();
+  }
+
   public getConnections(url: string, token: string): Promise<ShareEntry[]> {
-    return this.httpClient.get<ShareEntry[]>(url + "/share/connections?token=" + token + "&contacts=true", 
+    return this.httpClient.get<ShareEntry[]>(url + "/share/connections?token=" + token, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -50,6 +56,11 @@ export class ShareService {
     return this.httpClient.post<ShareEntry>(url + "/share/connections?token=" + token + "&emigoId=" + emigoId, 
         { headers: this.headers, observe: 'body' }).toPromise();
   } 
+
+  public getConnection(url: string, token: string, shareId: string): Promise<ShareEntry> {
+    return this.httpClient.get<ShareEntry>(url + "/share/connections/" + shareId + "?token=" + token,
+        { headers: this.headers, observe: 'body' }).toPromise();
+  }
 
   public removeConnection(url: string, token: string, shareId: string): Promise<void> {
     return this.httpClient.delete<void>(url + "/share/connections/" + shareId + "?token=" + token,

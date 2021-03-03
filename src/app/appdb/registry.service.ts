@@ -44,16 +44,32 @@ export class RegistryService {
     });
   }
 
-  public checkHandle(url: string, handle: string, emigoId: string): Promise<boolean> {
+  public checkHandle(url: string, handle: string, emigoId: string = null): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this.httpClient.get<Result>(url + "/emigo/status?handle=" + encodeURI(handle) + "&emigoId=" + emigoId,
-          { headers: this.headers, observe: 'body', responseType: 'json' }).toPromise().then(r => {
-        resolve(r.boolValue);
-      }).catch(err => {
-        console.log("RegistryService.checkHandle failed");
-        reject();
-      });
+
+      if(emigoId != null) {
+        this.httpClient.get<Result>(url + "/emigo/status?handle=" + encodeURI(handle) + "&emigoId=" + emigoId,
+            { headers: this.headers, observe: 'body', responseType: 'json' }).toPromise().then(r => {
+          resolve(r.boolValue);
+        }).catch(err => {
+          console.log("RegistryService.checkHandle failed");
+          reject();
+        });
+      }
+      else {
+        this.httpClient.get<Result>(url + "/emigo/status?handle=" + encodeURI(handle),
+            { headers: this.headers, observe: 'body', responseType: 'json' }).toPromise().then(r => {
+          resolve(r.boolValue);
+        }).catch(err => {
+          console.log("RegistryService.checkHandle failed");
+          reject();
+        });
+      }
     });
+  }
+
+  public getLogoUrl(url: string, emigoId: string, revision: number): string {
+    return url + "/emigo/messages/logo?emigoId=" + emigoId + "&revision=" + revision;
   }
 
   public getMessage(url: string, emigoId: string): Promise<EmigoMessage> {

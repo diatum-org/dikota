@@ -4,11 +4,12 @@ import { Subscription } from 'rxjs';
 import { Page } from "tns-core-modules/ui/page";
 
 import { AttributeUtil } from '../attributeUtil';
-import { MonitorService } from '../service/monitor.service';
 import { DikotaService } from '../service/dikota.service';
+import { EntryService } from '../service/entry.service';
 import { EmigoService } from '../appdb/emigo.service';
 import { AppSettings } from '../app.settings';
 import { AppContext } from '../model/appContext';
+import { EmigoUtil } from '../emigoUtil';
 
 @Component({
     selector: "root",
@@ -22,7 +23,7 @@ export class RootComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private dikotaService: DikotaService,
-      private monitorService: MonitorService,
+      private entryService: EntryService,
       private emigoService: EmigoService,
       private page: Page) {
     this.page.actionBarHidden = true;
@@ -32,19 +33,18 @@ export class RootComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.emigoService.init(AppSettings.DB + "dikota_v005").then(c => {
+    this.emigoService.init(AppSettings.DB + "dikota_v048").then(c => {
       if(c == null) {
-        // navigate to login screen
         this.router.navigate(["/login"], { clearHistory: true });
       }
       else {
         this.dikotaService.setToken(c.serviceToken);
-
-        this.emigoService.setEmigo(c.emigoId, c.registry, c.token, AttributeUtil.getSchemas(), c.appNode, c.appToken).then(p => {
+        this.emigoService.setEmigo(c.emigoId, c.registry, c.token, c.appNode, c.appToken,
+            AttributeUtil.getSchemas(), [], null, EmigoUtil.getSearchableEmigo, s => {}).then(p => {
           console.log("permissions: ", p);
+          this.entryService.init();
 
           // navigate to home screen
-          this.monitorService.start();
           this.router.navigate(["/home"], { clearHistory: true });
         }).catch(err => {
           console.log("EmigoService.setEmigo failed");

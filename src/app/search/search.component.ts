@@ -18,7 +18,6 @@ import { NgZone } from '@angular/core';
 import { Contact } from '../model/contact';
 import { GpsLocation } from '../model/gpsLocation';
 import { SearchArea } from '../model/searchArea';
-import { ContextService } from '../service/context.service';
 import { DikotaService } from '../service/dikota.service';
 import { EmigoService } from '../appdb/emigo.service';
 import { ScaleService } from '../service/scale.service';
@@ -51,8 +50,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       private zone: NgZone,
       private scaleService: ScaleService,
       private dikotaService: DikotaService,
-      private emigoService: EmigoService,
-      private contextService: ContextService) {
+      private emigoService: EmigoService) {
     this.scaleMap = new Map<string, Image>();
     this.ids = new Set<string>();
     this.iOS = (device.os == "iOS");
@@ -103,14 +101,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.stopId = null;
     }
     if(flag) {
+      this.noLocation = false;
       geolocation.enableLocationRequest(true).then(() => {
         geolocation.isEnabled().then(flag => {
           // location watch enabled
           this.location = true;
 
           // start watching location
-          this.noLocation = true;
-          this.noDirectory = true;
           this.watchId = geolocation.watchLocation(loc => {
             if(loc) {
               let gps: GpsLocation = { longitude: loc.longitude, latitude: loc.latitude, altitude: loc.altitude };
@@ -180,6 +177,10 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.ids.add(c[i].emigoId);
       }
     }
+  }
+
+  public isEmpty(): boolean {
+    return this.ids.size == 0;
   }
 
   public onBack() {
@@ -253,16 +254,14 @@ export class SearchComponent implements OnInit, OnDestroy {
     let g: GridLayout = new GridLayout();
     g.on(Button.tapEvent, () => {
       
-      // retrieve contact for rendering
-      this.emigoService.selectEmigoContact(e.emigoId);
+      this.zone.run(async () => { 
 
-      // set whether contact can be stored
-      this.contextService.setEmigo({ id: e.emigoId, handle: e.handle, registry: e.registry,
-        pending: false, available: e.available });
-
-      this.zone.run(() => { 
-        this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-          transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
+        // select contact for profile
+        await this.emigoService.setContact(e.emigoId);
+  
+        this.router.navigate(["/contactprofile", e.emigoId, e.registry, e.available, false],
+          { clearHistory: false, animated: true, transition: 
+          { name: "slideLeft", duration: 300, curve: "easeIn" }});
       });
     });
     g.height = 64;

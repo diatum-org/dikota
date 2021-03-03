@@ -18,7 +18,7 @@
       verticalAlignment="center" horizontalAlignment="right"></ActivityIndicator>
   <ScrollView row="2">
     <StackLayout>
-      <GridLayout *ngFor="let a of attributes" rows="*,*" columns="*,64" height="56" paddingLeft="32" paddingRight="32">
+      <GridLayout *ngFor="let a of attributeData" rows="*,*" columns="*,64" height="56" paddingLeft="32" paddingRight="32">
         <Label col="0" row="0" class="text" [text]="getAttributeType(a)" fontSize="16" fontWeight="Bold" verticalAlignment="bottom"></Label>
         <Label col="0" row="1" class="text" [text]="getDetail(a)" fontSize="14" verticalAlignment="top"></Label>
         <Image *ngIf="isSelected(a)" col="1" rowSpan="2" src="~/assets/checked.png" width="32" height="32" verticalAlignment="center"

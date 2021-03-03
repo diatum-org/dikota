@@ -4,12 +4,9 @@ import { HttpClient, HttpHeaders, HttpParams, HttpResponse, HttpEvent } from '@a
 import { HttpUrlEncodingCodec } from '@angular/common/http';
 
 import { Attribute } from './attribute';
-import { AttributeData } from './attributeData';
 import { AttributeEntry } from './attributeEntry';
-import { AttributeEntryView } from './attributeEntryView';
-import { AttributeEntryData } from './attributeEntryData';
 import { LabelEntry } from './labelEntry';
-import { Label } from './label';
+import { AttributeView } from './attributeView';
 
 @Injectable()
 export class ProfileService {
@@ -25,33 +22,48 @@ export class ProfileService {
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public getAttributes(url: string, token: string, filter: string[]): Promise<AttributeEntryView[]> {
-    return this.httpClient.post<AttributeEntryView[]>(url + "/profile/attributes/ids?token=" + token,
+  public getAttribute(url: string, token: string, attributeId: string): Promise<AttributeEntry> {
+    return this.httpClient.get<AttributeEntry>(url + "/profile/attributes/" + attributeId + "?token=" + token,
+        { headers: this.headers, observe: 'body' }).toPromise();
+  }
+
+  public getAttributes(url: string, token: string, filter: string[]): Promise<AttributeEntry[]> {
+    return this.httpClient.post<AttributeEntry[]>(url + "/profile/attributes/filter?token=" + token,
         filter, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public addAttribute(url: string, token: string, a: AttributeData): Promise<AttributeEntry> {
-    return this.httpClient.post<AttributeEntry>(url + "/profile/attributes?token=" + token,
-        a, { headers: this.headers, observe: 'body' }).toPromise();
+  public getAttributeViews(url: string, token: string, filter: string[]): Promise<AttributeView[]> {
+    return this.httpClient.post<AttributeView[]>(url + "/profile/attributes/view?token=" + token,
+        filter, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public updateAttribute(url: string, token: string, id: string, a: Attribute): Promise<void> {
-    return this.httpClient.put<void>(url + "/profile/attributes/" + id + "?token=" + token,
-        a, { headers: this.headers, observe: 'body' }).toPromise();
+  public addAttribute(url: string, token: string, schema: string, data: string): Promise<AttributeEntry> {
+    return this.httpClient.post<AttributeEntry>(url + "/profile/attributes?token=" + token + "&schema=" + schema,
+        data, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public removeAttribute(url: string, token: string, id: string): Promise<void> {
-    return this.httpClient.delete<void>(url + "/profile/attributes/" + id + "?token=" + token,
+  public updateAttribute(url: string, token: string, attributeId: string, schema: string, data: string): Promise<AttributeEntry> {
+    return this.httpClient.put<AttributeEntry>(url + "/profile/attributes/" + attributeId + "?token=" + token + "&schema=" + schema,
+        data, { headers: this.headers, observe: 'body' }).toPromise();
+  }
+
+  public removeAttribute(url: string, token: string, attributeId: string): Promise<void> {
+    return this.httpClient.delete<void>(url + "/profile/attributes/" + attributeId + "?token=" + token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public setAttributeLabel(url: string, token: string, attributeId: string, labelId: string): Promise<void> {
-    return this.httpClient.post<void>(url + "/profile/labels/" + labelId + "/attributes/" + attributeId + "?token=" + token,
+  public setAttributeLabels(url: string, token: string, attributeId: string, labelIds: string[]): Promise<AttributeEntry> {
+    return this.httpClient.put<AttributeEntry>(url + "/profile/attributes/" + attributeId + "/labels" + "?token=" + token,
+        labelIds, { headers: this.headers, observe: 'body' }).toPromise();
+  }
+
+  public setAttributeLabel(url: string, token: string, attributeId: string, labelId: string): Promise<AttributeEntry> {
+    return this.httpClient.post<AttributeEntry>(url + "/profile/attributes/" + attributeId + "/labels/" + labelId + "?token=" + token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public clearAttributeLabel(url: string, token: string, attributeId: string, labelId: string): Promise<void> {
-    return this.httpClient.delete<void>(url + "/profile/labels/" + labelId + "/attributes/" + attributeId + "?token=" + token,
+  public clearAttributeLabel(url: string, token: string, attributeId: string, labelId: string): Promise<AttributeEntry> {
+    return this.httpClient.delete<AttributeEntry>(url + "/profile/attributes/" + attributeId + "/labels/" + labelId + "?token=" + token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 

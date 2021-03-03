@@ -19,7 +19,6 @@ import { CreateP5Component } from './createp5/createp5.component';
 import { CreateP6Component } from './createp6/createp6.component';
 import { CreateP7Component } from './createp7/createp7.component';
 import { CreateP8Component } from './createp8/createp8.component';
-import { CreateP9Component } from './createp9/createp9.component';
 import { HomeComponent } from './home/home.component';
 import { BoardingP0Component } from './boardingp0/boardingp0.component';
 import { BoardingP1Component } from './boardingp1/boardingp1.component';
@@ -27,30 +26,29 @@ import { BoardingP2Component } from './boardingp2/boardingp2.component';
 import { BoardingP3Component } from './boardingp3/boardingp3.component';
 import { BoardingP4Component } from './boardingp4/boardingp4.component';
 import { ProfileComponent } from './profile/profile.component';
-import { ProfileEditComponent } from './profileedit/profileedit.component';
 import { ProfileImageComponent } from './profileimage/profileimage.component';
+import { ProfileEditComponent } from './profileedit/profileedit.component';
 import { ProfileAttributeComponent } from './profileattribute/profileattribute.component';
-import { LabelViewComponent } from './labelview/labelview.component';
+import { AttributeAddComponent } from './attributeadd/attributeadd.component';
+import { AttributeEditComponent } from './attributeedit/attributeedit.component';
 import { LabelsComponent } from './labels/labels.component';
 import { LabelCreateComponent } from './labelcreate/labelcreate.component';
 import { LabelProfileComponent } from './labelprofile/labelprofile.component';
-import { AttributeAddComponent } from './attributeadd/attributeadd.component';
-import { AttributeEditComponent } from './attributeedit/attributeedit.component';
-import { SearchComponent } from './search/search.component';
 import { AboutComponent } from './about/about.component';
 import { SettingsComponent } from './settings/settings.component';
-import { PrivacyControlsComponent } from './privacycontrols/privacycontrols.component';
-import { PasswordUpdateComponent } from './passwordupdate/passwordupdate.component';
-import { ContactProfileComponent } from './contactprofile/contactprofile.component';
-import { PendingComponent } from './pending/pending.component';
-import { SavedComponent } from './saved/saved.component';
-import { ContactMethodComponent } from './contactmethod/contactmethod.component';
-import { PasswordResetComponent } from './passwordreset/passwordreset.component';
+import { LabelViewComponent } from './labelview/labelview.component';
 import { OpenSourceNoticeComponent } from './opensourcenotice/opensourcenotice.component';
+import { PasswordUpdateComponent } from './passwordupdate/passwordupdate.component';
+import { PasswordResetComponent } from './passwordreset/passwordreset.component';
+import { ContactMethodComponent } from './contactmethod/contactmethod.component';
+import { PrivacyControlsComponent } from './privacycontrols/privacycontrols.component';
+import { SearchComponent } from './search/search.component';
+import { ContactProfileComponent } from './contactprofile/contactprofile.component';
+import { SavedComponent } from './saved/saved.component';
+import { PendingComponent } from './pending/pending.component';
 
 import { EmigoService } from './appdb/emigo.service';
 import { StoreService } from './appdb/store.service';
-import { BitmapService } from './appdb/bitmap.service';
 import { RegistryService } from './appdb/registry.service';
 import { AccessService } from './appdb/access.service';
 import { IdentityService } from './appdb/identity.service';
@@ -59,14 +57,17 @@ import { ProfileService } from './appdb/profile.service';
 import { IndexService } from './appdb/index.service';
 import { ShareService } from './appdb/share.service';
 import { ContactService } from './appdb/contact.service';
+import { ViewService } from './appdb/view.service';
+import { TokenService } from './appdb/token.service';
+import { ShowService } from './appdb/show.service';
 
 import { ScaleService } from './service/scale.service';
-import { MonitorService } from './service/monitor.service';
-import { ContextService } from './service/context.service';
-import { GalleryService } from './service/gallery.service';
 import { CameraService } from './service/camera.service';
+import { GalleryService } from './service/gallery.service';
+import { BitmapService } from './service/bitmap.service';
 import { CreateService } from './service/create.service';
 import { DikotaService } from './service/dikota.service';
+import { EntryService } from './service/entry.service';
 
 @NgModule({
     bootstrap: [
@@ -91,7 +92,6 @@ import { DikotaService } from './service/dikota.service';
       CreateP6Component,
       CreateP7Component,
       CreateP8Component,
-      CreateP9Component,
       HomeComponent,
       BoardingP0Component,
       BoardingP1Component,
@@ -99,31 +99,30 @@ import { DikotaService } from './service/dikota.service';
       BoardingP3Component,
       BoardingP4Component,
       ProfileComponent,
-      ProfileEditComponent,
       ProfileImageComponent,
+      ProfileEditComponent,
       ProfileAttributeComponent,
-      LabelViewComponent,
+      AttributeAddComponent,
+      AttributeEditComponent,
       LabelsComponent,
       LabelCreateComponent,
       LabelProfileComponent,
-      AttributeAddComponent,
-      AttributeEditComponent,
-      SearchComponent,
       AboutComponent,
       SettingsComponent,
-      PrivacyControlsComponent,
-      PasswordUpdateComponent,
-      ContactProfileComponent,
-      PendingComponent,
-      SavedComponent,
-      ContactMethodComponent,
-      PasswordResetComponent,
+      LabelViewComponent,
       OpenSourceNoticeComponent,
+      PasswordUpdateComponent,
+      PasswordResetComponent,
+      ContactMethodComponent,
+      PrivacyControlsComponent,
+      SearchComponent,
+      ContactProfileComponent,
+      SavedComponent,
+      PendingComponent,
     ],
     providers: [
       EmigoService,
       StoreService,
-      BitmapService,
       RegistryService,
       AccessService,
       IdentityService,
@@ -132,14 +131,17 @@ import { DikotaService } from './service/dikota.service';
       IndexService,
       ShareService,
       ContactService,
-  
-      ScaleService,
-      MonitorService,
-      ContextService,
+      ViewService,
+      TokenService,
+      ShowService,
+
+      ScaleService, 
       CameraService,
       GalleryService,
+      BitmapService,
       CreateService,
       DikotaService,
+      EntryService,
     ],
     schemas: [
       NO_ERRORS_SCHEMA

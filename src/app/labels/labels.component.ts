@@ -6,8 +6,6 @@ import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { EmigoService } from '../appdb/emigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
-import { ContextService } from '../service/context.service';
-
 @Component({
     selector: "labels",
     moduleId: module.id,
@@ -20,7 +18,6 @@ export class LabelsComponent implements OnInit, OnDestroy {
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private contextService: ContextService,
       private emigoService: EmigoService) {
     this.iOS = (device.os == "iOS");
   }
@@ -38,8 +35,7 @@ export class LabelsComponent implements OnInit, OnDestroy {
   }
 
   public onLabel(l: LabelEntry) {
-    this.contextService.setLabel(l);
-    this.router.navigate(["/labelprofile"], { clearHistory: false });
+    this.router.navigate(["/labelprofile", l.labelId], { clearHistory: false });
   }
 
   public onCreate(): void {

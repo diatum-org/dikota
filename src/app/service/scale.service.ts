@@ -2,7 +2,7 @@ import { Injectable, Type, Component } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ImageSource, fromBase64 } from "tns-core-modules/image-source";
 
-import { BitmapService } from '../appdb/bitmap.service';
+import { BitmapService } from './bitmap.service';
 
 export class ScaleEntry {
   id: string;

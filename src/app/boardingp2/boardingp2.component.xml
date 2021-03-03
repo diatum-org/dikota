@@ -47,7 +47,7 @@
       </StackLayout>
       <StackLayout *ngIf="more" orientation="horizontal" paddingBottom="24">
         <Label text="-" class="text" fontSize="16" verticalAlignment="top" paddingRight="8"></Label>
-        <Label text="the thought of losing touch when someone quits a site or charges their phone number." class="text" 
+        <Label text="the thought of losing touch when someone quits a site or changes their phone number." class="text" 
             textWrap="true" fontSize="16"></Label>
       </StackLayout>
     </StackLayout>

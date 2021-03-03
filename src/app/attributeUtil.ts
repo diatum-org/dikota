@@ -1,7 +1,4 @@
-export class AttributeDataEntry {
-  value: string;
-  type: string;
-}
+
 
 export class AttributeUtil {
 
@@ -19,7 +16,7 @@ export class AttributeUtil {
   }
 
   public static isWebsite(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.WEBSITE) {
@@ -29,7 +26,7 @@ export class AttributeUtil {
   }
 
   public static isCard(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.CARD) {
@@ -39,7 +36,7 @@ export class AttributeUtil {
   }
 
   public static isEmail(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.EMAIL) {
@@ -49,7 +46,7 @@ export class AttributeUtil {
   }
 
   public static isPhone(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.PHONE) {
@@ -59,7 +56,7 @@ export class AttributeUtil {
   }
 
   public static isHome(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.HOME) {
@@ -69,7 +66,7 @@ export class AttributeUtil {
   }
 
   public static isWork(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.WORK) {
@@ -79,7 +76,7 @@ export class AttributeUtil {
   }
 
   public static isSocial(a: any): boolean {
-    if(a == null || a.obj == null) {
+    if(a == null) {
       return false;
     }
     if(a.schema == AttributeUtil.SOCIAL) {
@@ -87,101 +84,12 @@ export class AttributeUtil {
     }
   }
 
-  public static getPhoneData(a: any[]): AttributeDataEntry[] {
-    let attributes: AttributeDataEntry[] = [];
+  public static getDataObject(a: any): any {
     if(a == null) {
-      return attributes;
+      return null;
     }
-    for(let i = 0; i < a.length; i++) {
-      if(AttributeUtil.isPhone(a[i])) {
-        if(a[i].obj.phone != null) {
-          attributes.push({ value: a[i].obj.phone, type: a[i].obj.category });
-        }
-      }
-      else if(AttributeUtil.isHome(a[i])) {
-        if(a[i].obj.phoneNumber != null) {
-          attributes.push({ value: a[i].obj.phoneNumber, type: 'Home' });
-        }
-      }
-      else if(AttributeUtil.isWork(a[i])) {
-        if(a[i].obj.phoneNumber != null) {
-          attributes.push({ value: a[i].obj.phoneNumber, type: 'Work' });
-        }
-      }
-      else if(AttributeUtil.isCard(a[i])) {
-        if(a[i].obj.mainPhone != null) {
-          attributes.push({ value: a[i].obj.mainPhone, type: 'Card Main' });
-        }
-        if(a[i].obj.directPhone != null) {
-          attributes.push({ value: a[i].obj.directPhone, type: 'Card Direct' });
-        }
-        if(a[i].obj.mobilePhone != null) {
-          attributes.push({ value: a[i].obj.mobilePhone, type: 'Card Mobile' });
-        }
-      }
-    }
-    return attributes;
-  }
-
-  public static getTextData(a: any[]): AttributeDataEntry[] {
-    let attributes: AttributeDataEntry[] = [];
-    if(a == null) {
-      return attributes;
-    }
-    for(let i = 0; i < a.length; i++) {
-      if(AttributeUtil.isPhone(a[i])) {
-        if(a[i].obj.phone != null && a[i].obj.phoneSms) {
-          attributes.push({ value: a[i].obj.phone, type: a[i].obj.category});
-        }
-      }
-      else if(AttributeUtil.isHome(a[i])) {
-        if(a[i].obj.phoneNumber != null && a[i].obj.phoneNumberSms) {
-          attributes.push({ value: a[i].obj.phoneNumber, type: 'Home'});
-        }
-      }
-      else if(AttributeUtil.isWork(a[i])) {
-        if(a[i].obj.phoneNumber != null && a[i].obj.phoneNumberSms) {
-          attributes.push({ value: a[i].obj.phoneNumber, type: 'Work'});
-        }
-      }
-      else if(AttributeUtil.isCard(a[i])) {
-        if(a[i].obj.mainPhone != null && a[i].obj.mainPhoneSms) {
-          attributes.push({ value: a[i].obj.mainPhone, type: 'Card Main' });
-        }
-        if(a[i].obj.directPhone != null && a[i].obj.directPhoneSms) {
-          attributes.push({ value: a[i].obj.directPhone, type: 'Card Direct' });
-        }
-        if(a[i].obj.mobilePhone != null && a[i].obj.mobilePhone) {
-          attributes.push({ value: a[i].obj.mobilePhone, type: 'Card Mobile' });
-        }
-      }
-    }
-    return attributes;
-  }
-
-  public static getEmailData(a: any[]): AttributeDataEntry[] {
-    let attributes: AttributeDataEntry[] = [];
-    if(a == null) {
-      return attributes;
-    }
-    for(let i = 0; i < a.length; i++) {
-      if(AttributeUtil.isEmail(a[i])) {
-        if(a[i].obj.email != null) {
-          attributes.push({ value: a[i].obj.email, type: a[i].obj.category });
-        }
-      }
-      else if(AttributeUtil.isWork(a[i])) {
-        if(a[i].obj.emailAddress != null) {
-          attributes.push({ value: a[i].obj.emailAddress, type: 'Work'});
-        }
-      }
-      else if(AttributeUtil.isCard(a[i])) {
-        if(a[i].obj.emailAddress != null) {
-          attributes.push({ value: a[i].obj.email, type: 'Card'});
-        }
-      }
-    }
-    return attributes;
+    return JSON.parse(a.data);
   }
 
 }
+

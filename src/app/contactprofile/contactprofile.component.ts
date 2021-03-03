@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router'
 import { RouterExtensions } from "nativescript-angular/router";
 import { EventData } from 'tns-core-modules/data/observable';
 import { ImageSource } from "tns-core-modules/image-source";
@@ -13,18 +14,20 @@ import * as dialogs from 'tns-core-modules/ui/dialogs';
 import * as utils from "tns-core-modules/utils/utils";
 import * as clipboard from "nativescript-clipboard";
 import { AttributeUtil } from '../attributeUtil';
-import { ContextService } from '../service/context.service';
 import { ContactView } from '../model/contactView';
 
 import { Attribute } from '../appdb/attribute';
-import { AttributeEntry } from '../appdb/attributeEntry';
 import { LabelEntry } from '../appdb/labelEntry';
 import { getEmigoObject } from '../appdb/emigo.util';
 import { RegistryService } from '../appdb/registry.service';
-import { EmigoService, EmigoContact, AttributeEntityData } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 import { EmigoMessage } from '../appdb/emigoMessage';
 import { Emigo } from '../appdb/emigo';
+import { ShareEntry } from '../appdb/shareEntry';
 import { AppSettings } from '../app.settings';
+import { EmigoEntry } from '../appdb/emigoEntry';
+import { EmigoView } from '../appdb/emigoView';
+import { EmigoContact } from '../appdb/emigoContact';
 
 @Component({
     selector: "contactprofile",
@@ -40,36 +43,49 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   private labelBusy: boolean = false;
   private menuSet: boolean = false;
   private notesSet: boolean = false;
-  private avatarSrc: ImageSource = null;
   private sub: Subscription[] = [];
   private application: any;
   private orientation: any;
   private iOS: boolean;
-  private view: ContactView = { available: false };
   private labels: LabelEntry[] = [];
-  private contact: EmigoContact = {};
+
+  private imageObj: any = null;
+  private imageSrc: ImageSource = null;
+
   private emigoMessage: EmigoMessage = null;
-  private added: boolean = true;
-  private afterInit: boolean = false;
+
+  private contact: EmigoContact = null;
+  
+  private emigoId: string;
+  private registry: string;
+  private available: boolean;
+  private pending: boolean;  
+  private shareId: string;
+
+  private emigo: Emigo = null;
+  private entry: EmigoEntry = null;
+  private labelSet: Set<string> = null;
+  private attr: any[] = [];
+  
   @ViewChild("img", {static: false}) img: ElementRef;
   @ViewChild("rmu", {static: false}) menu: ElementRef;
 
   constructor(private router: RouterExtensions,
-      private contextService: ContextService,
+      private route: ActivatedRoute,
       private registryService: RegistryService,
       private emigoService: EmigoService) {
 
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
-    let emigo: Emigo = { emigoId: null, node: null, revision: null, version: null };
-    this.contact = { emigo: emigo, labels: new Set<string>(), attributes: [], error: false };
     this.iOS = (device.os == "iOS");
-     
-    // retrieve view
-    this.view = this.contextService.getEmigo();
+  }
 
-    // load default logo
-    this.avatarSrc = ImageSource.fromFileSync("~/assets/avatar.png");
+  private setEmigoEntry(e: EmigoEntry) {
+    this.entry = e;
+    this.labelSet = new Set<string>();
+    for(let i = 0; i < e.labels.length; i++) {
+      this.labelSet.add(e.labels[i]);
+    }
   }
 
   ngOnInit(): void {
@@ -81,40 +97,93 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     this.sub.push(this.emigoService.labels.subscribe(l => {
       this.labels = l;
     }));
- 
-    // observe selected emigo
-    this.sub.push(this.emigoService.selectedEmigo.subscribe(c => {
-      if(c != null) {
-        if(Object.getOwnPropertyNames(c).length === 0) {
-          this.added = false;
-          if(this.view.registry != null && this.view.id != null) {
-            this.busy = true;
-            this.registryService.getMessage(this.view.registry, this.view.id).then(m => {
-              this.busy = false;
+
+    // retrieve contact
+    this.route.params.forEach(p => {
+
+      this.emigoId = p.emigo;
+      this.registry = p.registry;
+      this.available = p.available == "true";
+      this.pending = p.pending != "false";
+      this.shareId = p.pending;
+     
+      // subscribe to selected contact 
+      this.sub.push(this.emigoService.selectedContact.subscribe(c => {
+        
+        // case to load from store
+        if(this.contact == null && c != null) {
+
+          // load identity
+          this.emigoService.getContactIdentity(this.emigoId).then(e => {
+            if(e != null) {
+              this.emigo = e;
+              this.setImage(this.emigo.logo);
+            }
+          }).catch(err => {
+            console.log(err);
+          });
+
+          // load notes
+          this.emigoService.getEmigo(this.emigoId).then(e => {
+            this.setEmigoEntry(e);
+          }).catch(err => {
+            console.log(err);
+          });
+
+          // load attributes
+          this.attr = [];
+          this.emigoService.getContactProfile(p.emigo).then(a => {
+            for(let i = 0; i < a.length; i++) {
+              this.attr.push({ id: a[i].attributeId, schema: a[i].schema, obj: JSON.parse(a[i].data) });
+            }
+          }).catch(err => {
+            console.log(err);
+          }); 
+        }
+
+        // check if has been loaded from registry
+        if(c == null) {
+          if(this.emigo == null || this.emigoMessage == null) {
+            this.registryService.getMessage(this.registry, this.emigoId).then(m => {
               this.emigoMessage = m;
-              let emigo: Emigo = getEmigoObject(m);
-              this.contact = { emigo: emigo, labels: new Set<string>(), attributes: [], error: false };
-              this.setContact();
+              this.emigo = getEmigoObject(m);
+              this.setImage(this.emigo.logo);
             }).catch(err => {
-              this.busy = false;
-              console.log("RegistryService.getMessage failed");
-              dialogs.alert({ message: "failed to load contact profile", okButtonText: "ok" });
+              console.log(err);
             });
           }
         }
-        else {
-          this.added = true;
-          this.contact = c;
-          this.setContact();
+
+        // check if any revisions have changed
+        if(this.contact != null && c != null) {
+
+          // check if identity should reload
+          if(this.contact.identityRevision != c.identityRevision) {
+            this.emigoService.getContactIdentity(this.emigoId).then(e => {
+              this.emigo = e;
+              this.setImage(this.emigo.logo);
+            }).catch(err => {
+              console.log(err);
+            });
+          }
+
+          // check if attributes should reload
+          if(this.contact.attributeRevision != c.attributeRevision) {
+            this.attr = [];
+            this.emigoService.getContactProfile(p.emigo).then(a => {
+              for(let i = 0; i < a.length; i++) {
+                this.attr.push({ id: a[i].attributeId, schema: a[i].schema, obj: JSON.parse(a[i].data) });
+              }
+            }).catch(err => {
+              console.log(err);
+            }); 
+          }
         }
-      }
-    }));
 
-  }
-
-  ngAfterViewInit(): void {
-    this.afterInit = true;
-    this.setContact();
+        // update applied contact object
+        this.contact = c;
+      }));
+    });
   }
 
   ngOnDestroy(): void {
@@ -124,187 +193,231 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  private setImage(img: string) {
+    if(img == null) {
+      this.imageSrc = ImageSource.fromFileSync("~/assets/avatar.png");
+    }
+    else {
+      this.imageSrc = ImageSource.fromBase64Sync(img);
+    }
+    if(this.imageObj != null && this.imageSrc != null) {
+      this.imageObj.imageSource = this.imageSrc;
+    }
+  }
+
+  public onImageLoaded(args: EventData) {
+    this.imageObj = args.object;
+    this.imageObj.imageSource = this.imageSrc;
+  }
+
   public getHandle(): string {
-    if(this.contact == null || this.contact.emigo == null || this.contact.emigo.registry == null) {
-      return "";
-    }
-    let e: Emigo = this.contact.emigo;
-    if(e.registry == AppSettings.REGISTRY) {
-      return e.handle;
-    }
-    var reg = /^(https:\/\/registry\.).*(\/app)$/
-    if(reg.test(e.registry)) {
-      return e.handle + " [" + e.registry.replace(/^(https:\/\/registry\.)/,"").replace(/(\/app)$/,"") + "]";
-    }
-    return "invalid registry";
+    return "";
   }
 
-  public onSaveProfile(): void {
-    if(this.busy) {
-      console.log("can't save while processing");
-      return;
-    }
-    this.busy = true;
-    this.emigoService.addEmigo(this.emigoMessage).then(i => {
-      this.busy = false;
-    }).catch(err => {
-      this.busy = false;
-      console.log("EmigoService.addEmigo failed");
-      dialogs.alert({ message: "failed to save contact", okButtonText: "ok" });
-    });
-  }
+  public canSave(): boolean {
 
-  public canRequest(): boolean {
-    if(!this.added && this.view.pending) {
-      return false;
-    }
-    if(this.contact.status != 'requested' && this.contact.status != 'received' &&
-        this.contact.status != 'connected') {
-      return true;
+    if(this.contact == null && this.emigoMessage != null) {
+      if(this.pending == true || this.available == true) {
+        return true;
+      }
     }
     return false;
   }
 
-  public onRequest(): void {
-    if(this.busy) {
-      console.log("can't save while processing");
-      return;
-    }
-    this.busy = true;
-    if(!this.added) {
+  public onSave(): void {
+    
+    if(this.busy == false) {
+      this.busy = true;
       this.emigoService.addEmigo(this.emigoMessage).then(i => {
-        this.emigoService.requestContact(i).then(() => {
-          this.busy = false;
-        }).catch(err => {
-          this.busy = false;
-          console.log("EmigoService.requestContact failed");
-          dialogs.alert({ message: "failed to request connection", okButtonText: "ok" });
-        });
+        this.busy = false;
+        this.pending = false;
       }).catch(err => {
         this.busy = false;
         console.log("EmigoService.addEmigo failed");
         dialogs.alert({ message: "failed to save contact", okButtonText: "ok" });
       });
     }
-    else {
-      this.emigoService.requestContact(this.contact.emigo.emigoId).then(() => {
-        this.busy = false;
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.requestContact failed");
-        dialogs.alert({ message: "failed to request connection", okButtonText: "ok" });
-      });
+  }
+
+  public canRequest(): boolean {
+
+    // request not an option if needs to be saved
+    if(this.contact == null || this.pending == true) {
+      return false;
+    }
+
+    // states in which can request
+    if(this.contact.status == "requested" || this.contact.status == "received" || this.contact.status == "connected") {
+      return false;
+    }
+
+    return true;
+  }
+
+  public onRequest(): void {
+
+    if(this.contact != null && !this.busy) {
+   
+      if(this.contact.shareId == null) {
+        // add and request
+        this.busy = true;
+        this.emigoService.addConnection(this.emigoId).then(e => {
+          this.emigoService.openConnection(this.emigoId, e.shareId, this.contact.node).then(s => {
+            this.busy = false;
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to request contact", okButtonText: "ok" });
+          });
+        }).catch(err => {
+          this.busy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to add connection", okButtonText: "ok" });
+        });
+      }
+      else {
+        // request only
+        this.busy = true;
+        this.emigoService.openConnection(this.emigoId, this.contact.shareId, this.contact.node).then(s => {
+          this.busy = false;
+        }).catch(err => {
+          this.busy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to request contact", okButtonText: "ok" });
+        });
+      }
     }
   }
 
   public canAccept(): boolean {
-    if(this.added && this.contact.status == 'received') {
+  
+    if(this.contact == null && this.pending == true && this.emigoMessage != null) {
       return true;
     }
-    if(!this.added && this.view.pending) {
+    if(this.contact != null && this.contact.status == "received") {
       return true;
     }
     return false;
   }
 
   public onAccept(): void {
-    this.busy = true;
-    if(!this.added && this.view.pending) {
-      this.emigoService.addEmigo(this.emigoMessage).then(i => {
-        this.emigoService.acceptContact(this.contact.emigo.emigoId).then(() => {
-          this.busy = false;
+
+    if(this.busy == false) {
+
+      if(this.contact == null && this.pending == true) {
+        this.emigoService.addEmigo(this.emigoMessage).then(i => {
+          this.pending = false;
+          this.emigoService.addConnection(this.emigoId).then(e => {
+            this.emigoService.openConnection(this.emigoId, e.shareId, this.emigo.node).then(s => {
+              this.busy = false;
+            }).catch(err => {
+              this.busy = false;
+              console.log(err);
+              dialogs.alert({ message: "failed to accept request", okButtonText: "ok" });
+            });
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to accept request", okButtonText: "ok" });
+          });
         }).catch(err => {
           this.busy = false;
-          console.log("EmigoService.acceptContact failed");
-          dialogs.alert({ message: "failed to accept pending connection", okButtonText: "ok" });
+          console.log(err);
+          dialogs.alert({ message: "failed to accept request", okButtonText: "ok" });
         });
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.addEmigo failed");
-        dialogs.alert({ message: "failed to accept pending connection", okButtonText: "ok" });
-      });
-    }
-    else {
-      this.emigoService.acceptContact(this.contact.emigo.emigoId).then(() => {
-        this.busy = false;
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.acceptContact failed");
-        dialogs.alert({ message: "failed to accept connection", okButtonText: "ok" });
-      });
+      }
+
+      if(this.contact != null && this.contact.status == "received") {
+        // add and request
+        this.busy = true;
+        this.emigoService.addConnection(this.emigoId).then(e => {
+          this.emigoService.openConnection(this.emigoId, e.shareId, this.contact.node).then(s => {
+            this.busy = false;
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to accept request", okButtonText: "ok" });
+          });
+        }).catch(err => {
+          this.busy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to accept request", okButtonText: "ok" });
+        });
+      }
     }
   }
 
   public canDeny(): boolean {
-    if(this.added && this.contact.status == 'received') {
+  
+    if(this.contact == null && this.pending == true) {
       return true;
     }
-    if(!this.added && this.view.pending) {
+
+    if(this.contact != null && this.contact.status == "received") {
       return true;
     }
     return false;
   }
 
   public onDeny() {
-    this.busy = true;
-    if(!this.added && this.view.pending) {
-      this.emigoService.clearEmigoRequest(this.view.shareId).then(() => {
-        this.busy = false;
-        this.router.back();
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.clearEmigoRequest failed");
-        dialogs.alert({ message: "failed to deny pending request", okButtonText: "ok" });
-      });
-    }
-    else {
-      this.emigoService.closeContact(this.contact.emigo.emigoId).then(() => {
-        this.busy = false;
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.closeContact failed");
-        dialogs.alert({ message: "failed to deny request", okButtonText: "ok" });
-      });
+
+    if(this.busy == false) {
+      if(this.contact == null && this.pending == true) {
+        this.busy = true;
+        this.emigoService.clearEmigoRequest(this.shareId).then(() => {
+          this.pending = false;
+          this.busy = false;
+        }).catch(err => {
+          this.busy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to deny pending request", okButtonText: "ok" });
+        }); 
+      }
+
+      if(this.contact != null && this.contact.status == "received") {
+        this.busy = true;
+        this.emigoService.closeConnection(this.emigoId, this.contact.shareId, this.contact.node).then(s => {
+          this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+            this.busy = false;
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to deny connection", okButtonText: "ok" });
+          });  
+        }).catch(err => {
+          console.log(err);
+          this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+            this.busy = false;
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to deny connection", okButtonText: "ok" });
+          });
+        });
+      }
     }
   }
 
   public canCancel(): boolean {
-    if(this.added && this.contact.status == 'requested') {
+    
+    if(this.contact != null && this.contact.status == "requested") {
       return true;
     }
     return false;
   }
 
   public onCancel(): void {
-    this.busy = true;
-    this.emigoService.closeContact(this.contact.emigo.emigoId).then(() => {
-      this.busy = false;
-    }).catch(err => {
-      this.busy = false;
-      console.log("EmigoService.closeContact failed");
-      dialogs.alert({ message: "failed to cancel request", okButtonText: "ok" });
-    });
-  }
 
-  private setContact(): void {
-    if(this.afterInit) {
-      if(this.contact.emigo.logo == null) {
-        let obj: Image = <Image>this.img.nativeElement;
-        obj.imageSource = this.avatarSrc;
-      }
-      else {
-        let obj: Image = <Image>this.img.nativeElement;
-        obj.imageSource = ImageSource.fromBase64Sync(this.contact.emigo.logo);
-      }
+    if(this.contact != null && this.busy == false) {
+      this.busy = true;
+      this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+        this.busy = false;
+      }).catch(err => {
+        this.busy = false;
+        console.log(err);
+        dialogs.alert({ message: "failed to cancel request", okButtonText: "ok" });
+      });
     }
-
-    if(this.contact.emigo.name == null) {
-      this.name = "Contact";
-    }
-    else {
-      this.name = this.contact.emigo.name;
-    }
-    this.notes = this.contact.notes;
   }
 
   private onOrientation() {
@@ -327,8 +440,9 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public onOptions(ev): void {
+    this.notesSet = false;
     let actions = [];
-    if(this.added) {
+    if(this.contact != null) {
       if(this.contact.status == "connected") {
         actions.push({ id: 1, title: "Disconnect" });
       }
@@ -341,9 +455,8 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
             okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
           if(flag) {
             this.busy = true;
-            this.emigoService.deleteEmigo(this.contact.emigo.emigoId).then(() => {
+            this.emigoService.removeEmigo(this.emigoId).then(() => {
               this.busy = false;
-              this.router.back();
             }).catch(err => {
               console.log("EmigoService.deleteEmigo failed");
               dialogs.alert({ message: "failed to delete contact", okButtonText: "ok" });
@@ -356,43 +469,54 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
             okButtonText: "Yes, Disconnect", cancelButtonText: "No, Cancel" }).then(flag => {
           if(flag) {
             this.busy = true;
-            this.emigoService.closeContact(this.contact.emigo.emigoId).then(() => {
-              this.busy = false;
+            this.emigoService.closeConnection(this.emigoId, this.contact.shareId, this.contact.node).then(() => {
+              this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+                this.busy = false;
+              }).catch(err => {
+                this.busy = false;
+                console.log(err);
+                dialogs.alert({ message: "failed to disconnect", okButtonText: "ok" });
+              });
             }).catch(err => {
-              this.busy = false;
-              console.log("EmigoService.closeContact failed");
-              dialogs.alert({ message: "failed to cancel request", okButtonText: "ok" });
+              // remove connection even if frienndly close failed
+              this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+                this.busy = false;
+              }).catch(err => {
+                this.busy = false;
+                console.log(err);
+                dialogs.alert({ message: "failed to disconnect", okButtonText: "ok" });
+              });
             });
           }
-        }); 
+        });
       }
       if(action.id == 2) {
-        this.emigoService.refreshEmigoContact(this.contact.emigo.emigoId);
+        this.emigoService.refreshContact(this.contact.emigoId);
       }
     });
   }
 
   public getLabels(): string {
-    if(this.contact == null || this.contact.labels == null || this.contact.labels.size == 0) {
+
+    // check if labels are loaded
+    if(this.labelSet == null || this.labels == null) {
       return "Add a label";
     }
 
     // construct label list
     let l: string = null;
-    this.contact.labels.forEach(v => {
-      for(let i = 0; i < this.labels.length; i++) {
-        if(this.labels[i].labelId == v) {
-          if(l == null) {
-            l = this.labels[i].label.name;
-          }
-          else {
-            l += ", " + this.labels[i].label.name;
-          }
+    for(let i = 0; i < this.labels.length; i++) {
+      if(this.labelSet.has(this.labels[i].labelId)) {
+        if(l == null) {
+          l = this.labels[i].name;
+        }
+        else {
+          l += ", " + this.labels[i].name;
         }
       }
-    });
+    }
 
-    // check if labels matched
+    // check if label was assigned
     if(l == null) {
       return "Add a label";
     }
@@ -411,48 +535,58 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public onLabel(l: LabelEntry): void {
-    this.labelBusy = true;
-    if(this.isLabeled(l)) {
-      this.emigoService.clearEmigoLabel(this.contact.emigo.emigoId, l.labelId).then(() => {
-        this.labelBusy = false;
-      }).catch(err => {
-        this.labelBusy = false;
-        console.log("EmigoService.clearEmigoLabel failed");
-        dialogs.alert({ message: "failed to remove contact label", okButtonText: "ok" });
-      });
-    }
-    else {
-      this.emigoService.setEmigoLabel(this.contact.emigo.emigoId, l.labelId).then(() => {
-        this.labelBusy = false;
-      }).catch(err => {
-        this.labelBusy = false; 
-        console.log("EmigoService.clearEmigoLabel failed");
-        dialogs.alert({ message: "failed to add contact label", okButtonText: "ok" });
-      });
+    if(this.labelBusy != true && this.labelSet != null) {
+      this.labelBusy = true;
+      if(this.labelSet.has(l.labelId)) {
+        this.emigoService.clearEmigoLabel(this.emigoId, l.labelId).then(e => {
+          this.labelBusy = false;
+          this.setEmigoEntry(e);
+        }).catch(err => {
+          this.labelBusy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to clear labeal", okButtonText: "ok" });
+        });
+      }
+      else {
+        this.emigoService.setEmigoLabel(this.emigoId, l.labelId).then(e => {
+          this.labelBusy = false;
+          this.setEmigoEntry(e);
+        }).catch(err => {
+          this.labelBusy = false;
+          console.log(err);
+          dialogs.alert({ message: "failed to set labeal", okButtonText: "ok" });
+        });
+      }
     }
   }
 
   public isLabeled(l: LabelEntry): boolean {
-    if(this.contact.labels != null) {
-      return this.contact.labels.has(l.labelId);
+    if(this.labelSet != null && this.labelSet.has(l.labelId)) {
+      return true;
     }
     return false;
   }
 
   public clearNotes() {
-    if(this.notesSet) {
-      this.notesSet = false;
-      this.notes = this.contact.notes;
-    }
-    else {
-      this.busy = true;
-      this.emigoService.updateEmigo(this.contact.emigo.emigoId, null).then(() => {
-        this.busy = false;
-      }).catch(err => {
-        this.busy = false;
-        console.log("EmigoService.updateEmigo failed");
-        dialogs.alert({ message: "failed to clear contact notes", okButtonText: "ok" });
-      });
+
+    if(this.contact != null && this.entry != null) {
+      if(this.notesSet) {
+        this.notesSet = false;
+        this.notes = this.entry.notes;
+      }
+      else {
+        if(this.entry.notes != null) {
+          this.busy = true;
+          this.emigoService.updateEmigoNotes(this.entry.emigoId, null).then(e => {
+            this.busy = false;
+            this.entry = e;
+          }).catch(err => {
+            this.busy = false;
+            console.log(err);
+            dialogs.alert({ message: "failed to clear notes", okButtonText: "ok" });
+          });
+        }
+      }
     }
   }
 
@@ -460,32 +594,40 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     if(this.notesSet) {
       return "";
     }
-    else {
-      return this.hint;
-    }
+    return this.hint;
   }
 
   public getNotes(): string {
-    if(this.notes == null) {
+    if(this.entry == null || this.entry.notes == null) {
       return "Add personal notes about the contact";
     }
-    return this.notes;
+    return this.entry.notes;
   }
 
   public onNotes() {
     this.notesSet = true;
+    if(this.entry == null || this.entry.notes == null) {
+      this.notes = "";
+    }
+    else {
+      this.notes = this.entry.notes;
+    }
   }
 
   public setNotes() {
-    this.busy = true;
-    this.emigoService.updateEmigo(this.contact.emigo.emigoId, this.notes).then(() => {
-      this.busy = false;
-      this.notesSet = false;
-    }).catch(err => {
-      this.busy = false;
-      console.log("EmigoService.updateEmigo failed");
-      dialogs.alert({ message: "failed to set contact notes", okButtonText: "ok" });
-    });
+
+    if(this.contact != null && this.entry != null) {
+      this.busy = true;
+      this.emigoService.updateEmigoNotes(this.entry.emigoId, this.notes).then(e => {
+        this.busy = false;
+        this.entry = e;
+        this.notesSet = false;
+      }).catch(err => {
+        this.busy = false;
+        console.log(err);
+        dialogs.alert({ message: "failed to set notes", okButtonText: "ok" });
+      });
+    }
   }
 
   public updateNotes(n: string) {
@@ -493,6 +635,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public showLabelMenu(): void {
+    this.notesSet = false;
     this.menuSet = true;
     let right: GridLayout = <GridLayout>this.menu.nativeElement;
     right.animate({ translate: { x: 0, y: 0 }, duration: 300, curve: AnimationCurve.easeOut })
@@ -527,7 +670,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public setSocial(a: any) {
-    clipboard.setText(a.value.link);
+    clipboard.setText(a.obj.link);
 
     // show copied message
     a.flag = true;
@@ -603,31 +746,31 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  public isWebsite(a: AttributeEntityData): boolean {
+  public isWebsite(a): boolean {
     return AttributeUtil.isWebsite(a);
   }
 
-  public isBusinessCard(a: AttributeEntityData): boolean {
+  public isBusinessCard(a): boolean {
     return AttributeUtil.isCard(a);
   }
 
-  public isEmail(a: AttributeEntityData): boolean {
+  public isEmail(a): boolean {
     return AttributeUtil.isEmail(a);
   }
   
-  public isPhone(a: AttributeEntityData): boolean {
+  public isPhone(a): boolean {
     return AttributeUtil.isPhone(a);
   }
 
-  public isHome(a: AttributeEntityData): boolean {
+  public isHome(a): boolean {
     return AttributeUtil.isHome(a);
   }
 
-  public isWork(a: AttributeEntityData): boolean {
+  public isWork(a): boolean {
     return AttributeUtil.isWork(a);
   }
 
-  public isSocial(a: AttributeEntityData): boolean {
+  public isSocial(a): boolean {
     return AttributeUtil.isSocial(a);
   }
 

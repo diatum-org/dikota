@@ -6,6 +6,7 @@ import { HttpUrlEncodingCodec } from '@angular/common/http';
 import { timeout } from 'rxjs/operators';
 
 import { Attribute } from './attribute';
+import { AttributeView } from './attributeView';
 import { EmigoMessage } from './emigoMessage';
 import { AuthMessage } from './authMessage';
 
@@ -33,8 +34,85 @@ export class ContactService {
       msg, { headers: this.headers, observe: 'body', responseType: 'text' }).pipe(timeout(5000)).toPromise();
   }
 
+  private viewAttributeViews(url: string, token: string, agent: string, filter: string[]): Promise<AttributeView[]> {
+    return this.httpClient.post<AttributeView[]>(url + "/contact/attributes/view?token=" + token + "&agent=" + agent,
+        filter, { headers: this.headers, observe: 'body'  }).toPromise();
+  }
+
+  private authAttributeViews(url: string, token: string, filter: string[]): Promise<AttributeView[]> {
+
+    return new Promise<AttributeView[]>((resolve, reject) => {
+      // send auth message if not set
+      if(!this.auth.has(url)) {
+        this.setAgentMessage(url, token, this.authMessage).then(t => {
+          this.auth.set(url, t);
+          this.viewAttributeViews(url, token, this.auth.get(url), filter).then(a => {
+            resolve(a);
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        }).catch(err => {
+          reject(JSON.stringify(err));
+        });
+      }
+      else {
+        this.viewAttributeViews(url, token, this.auth.get(url), filter).then(a => {
+          resolve(a);
+        }).catch(err => {
+          // TODO only retry on 402
+          this.setAgentMessage(url, token, this.authMessage).then(t => {
+            this.auth.set(url, t);
+            this.viewAttributeViews(url, token, this.auth.get(url), filter).then(a => {
+              resolve(a);
+            }).catch(err => {
+              reject(JSON.stringify(err));
+            });
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        });
+      }
+    });
+  }
+
+  public getAttributeViews(serviceUrl: string, serviceToken: string, nodeUrl: string, nodeToken: string, filter: string[]): Promise<AttributeView[]> {
+
+    return new Promise<AttributeView[]>((resolve, reject) => {
+      // retrieve auth message if not set
+      if(this.authMessage == null) {
+        this.getAgentMessage(serviceUrl, serviceToken).then(m => {
+          this.authMessage = m;
+          this.authAttributeViews(nodeUrl, nodeToken, filter).then(a => {
+            resolve(a);
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        }).catch(err => {
+          reject(JSON.stringify(err));
+        });
+      }
+      else {
+        this.authAttributeViews(nodeUrl, nodeToken, filter).then(a => {
+          resolve(a);
+        }).catch(err => {
+          // TODO only retry on 402
+          this.getAgentMessage(serviceUrl, serviceToken).then(m => {
+            this.authMessage = m;
+            this.authAttributeViews(nodeUrl, nodeToken, filter).then(a => {
+              resolve(a);
+            }).catch(err => {
+              reject(JSON.stringify(err));
+            });
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        });
+      }
+    });
+  }
+
   private viewAttributes(url: string, token: string, agent: string, filter: string[]): Promise<Attribute[]> {
-    return this.httpClient.post<Attribute[]>(url + "/contact/attributes/filters?token=" + token + "&agent=" + agent,
+    return this.httpClient.post<Attribute[]>(url + "/contact/attributes/filter?token=" + token + "&agent=" + agent,
         filter, { headers: this.headers, observe: 'body'  }).toPromise();
   }
 
@@ -98,6 +176,83 @@ export class ContactService {
           this.getAgentMessage(serviceUrl, serviceToken).then(m => {
             this.authMessage = m;
             this.authAttributes(nodeUrl, nodeToken, filter).then(a => {
+              resolve(a);
+            }).catch(err => {
+              reject(JSON.stringify(err));
+            });
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        });
+      }
+    });
+  }
+
+  private viewAttribute(url: string, token: string, agent: string, attributeId: string): Promise<Attribute> {
+    return this.httpClient.get<Attribute>(url + "/contact/attributes/" + attributeId + "?token=" + token + "&agent=" + agent,
+    { headers: this.headers, observe: 'body'  }).toPromise();
+  }
+
+  private authAttribute(url: string, token: string, attributeId: string): Promise<Attribute> {
+
+    return new Promise<Attribute>((resolve, reject) => {
+      // send auth message if not set
+      if(!this.auth.has(url)) {
+        this.setAgentMessage(url, token, this.authMessage).then(t => {
+          this.auth.set(url, t);
+          this.viewAttribute(url, token, this.auth.get(url), attributeId).then(a => {
+            resolve(a);
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        }).catch(err => {
+          reject(JSON.stringify(err));
+        });
+      }
+      else {
+        this.viewAttribute(url, token, this.auth.get(url), attributeId).then(a => {
+          resolve(a);
+        }).catch(err => {
+          // TODO only retry on 402
+          this.setAgentMessage(url, token, this.authMessage).then(t => {
+            this.auth.set(url, t);
+            this.viewAttribute(url, token, this.auth.get(url), attributeId).then(a => {
+              resolve(a);
+            }).catch(err => {
+              reject(JSON.stringify(err));
+            });
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        });
+      }
+    });
+  }
+
+  public getAttribute(serviceUrl: string, serviceToken: string, nodeUrl: string, nodeToken: string, attributeId: string): Promise<Attribute> {
+
+    return new Promise<Attribute>((resolve, reject) => {
+      // retrieve auth message if not set
+      if(this.authMessage == null) {
+        this.getAgentMessage(serviceUrl, serviceToken).then(m => {
+          this.authMessage = m;
+          this.authAttribute(nodeUrl, nodeToken, attributeId).then(a => {
+            resolve(a);
+          }).catch(err => {
+            reject(JSON.stringify(err));
+          });
+        }).catch(err => {
+          reject(JSON.stringify(err));
+        });
+      }
+      else {
+        this.authAttribute(nodeUrl, nodeToken, attributeId).then(a => {
+          resolve(a);
+        }).catch(err => {
+          // TODO only retry on 402
+          this.getAgentMessage(serviceUrl, serviceToken).then(m => {
+            this.authMessage = m;
+            this.authAttribute(nodeUrl, nodeToken, attributeId).then(a => {
               resolve(a);
             }).catch(err => {
               reject(JSON.stringify(err));

@@ -10,14 +10,13 @@ import { AnimationCurve } from "tns-core-modules/ui/enums";
 import { GridLayout, ItemSpec } from 'tns-core-modules/ui/layouts/grid-layout';
 
 import { AttributeUtil } from '../attributeUtil';
-import { ContextService } from '../service/context.service';
 import { AppSettings } from '../app.settings';
 
 import { Attribute } from '../appdb/attribute';
-import { AttributeEntry } from '../appdb/attributeEntry';
 import { LabelEntry } from '../appdb/labelEntry';
+import { AttributeView } from '../appdb/attributeView';
 
-import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 
 @Component({
     selector: "profile",
@@ -27,9 +26,9 @@ import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
 export class ProfileComponent implements OnInit, OnDestroy {
 
   public menuSet: boolean = false;
-  @ViewChild("rmu", {static: false}) menu: ElementRef;
-  public attributes: AttributeEntity[] = [];
+  public attributeData: any[] = [];
   public labels: LabelEntry[] = [];
+  private labelSet: Set<string> = null;
   private name: string = null;
   private handle: string = null;
   private registry: string = null;
@@ -39,15 +38,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private imgObject: any = null;
   private imageSrc: ImageSource = null;
   private avatarSrc: ImageSource = null;
-  private attr: string = null;
   public header: string = "";
   private application: any;
   private orientation: any;
   private showHint: boolean = false;
   private iOS: boolean;
+  @ViewChild("rmu", {static: false}) menu: ElementRef;
 
   constructor(private router: RouterExtensions,
-      private contextService: ContextService,
       private emigoService: EmigoService) {
 
     this.application = require('application');
@@ -83,11 +81,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.showHint = false;
       }
     }));
-    this.sub.push(this.emigoService.labels.subscribe(t => {
-      this.labels = t;
+    this.sub.push(this.emigoService.labels.subscribe(l => {
+      this.labels = l;
     }));
+
     this.sub.push(this.emigoService.attributes.subscribe(a => {
-      this.attributes = a;
+      let attr: any[] = [];
+      for(let i = 0; i < a.length; i++) {
+
+        // construct label set
+        let labels: Set<string> = new Set<string>();
+        for(let j = 0; j < a[i].labels.length; j++) {
+          labels.add(a[i].labels[j]);
+        }
+
+        // build labels
+        attr.push({ 
+          attributeId: a[i].attribute.attributeId, 
+          schema: a[i].attribute.schema, 
+          obj: JSON.parse(a[i].attribute.data),
+          labels: labels,
+        });
+      }
+      this.attributeData = attr;
     }));
 
     this.application.on(this.application.orientationChangedEvent, this.orientation);
@@ -166,24 +182,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   public isLabeled(l: LabelEntry): boolean {
-    let a: AttributeEntity = null;
-    if(this.attributes == null || this.attr == null || l == null) {
+    if(this.labelSet == null) {
       return false;
     }
-    for(let i = 0; i < this.attributes.length; i++) {
-      if(this.attr == this.attributes[i].id) {
-        a = this.attributes[i];
-      }
-    }
-    if(a == null || a.labels == null) {
-      return false;
-    }
-    for(let i = 0; i < a.labels.length; i++) {
-      if(a.labels[i] == l.labelId) {
-        return true;
-      }
-    }
-    return false;
+    return this.labelSet.has(l.labelId);
   }
 
   public getSms(sms: boolean): string {
@@ -193,14 +195,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return "";
   }
 
-  public viewAttribute(a: AttributeEntity) {
-    this.contextService.setAttribute(a);
-    this.router.navigate(["/attributeedit"], { clearHistory: false });
+  public viewAttribute(a: any) {
+    this.router.navigate(["/attributeedit", a.attributeId], { clearHistory: false });
   }
 
-  public showLabel(a: AttributeEntity, h: string) {
+  public showLabel(a: any, h: string) {
+
+    // show label menu
     this.header = h;
-    this.attr = a.id;
+    this.labelSet = a.labels;
     this.showLabelMenu();
   }
 
@@ -229,31 +232,52 @@ export class ProfileComponent implements OnInit, OnDestroy {
     right.animate({ translate: { x: width, y: 0 }, duration: 300, curve: AnimationCurve.easeOut });
   }
 
-  public isWebsite(a: AttributeEntity): boolean {
+  public isWebsite(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isWebsite(a);
   }
 
-  public isBusinessCard(a: AttributeEntity): boolean {
+  public isBusinessCard(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isCard(a);
   }
 
-  public isEmail(a: AttributeEntity): boolean {
+  public isEmail(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isEmail(a);
   }
   
-  public isPhone(a: AttributeEntity): boolean {
+  public isPhone(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isPhone(a);
   }
 
-  public isHome(a: AttributeEntity): boolean {
+  public isHome(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isHome(a);
   }
 
-  public isWork(a: AttributeEntity): boolean {
+  public isWork(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isWork(a);
   }
 
-  public isSocial(a: AttributeEntity): boolean {
+  public isSocial(a: any): boolean {
+    if(a == null || a.obj == null) {
+      return false;
+    }
     return AttributeUtil.isSocial(a);
   }
 

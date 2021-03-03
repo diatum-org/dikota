@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute } from '@angular/router';
 import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import * as application from "tns-core-modules/application";
@@ -13,10 +14,10 @@ import { WorkAddress } from '../model/workAddress';
 import { SocialLink } from '../model/socialLink';
 
 import { AttributeUtil } from '../attributeUtil';
-import { ContextService } from '../service/context.service';
 
-import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 import { Attribute } from '../appdb/attribute';
+import { AttributeEntry } from '../appdb/attributeEntry';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -29,13 +30,9 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
   private sub: Subscription[] = [];
   private labels: LabelEntry[] = []
   private busy: boolean = false;
-  private applySave: boolean = false;
-  private applyDelete: boolean = false;
-  public applyText: string = "";
-  private attribute: AttributeEntity;
-  private attr: any;
+  private attr: any = {};
+  private schema: string = "";
   private addFlag: boolean;
-  private id: string;
   public name: string = "";
   public dropActive: boolean = false;
   private attributeKey: string;
@@ -45,58 +42,36 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
   private discard: any;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService,
-      private contextService: ContextService) {
-    
+      private route: ActivatedRoute,
+      private emigoService: EmigoService) {
+
+    this.labelSet = new Set<string>();    
     this.iOS = (device.os == "iOS");
-    this.attribute = this.contextService.getAttribute();
-    this.attr = JSON.parse(JSON.stringify(this.attribute.obj));
 
-    // determine which labels have been set 
-    this.labelSet = new Set<string>();
-    if(this.attribute != null && this.attribute.labels != null) {
-      for(let i = 0; i < this.attribute.labels.length; i++) {
-        this.labelSet.add(this.attribute.labels[i]);
+    this.route.params.forEach(p => {
+      this.schema = p.schema;
+      if(AttributeUtil.WEBSITE == this.schema) {
+        this.name = "Website";
       }
-    }
-
-    // check if attribute can be deleted
-    if(this.attribute.id == null) {
-      this.applyDelete = false;
-      this.addFlag = true;
-      this.applyText = "";
-    }
-    else {
-      this.addFlag = false;
-      this.applyDelete = true;
-      this.applyText = "DELETE";
-    }
-
-    // configure for each type of attribute
-    if(AttributeUtil.isEmail(this.attribute)) {
-      this.name = "Email";
-    }
-    else if(AttributeUtil.isPhone(this.attribute)) {
-      this.name = "Phone";
-    }
-    else if(AttributeUtil.isHome(this.attribute)) {
-      this.name = "Home Address";
-    }
-    else if(AttributeUtil.isWork(this.attribute)) {
-      this.name = "Workplace";
-    }
-    else if(AttributeUtil.isSocial(this.attribute)) {
-      this.name = "Social & Messaging";
-    }
-    else if(AttributeUtil.isWebsite(this.attribute)) {
-      this.name = "Website";
-    }
-    else if(AttributeUtil.isCard(this.attribute)) {
-      this.name = "Business Card";
-    }
-    else {
-      this.name = "Attribute";
-    }
+      if(AttributeUtil.CARD == this.schema) {
+        this.name = "Business Card";
+      }
+      if(AttributeUtil.EMAIL == this.schema) {
+        this.name = "Email";
+      }
+      if(AttributeUtil.PHONE == this.schema) {
+        this.name = "Phone";
+      }
+      if(AttributeUtil.HOME == this.schema) {
+        this.name = "Home Address";
+      }
+      if(AttributeUtil.WORK == this.schema) {
+        this.name = "Workplace";
+      }
+      if(AttributeUtil.SOCIAL == this.schema) {
+        this.name = "Social & Messaging";
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -105,17 +80,12 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
     if(application.android != null) {
       this.discard = (args: any) => {
         args.cancel = true;
-        if(this.applySave) {
-          dialogs.confirm({ message: "Are you sure you want to discard your changes?",
-              okButtonText: "Yes, Discard", cancelButtonText: "No, Cancel" }).then(flag => {
-            if(flag) {
-              this.goBack();
-            }
-          });
-        }
-        else {
-          this.goBack();
-        }
+        dialogs.confirm({ message: "Are you sure you want to discard your changes?",
+            okButtonText: "Yes, Discard", cancelButtonText: "No, Cancel" }).then(flag => {
+          if(flag) {
+            this.goBack();
+          }
+        });
       };
       application.android.on(application.AndroidApplication.activityBackPressedEvent, this.discard);
     }
@@ -139,77 +109,66 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
   }
 
   public isEmailAddress(): boolean {
-    return AttributeUtil.isEmail(this.attribute);
+    return AttributeUtil.EMAIL == this.schema;
   }
 
   public isPhoneNumber(): boolean {
-    return AttributeUtil.isPhone(this.attribute);
+    return AttributeUtil.PHONE == this.schema;
   }
 
   public isHomeAddress(): boolean {
-    return AttributeUtil.isHome(this.attribute);
+    return AttributeUtil.HOME == this.schema;
   }
 
   public isWorkAddress(): boolean {
-    return AttributeUtil.isWork(this.attribute);
+    return AttributeUtil.WORK == this.schema;
   }
 
   public isSocialLink(): boolean {
-    return AttributeUtil.isSocial(this.attribute);
+    return AttributeUtil.SOCIAL == this.schema;
   }
 
   public isWebsite(): boolean {
-    return AttributeUtil.isWebsite(this.attribute);
+    return AttributeUtil.WEBSITE == this.schema;
   }
 
   public isBusinessCard(): boolean {
-    return AttributeUtil.isCard(this.attribute);
+    return AttributeUtil.CARD == this.schema;
   }
 
   public onBack(): void {
-    if(this.applySave) {
-      dialogs.confirm({ message: "Are you sure you want to discard your changes?",
-          okButtonText: "Yes, Discard", cancelButtonText: "No, Cancel" }).then(flag => {
-        if(flag) {
-          this.goBack();
-        }
-      });
-    }
-    else {
-      this.goBack();
-    }
+    dialogs.confirm({ message: "Are you sure you want to discard your changes?",
+        okButtonText: "Yes, Discard", cancelButtonText: "No, Cancel" }).then(flag => {
+      if(flag) {
+        this.goBack();
+      }
+    });
   }
 
-  public onApply(): void {
-    if(!this.busy && this.applySave) {
-      this.busy = true;
-      this.emigoService.addAttribute(this.attribute.schema, this.attr, Array.from(this.labelSet)).then(e => {
-        this.applySave = false;
-        this.applyText = "";
+  public async onApply() {
+
+    if(!this.busy) {
+      // create array of labels to associate
+      let ids: string[] = [];
+      this.labelSet.forEach(l => {
+        ids.push(l);
+      });
+
+      // save attribute
+      try {
+        this.busy = true;
+        let a: AttributeEntry = await this.emigoService.addAttribute(this.schema, JSON.stringify(this.attr));
+        for(let i = 0; i < ids.length; i++) {
+          await this.emigoService.setAttributeLabel(a.attribute.attributeId, ids[i]);
+        }
         this.busy = false;
         this.goBack();
-      }).catch(err => {
+      }
+      catch(e) {
         this.busy = false;
         dialogs.alert({ message: "Error: failed to save attribute", okButtonText: "ok" });
-      });
+      } 
     }
-    if(!this.busy && this.applyDelete && this.id != null) {
-      dialogs.confirm({ message: "Are you sure you want to delete this info?",
-          okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
-        if(flag) {
-          this.busy = true;
-          this.emigoService.deleteAttribute(this.id).then(e => {
-            this.applySave = false;
-            this.applyText = "";
-            this.busy = false;
-            this.goBack();
-          }).catch(err => {
-            this.busy = false;
-            dialogs.alert({ message: "Error: failed to delete attribute", okButtonText: "ok" });
-          });
-        }
-      });
-    }    
   }
 
   public isSelected(id: string): boolean {
@@ -223,106 +182,66 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
     else {
       this.labelSet.add(id);
     }
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public updateField(field: string, value: string) {
     if(this.attr[field] != value) {
       this.attr[field] = value;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public clearField(field: string) {
     this.attr[field] = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public clearPhone() {
     this.attr.phone = null;
     this.attr.phoneSms = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public updatePhone(val: string) { 
     if(val != this.attr.phone) {
       this.attr.phone = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public updateCategory(val: string) {
     if(val != this.attr.category) {
       this.attr.category = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public updateUrl(val: string) {
     if(val != this.attr.url) {
       this.attr.url = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public clearUrl() {
     this.attr.url = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public updateSms(field: string, sms: boolean) {
     this.attr[field] = sms;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public setCategory(c: string) {
     this.attr.category = c;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.dropActive = false;
-    this.applyText = "SAVE";
   }
 
   public clearEmail() {
     this.attr.email = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public clearCategory() {
     this.handled = true;
     this.attr.category = null;
-    this.applySave = true;
-    this.applyDelete = false;
     this.dropActive = false;
-    this.applyText = "SAVE";
   }
 
   public updateEmail(val: string) { 
     if(val != this.attr.email) {
       this.attr.email = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
@@ -332,10 +251,7 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
           "OK", "Pinterest", "QQ", "Skype", "Snapchat", "SoundCloud", "Spotify", "Twitch", "Tumblr", "Twitter", "VK",
           "WhatsApp", "WeChat", "YouTube", "Other" ], cancelButtonText: "Dismiss" }).then(action => {
         this.attr.category = action.title;
-        this.applySave = true;
-        this.applyDelete = false;
         this.dropActive = false;
-        this.applyText = "SAVE";
       });
     }
     this.handled = false;
@@ -344,42 +260,27 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
 
   public clearLink() {
     this.attr.link = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public updateLink(val: string) { 
     if(val != this.attr.link) {
       this.attr.link = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public setLinkCategory(c: string) {
     this.attr.category = c;
-    this.applySave = true;
-    this.applyDelete = false;
     this.dropActive = false;
-    this.applyText = "SAVE";
   }
 
   public updateWorkField(field: string, val: string) {
     if(val != this.attr[field]) {
       this.attr[field] = val;
-      this.applySave = true;
-      this.applyDelete = false;
-      this.applyText = "SAVE";
     }
   }
 
   public clearWorkField(field: string) {
     this.attr[field] = null;
-    this.applySave = true;
-    this.applyDelete = false;
-    this.applyText = "SAVE";
   }
 
   public isSms(sms: boolean): boolean {

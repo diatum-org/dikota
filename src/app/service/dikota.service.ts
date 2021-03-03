@@ -93,15 +93,7 @@ export class DikotaService {
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public attachAccount(phone: string, email: string, password: string, emigoId: string, node: string, code: string): Promise<EmigoLogin> {
-    let e: string = "";
-    if(email != null) {
-      e = "&emailAddress=" + email;
-    }
-    let p: string = "";
-    if(phone != null) {
-      p = "&phoneNumber=" + phone.replace(/\+/g, "%2B");
-    }
+  public attachAccount(password: string, emigoId: string, node: string, code: string): Promise<EmigoLogin> {
 
     // construct auth
     let d: Date = new Date();
@@ -110,7 +102,7 @@ export class DikotaService {
     let auth = SHA256(this.SEMI_SECRET + ":" + t);
 
     return this.httpClient.post<EmigoLogin>(AppSettings.EMIGO + "/accounts/attached?password=" + 
-        password + e + p + "&emigoId=" + emigoId + "&node=" + node + "&code=" + code + "&timestamp=" + t + "&auth=" + auth, 
+        password + "&emigoId=" + emigoId + "&node=" + node + "&code=" + code + "&timestamp=" + t + "&auth=" + auth, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -275,7 +267,7 @@ export class DikotaService {
   }
 
   private syncChanges(): void {
-    if(this.syncRevision != this.identity.revision) {
+    if(this.identity != null && this.syncRevision != this.identity.revision) {
 
       this.getIdentityRevision().then(r => {
         if(r != this.identity.revision) {

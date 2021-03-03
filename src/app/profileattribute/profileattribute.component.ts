@@ -1,11 +1,9 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 import { RouterExtensions } from "nativescript-angular/router";
-import { device, screen, platformNames } from 'tns-core-modules/platform';
+import { isIOS, device, screen, platformNames } from 'tns-core-modules/platform';
 import * as utils from "tns-core-modules/utils/utils";
 
-import { AttributeEntity } from '../appdb/emigo.service';
-import { ContextService } from '../service/context.service';
 import { AttributeUtil } from '../attributeUtil';
 
 @Component({
@@ -15,16 +13,13 @@ import { AttributeUtil } from '../attributeUtil';
 })
 export class ProfileAttributeComponent implements OnInit, OnDestroy {
 
-  private attribute: AttributeEntity;
   private iOS: boolean;
 
-  constructor(private router: RouterExtensions,
-      private contextService: ContextService) {
-    this.iOS = (device.os == "iOS");
+  constructor(private router: RouterExtensions) {
+    this.iOS = isIOS;
   }
 
   ngOnInit(): void {
-   this.attribute = { id: null, schema: null, obj: { }, labels: [] };
   }
 
   ngOnDestroy(): void {
@@ -35,39 +30,27 @@ export class ProfileAttributeComponent implements OnInit, OnDestroy {
   }
 
   public onAddEmail() {
-    this.attribute.schema = AttributeUtil.EMAIL;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd",  AttributeUtil.EMAIL], { clearHistory: false });
   }
 
   public onAddPhone() {
-    this.attribute.schema = AttributeUtil.PHONE;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd", AttributeUtil.PHONE], { clearHistory: false });
   }
 
   public onAddHome() {
-    this.attribute.schema = AttributeUtil.HOME;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd", AttributeUtil.HOME], { clearHistory: false });
   }
 
   public onAddBusinessCard() {
-    this.attribute.schema = AttributeUtil.CARD;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd", AttributeUtil.CARD], { clearHistory: false });
   }
 
   public onAddWebsite() {
-    this.attribute.schema = AttributeUtil.WEBSITE;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd", AttributeUtil.WEBSITE], { clearHistory: false });
   }
 
   public onAddSocialLink() {
-    this.attribute.schema = AttributeUtil.SOCIAL;
-    this.contextService.setAttribute(this.attribute);
-    this.router.navigate(["/attributeadd"], { clearHistory: false });
+    this.router.navigate(["/attributeadd", AttributeUtil.SOCIAL], { clearHistory: false });
   }
 
   public onRequest() {

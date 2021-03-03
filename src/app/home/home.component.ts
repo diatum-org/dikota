@@ -19,11 +19,12 @@ import { AnimationCurve } from "tns-core-modules/ui/enums";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { NgZone } from "@angular/core";
 
-import { AttributeUtil, AttributeDataEntry } from '../attributeUtil';
+import { ContactEntry, ContactLayoutType } from '../contactEntry';
+
+import { AttributeUtil } from '../attributeUtil';
 import { DikotaService } from '../service/dikota.service';
-import { ContextService } from '../service/context.service';
-import { MonitorService } from '../service/monitor.service';
-import { EmigoService, EmigoView, EmigoContact, AttributeEntity } from '../appdb/emigo.service';
+import { EntryService } from '../service/entry.service';
+import { EmigoService } from '../appdb/emigo.service';
 import { Emigo } from '../appdb/emigo';
 import { LabelEntry } from '../appdb/labelEntry';
 
@@ -40,7 +41,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private imgObject: any = null;
   private imgSource: ImageSource = null;
   public labels: LabelEntry[] = [];
-  @ViewChild("res", {static: false}) emigos: ElementRef;
+  @ViewChild("res", {static: false}) contacts: ElementRef;
   @ViewChild("top", {static: false}) top: ElementRef;
   @ViewChild("nxt", {static: false}) next: ElementRef;
   @ViewChild("scr", {static: false}) scrollView: ElementRef;
@@ -50,14 +51,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private leftMenuVisible: boolean = false;
   private rightMenuVisible: boolean = false;
   private avatarSrc: ImageSource = null;
-  private maskSrc: ImageSource = null;
-  private viewSrc: ImageSource = null;
-  private phoneSrc: ImageSource = null;
-  private textSrc: ImageSource = null;
-  private emailSrc: ImageSource = null;
   private sub: Subscription[] = [];
   private selected: string = null;
-  private grids: Map<string, GridLayout>;
   private scrollTop: number = null;
   private scrollBottom: number = null;
   private scrollIdx: Map<string, number>;
@@ -74,18 +69,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   private alertMsg: string = "";
   private nodeAlert: boolean = false;
   private registryAlert: boolean = false;
-  private afterInit: boolean = false;
-  private contacts: EmigoView[] = [];
   public notify: boolean = false;
   public syncProgress: number = null;
 
+  private entries: Map<string, ContactEntry>;
+
   constructor(private router: RouterExtensions,
       private zone: NgZone,
-      private monitorService: MonitorService,
-      private contextService: ContextService,
+      private entryService: EntryService,
       private dikotaService: DikotaService,
       private emigoService: EmigoService) {
-    this.grids = new Map<string, GridLayout>();
     this.scrollVal = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
     this.scrollIdx = new Map<string, number>();
     this.scrollIdx.set('A', 0);
@@ -118,52 +111,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
     this.iOS = (device.os == "iOS");
-    this.emigoService.setLabels(null);
+    this.emigoService.setEmigoSearchFilter(null);
+    this.entries = new Map<string, ContactEntry>();
   }
 
   ngOnInit(): void {
 
-    // load mask
-    this.maskSrc = ImageSource.fromFileSync("~/assets/mask.png");
-
     // load default icon
     this.avatarSrc = ImageSource.fromFileSync("~/assets/savatar.png");
-
-    // load messaging icon
-    this.textSrc = ImageSource.fromFileSync("~/assets/messaging.png");
-    
-    // load email icon
-    this.emailSrc = ImageSource.fromFileSync("~/assets/email.png");
-
-    // load telephone icon
-    this.phoneSrc = ImageSource.fromFileSync("~/assets/telephone.png");
 
     // observe labels
     this.sub.push(this.emigoService.labels.subscribe(l => {
       this.labels = l;
     })); 
-
-    // observe notify flag
-    this.sub.push(this.monitorService.notifyFlag.subscribe(n => {
-      this.notify = n;
-    }));
-
-    // observe node alert
-    this.sub.push(this.emigoService.nodeAlert.subscribe(f => {
-      this.nodeAlert = f;
-      this.setAlert();
-    }));
-
-    // observe registry alert
-    this.sub.push(this.emigoService.registryAlert.subscribe(f => {
-      this.registryAlert = f;
-      this.setAlert();
-    }));
-
-    // observe sync status
-    this.sub.push(this.emigoService.synchronizing.subscribe(s => {
-      this.syncProgress = s;
-    }));
 
     // observe identity
     this.sub.push(this.emigoService.identity.subscribe(i => {
@@ -213,9 +173,25 @@ export class HomeComponent implements OnInit, OnDestroy {
       console.log("DikotaService.getProfileRevision failed");
     });
     
+    this.application.on(this.application.orientationChangedEvent, this.orientation);
+  }
+
+  ngAfterViewInit(): void {
+    
+    // observe filtered contacts
     this.sub.push(this.emigoService.filteredContacts.subscribe(c => {
-      if(this.count == null || this.count == 0) {
-        this.count = c.length;
+
+      // load contact
+      let stack = <StackLayout>this.contacts.nativeElement;
+      stack.removeChildren();
+      for(let i = 0; i < c.length; i++) {
+        let e: ContactEntry = this.entries.get(c[i].emigoId);
+        if(e == null) {
+          e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
+          this.entries.set(c[i].emigoId, e);
+        }
+        e.setContact(c[i], ContactLayoutType.Controls);
+        stack.addChild(e.getLayout());
       }
 
       // determine scroll range for each letter
@@ -230,17 +206,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.scrollVal[i] = this.scrollVal[i] * 64 + prev;
         prev = this.scrollVal[i];
       }
-
-      this.contacts = c;
-      this.applyContacts();
     }));
-
-    this.application.on(this.application.orientationChangedEvent, this.orientation);
   }
 
-  ngAfterViewInit(): void {
-    this.afterInit = true;
-    this.applyContacts();
+  ngAfterContentInit(): void {
+    // observe contact notifications
+    this.sub.push(this.entryService.notifyUpdate.subscribe(n => {
+      this.notify = n;
+    }));
   }
 
   ngOnDestroy(): void {
@@ -261,201 +234,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  private setAlert(): void {
-    if(this.nodeAlert && this.registryAlert) {
-      this.alertMsg = "Communication Error";
-    }
-    else if(this.nodeAlert) {
-      this.alertMsg = "Node Communication Error";
-    }
-    else if(this.registryAlert) {
-      this.alertMsg = "Registry Communication Error";
-    }
-    else {
-      this.alertMsg = "";
-    }
-  }
-
-  private applyContacts() {
-
-    if(this.afterInit) {
-      // populate list of emigos
-      let e: EmigoView[] = this.contacts;
-      let stack = <StackLayout>this.emigos.nativeElement;
-      let views: Map<string, GridLayout> = new Map<string, GridLayout>();
-      for(let i = 0; i < e.length; i++) {
-        let id: string = e[i].id + "-" + e[i].identityRevision + "-" + e[i].attributeRevision;
-        if(e[i].appData != null) {
-          id += "-" + e[i].appData.revision;
-        }
-        if(this.grids.has(id)) {
-          let g: GridLayout = this.grids.get(id);
-          if(stack.getChildAt(i) != g) {
-            stack.removeChild(g);
-            stack.insertChild(g, i);
-            views.set(id, g);
-          }
-        }
-        else {
-          let g: GridLayout = this.getGridView(e[i]);
-          stack.insertChild(g, i);
-          views.set(id, g);
-        }
-      }
-      while(stack.getChildrenCount() > e.length) {
-        stack.removeChild(stack.getChildAt(e.length));
-      }
-      this.grids = views;
-    }
-  }
-
-  private selectContact(e: EmigoView): void {
-    this.emigoService.selectEmigoContact(e.id).then(() => {
-      this.contextService.setEmigo({ id: e.id, handle: e.handle, registry: null, pending: false, available: true });
-      this.zone.run(() => {
-        this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-          transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-      });
-    }).catch(err => {
-      console.log("EmigoService.selectEmigoContact failed");
-      dialogs.alert({ message: "failed to select contact", okButtonText: "ok" });
-    });
-  }
-
-  private getGridView(e: EmigoView): GridLayout {
-
-    let name: Label = new Label();
-    name.text = e.name;
-    name.fontSize = 18;
-    name.className = "text";
-    name.translateY = -12;
-    name.verticalAlignment = VerticalAlignment.middle;
-    name.paddingLeft = 12;
-    name.on(Button.tapEvent, () => {
-      this.selectContact(e);
-    }); 
-  
-    let mask: Image = new Image();
-    mask.width = 48;
-    mask.height = 48;
-    mask.src = this.maskSrc;
-    mask.on(Button.tapEvent, () => {
-      this.emigoService.selectEmigoContact(e.id).then(() => {
-        this.contextService.setEmigo({ id: e.id, handle: e.handle, registry: null, pending: false, available: true });
-        this.zone.run(() => {
-          this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-            transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-        });
-      }).catch(err => {
-        console.log("EmigoService.selectEmigoContact failed");
-        dialogs.alert({ message: "failed to select contact", okButtonText: "ok" });
-      });
-    });
-
-    let icon: Image = new Image();
-    icon = new Image();
-    icon.width = 48;
-    icon.height = 48;
-    if(e.thumb != null) {
-      icon.src = ImageSource.fromBase64Sync(e.thumb);
-    }
-    else {
-      icon.src = this.avatarSrc;
-    }
-
-    let g: GridLayout = new GridLayout();
-    g.on(Button.tapEvent, () => {});
-    g.height = 64;
-    g.marginLeft = 16;
-    g.paddingTop = 8;
-    g.paddingBottom = 8;
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addColumn(new ItemSpec(1, "star"));
-    g.addChildAtCell(icon, 0, 0);
-    g.addChildAtCell(mask, 0, 0);
-
-    let ctrl: GridLayout = new GridLayout();
-    ctrl.addColumn(new ItemSpec(1, "star"));
-    ctrl.addColumn(new ItemSpec(1, "auto"));
-    g.addChildAtCell(ctrl, 0, 1);
-    g.addChildAtCell(name, 0, 1);
-
-    let fill: Label = new Label();
-    fill.on(Button.tapEvent, () => {
-      this.selectContact(e);
-    });
-    ctrl.addChildAtCell(fill, 0, 0);   
- 
-    let btns: StackLayout = new StackLayout();
-    btns.orientation = Orientation.horizontal;
-    btns.horizontalAlignment = HorizontalAlignment.right;
-
-    if(e.appData != null && e.appData.hasText) {
-      let text: Image = new Image();
-      text.on(Button.tapEvent, () => {
-        this.emigoService.getEmigoContact(e.id).then(c => {
-          let texts: AttributeDataEntry[] = AttributeUtil.getTextData(c.attributes);
-          this.onControl("sms", texts, text);
-        });
-      });
-      text.marginLeft = 16;  
-      text.width = 32;
-      text.height = 32;
-      text.translateY = 12;
-      text.src = this.textSrc;
-      btns.addChild(text);
-    }
-    
-    if(e.appData != null && e.appData.hasPhone) {
-      let phone: Image = new Image();
-      phone.on(Button.tapEvent, () => {
-        this.emigoService.getEmigoContact(e.id).then(c => {
-          let phones: AttributeDataEntry[] = AttributeUtil.getPhoneData(c.attributes);
-          this.onControl("tel", phones, phone);
-        });
-      });
-      phone.marginLeft = 16;
-      phone.width = 32;
-      phone.height = 32;
-      phone.translateY = 12;
-      phone.src = this.phoneSrc;
-      btns.addChild(phone);
-    }
-
-    if(e.appData != null && e.appData.hasEmail) {
-      let email: Image = new Image();
-      email.on(Button.tapEvent, () => {
-        this.emigoService.getEmigoContact(e.id).then(c => {
-          let emails: AttributeDataEntry[] = AttributeUtil.getEmailData(c.attributes);
-          this.onControl("mailto", emails, email, false);
-        });
-      });
-      email.marginLeft = 16;
-      email.width = 32;
-      email.height = 32;
-      email.translateY = 12;
-      email.src = this.emailSrc;
-      btns.addChild(email);
-    }
-
-    // add buttons to view
-    ctrl.addChildAtCell(btns, 0, 1);
-
-    return g;
-  }
-
   private onSearchUpdate(s: string) {
     if(s == null) {
-      this.emigoService.setFilter(null);
+      this.emigoService.setEmigoSearchFilter(null);
       this.search = null;
     }
     else if(s.length == 0) {
-      this.emigoService.setFilter(null);
+      this.emigoService.setEmigoSearchFilter(null);
       this.search = null;
       this.searchSet = false;
     }
     else {
-      this.emigoService.setFilter(s);
+      this.emigoService.setEmigoSearchFilter(s);
       this.search = s;
     }  
   }
@@ -649,7 +439,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onControl(prefix: string, e: AttributeDataEntry[], view: Image, trim: boolean = true) {
+  public onControl(prefix: string, e: any[] , view: Image, trim: boolean = true) {
     if(e == null || e.length == 0) {
       console.log("no entry option");
     }
@@ -688,13 +478,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   public onLabel(label: string): void {
     this.labelId = label;
     if(label == null) {
-      this.emigoService.setLabels(null);
+      this.emigoService.setEmigoLabelFilter(null);
     }
     else if(label == "") {
-      this.emigoService.setLabels([]);
+      this.emigoService.setEmigoLabelFilter("");
     }
     else {
-      this.emigoService.setLabels([ label ]);
+      this.emigoService.setEmigoLabelFilter(label);
     }
   }
 
@@ -786,9 +576,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   public onLogout() {
     dialogs.confirm({ message: "Log out of Dikota?", okButtonText: "Log Out", cancelButtonText: "Cancel" }).then(flag => {
       if(flag) {
-        this.monitorService.stop();
-        this.dikotaService.clearToken();
         this.emigoService.clearEmigo();
+        this.entryService.clear();
+        this.dikotaService.clearToken();
         this.emigoService.clearAppContext().then(() => {
           this.router.navigate(["/root"], { clearHistory: true });
         }).catch(err => {

@@ -11,10 +11,11 @@ import { AppContext } from '../model/appContext';
 import { AppSettings } from "../app.settings";
 import { DikotaService } from "../service/dikota.service";
 import { CreateService } from "../service/create.service";
-import { MonitorService } from "../service/monitor.service";
 import { EmigoService } from "../appdb/emigo.service";
 import { RegistryService } from "../appdb/registry.service";
 import { AttributeUtil } from '../attributeUtil';
+import { EmigoUtil } from '../emigoUtil';
+import { EntryService } from '../service/entry.service';
 
 @Component({
     selector: "login",
@@ -32,7 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   public loginColor: string = "#888888";
   public loginFlag: boolean = false;
   public show: boolean = false;
-  public hint: string = "Username / Phone / Email";
+  public hint: string = "Username";
   @ViewChild("lgn", {static: false}) loginRef: ElementRef;
   @ViewChild("pas", {static: false}) passRef: ElementRef;
   private version: string = "";
@@ -40,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(private dikotaService: DikotaService, 
       private createService: CreateService,
       private emigoService: EmigoService,
-      private monitorService: MonitorService,
+      private entryService: EntryService,
       private registryService: RegistryService,
       private router: RouterExtensions,
       private page: Page) { 
@@ -127,12 +128,12 @@ export class LoginComponent implements OnInit, OnDestroy {
         appNode: l.service.node, appToken: l.service.token, serviceToken: l.token};
     
     this.dikotaService.setToken(l.token);
-    this.emigoService.setEmigo(context.emigoId, context.registry, context.token, AttributeUtil.getSchemas(),
-        context.appNode, context.appToken).then(p => {
+    this.emigoService.setEmigo(context.emigoId, context.registry, context.token, context.appNode, context.appToken,
+        AttributeUtil.getSchemas(), [], null, EmigoUtil.getSearchableEmigo, s => {}).then(p => {
      
+      this.entryService.init();
       // save context 
       this.emigoService.setAppContext(context).then(() => {
-        this.monitorService.start();
         this.router.navigate(["/home"], { clearHistory: true });
       }).catch(err => {
         console.log("EmigoService.setAppContext failed");
@@ -158,21 +159,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     // regex
     var at = /^(?=.*[@])/
-    var reg = /^(?=.*[|])/
-    var alpha = /^(?=.*[a-zA-Z])/
 
     if(at.test(this.login)) {
-      // assume email login if contains '@'
-      this.dikotaService.emailLogin(this.login, pass).then(l => {
-        this.applyLogin(l);  
-      }).catch(err => {
-        this.busy = false;
-        dialogs.alert({ message: "Error: account login failed", okButtonText: "ok" });
-      });
-    }
-    else if(reg.test(this.login)) {
       // assume username login at specified registry
-      let address: string[] = this.login.split("|");
+      let address: string[] = this.login.split("@");
       this.registryService.getEmigoId("https://registry." + address[1] + "/app", address[0]).then(i => {
         this.dikotaService.emigoIdLogin(i, pass).then(l => {
           this.applyLogin(l);
@@ -185,18 +175,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         dialogs.alert({ message: "Error: could not find user", okButtonText: "ok" });
       });
     }
-    else if(!alpha.test(this.login)) {
-      // assume phone if does not contain any alpha
-      let e164: string = this.dikotaService.getE164(this.login);
-      this.dikotaService.phoneLogin(e164, pass).then(l => {
-        this.applyLogin(l);
-      }).catch(err => {
-        this.busy = false;
-        dialogs.alert({ message: "Error: account login failed", okButtonText: "ok" });
-      });
-    }
     else {
-      // assume username at coredb.org registry
+      // assume username at default registry
       this.registryService.getEmigoId(AppSettings.REGISTRY, this.login).then(i => {
         this.dikotaService.emigoIdLogin(i, pass).then(l => {
           this.applyLogin(l);

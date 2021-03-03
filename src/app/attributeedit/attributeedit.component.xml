@@ -256,7 +256,7 @@
           <Label text="Labels:" fontWeight="Bold" class="text" fontSize="16"></Label>
         </GridLayout>
         <GridLayout *ngFor="let l of labels" height="32" borderBottomWidth="1" borderColor="#EEEEEE" (tap)="toggleSelected(l.labelId)">
-          <Label class="text" [text]="l.label.name" fontSize="16" verticalAlignment="center" horizontalAlgignment="left"></Label>
+          <Label class="text" [text]="l.name" fontSize="16" verticalAlignment="center" horizontalAlgignment="left"></Label>
           <Image *ngIf="isSelected(l.labelId)" src="~/assets/checked.png" width="32" height="32" verticalAlignment="center"
               horizontalAlignment="right"></Image>
           <Image *ngIf="!isSelected(l.labelId)" src="~/assets/unchecked.png" width="32" height="32" verticalAlignment="center"

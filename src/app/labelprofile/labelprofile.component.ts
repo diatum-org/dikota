@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute } from '@angular/router';
 import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import { Menu } from "nativescript-menu";
 import { Subscription } from 'rxjs';
-import { device, screen, platformNames } from 'tns-core-modules/platform';
+import { isIOS, device, screen, platformNames } from 'tns-core-modules/platform';
 
 import { AttributeUtil } from '../attributeUtil';
-import { ContextService } from '../service/context.service';
 
-import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
-import { Label } from '../appdb/label';
 
 @Component({
     selector: "labelprofile",
@@ -19,33 +18,54 @@ import { Label } from '../appdb/label';
 })
 export class LabelProfileComponent implements OnInit, OnDestroy {
 
-  private sub: Subscription[] = [];
-  public attributes: AttributeEntity[] = [];
   public busy: boolean = false;
-  public entry: LabelEntry = null;
+  public labelId: string = null;
+  public attributeData: any[] = [];
+  public labelMap: Map<string, boolean>;
   public name: string = "";
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService,
-      private contextService: ContextService) {
-    this.iOS = (device.os == "iOS");
+      private route: ActivatedRoute,
+      private emigoService: EmigoService) {
+    this.iOS = isIOS;
+    this.labelMap = new Map<string, boolean>();
   }
 
   ngOnInit(): void {
-    this.entry = this.contextService.getLabel();
-    if(this.entry != null) {
-      this.name = this.entry.label.name;
-    }
-    this.sub.push(this.emigoService.attributes.subscribe(a => {
-      this.attributes = a;
-    }));
+
+    // retrieve specified label
+    this.route.params.forEach(p => {
+      this.emigoService.getLabel(p.id).then(l => {
+        this.labelId = l.labelId;
+        this.name = l.name;
+    
+        // construct map of attributes and thir labels
+        this.emigoService.getAttributes().then(a => {
+          // determine labeled state of attribute
+          for(let i = 0; i < a.length; i++) {
+            this.attributeData.push({ 
+              attributeId: a[i].attribute.attributeId, 
+              schema: a[i].attribute.schema, 
+              obj: JSON.parse(a[i].attribute.data) 
+            });
+            this.labelMap.set(a[i].attribute.attributeId, false);
+            for(let j = 0; j < a[i].labels.length; j++) {
+              if(a[i].labels[j] == l.labelId) {
+                this.labelMap.set(a[i].attribute.attributeId, true);
+              }
+            }
+          }
+        }).catch(err => {
+          console.log(err);
+        });
+      }).catch(err => {
+        console.log(err);
+      });
+    });
   }
 
   ngOnDestroy(): void {
-    for(let i = 0; i < this.sub.length; i++) {
-      this.sub[i].unsubscribe();
-    }
   }
 
   public onBack(): void {
@@ -58,13 +78,12 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
   }
 
   public onMenu(ev): void {
-    if(this.entry != null) {
+    if(this.labelId != null) {
       Menu.popup({ view: ev.view, actions: [{ id: 1, title: "Edit Label Name" }, { id: 2, title: "Delete Label" }], cancelButtonText: "Dismiss" }).then(action => {
         if(action.id == 1) {
           dialogs.prompt({ title: "Label Name", okButtonText: "Save", cancelButtonText: "Cancel", inputType: dialogs.inputType.text }).then(r => {
             if(r.result) {
-              let l: Label = { name: r.text, description: this.entry.label.description, logo: this.entry.label.logo, show: this.entry.label.show };
-              this.emigoService.updateLabel(this.entry.labelId, l).then(() => {
+              this.emigoService.updateLabel(this.labelId, r.text).then(() => {
                 this.name = r.text;
               }).catch(err => {
                 dialogs.alert({ message: "failed to save label name: " + JSON.stringify(err), okButtonText: "ok" });
@@ -77,7 +96,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
               okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
             if(flag) {
               this.busy = true;
-              this.emigoService.deleteLabel(this.entry.labelId).then(() => {
+              this.emigoService.removeLabel(this.labelId).then(() => {
                 this.busy = false;
                 this.router.back();
               }).catch(err => {
@@ -93,7 +112,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  public getDetail(a: AttributeEntity): string {
+  public getDetail(a): string {
     if(a.obj == null) {
       return "";
     }
@@ -145,7 +164,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
     return "";
   }
 
-  public getAttributeType(a: AttributeEntity): string {
+  public getAttributeType(a): string {
     if(AttributeUtil.isEmail(a)) {
       if(a.obj == null || a.obj.category == null) {
         return "Email";
@@ -176,41 +195,41 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
     return "Unknown";
   }    
 
-  public isSelected(a: AttributeEntity): boolean {
-    if(a.labels != null && this.entry != null) {
-      for(let i = 0; i < a.labels.length; i++) {
-        if(a.labels[i] == this.entry.labelId) {
-          return true;
-        }
+  public isSelected(a): boolean {
+
+    if(this.labelId != null) {  
+      if(this.labelMap.has(a.attributeId)) {
+        return this.labelMap.get(a.attributeId);
       }
     }
     return false;
   }
    
-  public setSelected(a: AttributeEntity) {
-    if(a.labels != null && this.entry != null) {
+  public setSelected(a) {
+
+    if(this.labelId != null) {
       this.busy = true;
-      this.emigoService.setAttributeLabel(a.id, this.entry.labelId).then(() => {
+      this.emigoService.setAttributeLabel(a.attributeId, this.labelId).then(v => {
         this.busy = false;
+        this.labelMap.set(a.attributeId, true);
       }).catch(err => {
         this.busy = false;
-        console.log("EmigoService.setAttributeLabel failed");
-        dialogs.alert({ message: "failed to assign label", okButtonText: "ok" });
+        console.log(err);
       });
     }
   }
 
-  public clearSelected(a: AttributeEntity) {
-    if(a.labels != null && this.entry != null) {
+  public clearSelected(a) {
+
+    if(this.labelId != null) {
       this.busy = true;
-      this.emigoService.clearAttributeLabel(a.id, this.entry.labelId).then(() => {
+      this.emigoService.clearAttributeLabel(a.attributeId, this.labelId).then(v => {
         this.busy = false;
+        this.labelMap.set(a.attributeId, false);
       }).catch(err => {
         this.busy = false;
-        console.log("EmigoService.clearAttributeLabel failed");
-        dialogs.alert({ message: "failed to remove label", okButtonText: "ok" });
+        console.log(err);
       });
     }
-
   }
 }

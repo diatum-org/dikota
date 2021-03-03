@@ -2,8 +2,8 @@ import { Injectable, Type, Component } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ImageSource } from 'tns-core-modules/image-source';
 import { ImageAsset } from "tns-core-modules/image-asset/image-asset";
-import { BitmapService } from '../appdb/bitmap.service';
 import * as imagepicker from "nativescript-imagepicker";
+import { BitmapService } from './bitmap.service';
 
 @Injectable()
 export class GalleryService {

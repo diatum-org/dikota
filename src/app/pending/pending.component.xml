@@ -19,6 +19,11 @@
         (tap)="setRequested()" borderBottomWidth="1" [borderColor]="requestedBorderColor"></Label>
   </GridLayout>
   <ScrollView row="1">
-    <StackLayout #res></StackLayout>
+    <StackLayout>
+      <StackLayout #con></StackLayout>
+      <StackLayout #req></StackLayout>
+      <StackLayout #rec></StackLayout>
+      <StackLayout #pen></StackLayout>
+    </StackLayout>
   </ScrollView>
 </GridLayout>

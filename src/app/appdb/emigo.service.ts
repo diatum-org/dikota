@@ -6,7 +6,34 @@ import { ImageSource, fromBase64 } from "tns-core-modules/image-source";
 
 import { getEmigoObject } from './emigo.util';
 
-import { StoreService, EmigoBase, EmigoConnection, EmigoUpdate } from './store.service';
+import { Emigo } from './emigo';
+import { EmigoMessage } from './emigoMessage';
+import { ServiceAccess } from './serviceAccess';
+import { LabelEntry } from './labelEntry';
+import { EmigoEntry } from './emigoEntry';
+import { EmigoView } from './emigoView';
+import { Attribute } from './attribute';
+import { AttributeEntry } from './attributeEntry';
+import { AttributeView } from './attributeView';
+import { Subject } from './subject';
+import { SubjectEntry } from './subjectEntry';
+import { SubjectView } from './subjectView';
+import { PendingEmigo } from './pendingEmigo';
+import { PendingEmigoView } from './pendingEmigoView';
+import { ShareEntry } from './shareEntry';
+import { ShareStatus } from './shareStatus';
+import { ShareMessage } from './shareMessage';
+import { ShareView } from './shareView';
+import { LabelView } from './labelView';
+import { SubjectTag } from './subjectTag';
+import { Tag } from './tag';
+
+import { FeedSubject } from './feedSubject';
+import { FeedSubjectEntry } from './feedSubjectEntry';
+import { EmigoContact } from './emigoContact';
+import { PendingContact } from './pendingContact';
+
+import { StoreService, IdRevision, EmigoUpdate } from './store.service';
 import { RegistryService } from './registry.service';
 import { AccessService } from './access.service';
 import { IdentityService } from './identity.service';
@@ -15,151 +42,74 @@ import { ProfileService } from './profile.service';
 import { IndexService } from './index.service';
 import { ShareService } from './share.service';
 import { ContactService } from './contact.service';
+import { TokenService } from './token.service';
+import { ShowService } from './show.service';
+import { ViewService } from './view.service';
 
-import { Emigo } from './emigo';
-import { EmigoMessage } from './emigoMessage';
-import { EmigoEntry } from './emigoEntry';
-import { EmigoEntryData } from './emigoEntryData';
-import { EmigoEntryView } from './emigoEntryView';
-import { ShareEntry } from './shareEntry';
-import { Label } from './label';
-import { LabelEntry } from './labelEntry';
-import { Attribute } from './attribute';
-import { AttributeData } from './attributeData';
-import { AttributeEntryView } from './attributeEntryView';
-import { ServiceAccess } from './serviceAccess';
-import { PendingEmigo } from './pendingEmigo';
-import { PendingEmigoView } from './pendingEmigoView';
-
-export interface AttributeEntity {
-  id: string;
-  schema: string;
-  obj: any;
-  labels: Array<string>;
-}
-
-export interface AttributeEntityData {
-  schema: string;
-  obj: any;
-}
-
-export class EmigoView {
-  id: string;
-  name: string;
-  handle: string;
-  thumb: string;
-  appData: any;
-  appState: any;
-  identityRevision: number;
-  attributeRevision: number;
-  subjectRevision: number;
-  shareRevision: number;
-  shareTimestamp: number;
-}
-
-export class EmigoContact {
-  emigo?: Emigo;
-  notes?: string;
-  labels?: Set<string>;
-  status?: string;
-  attributeRevision?: number;
-  subjectRevision?: number;
-  attributes?: AttributeEntityData[];
-  appData?: any;
-  appState?: any;
-  error?: boolean;
+class Prop {
+    public static readonly IDENTITY = "identity";
+    public static readonly REVISION = "revision";
 }
 
 class Revision {
-  public identity: number;
-  public profile: number;
-  public group: number;
-  public index: number;
-  public share: number;
+  identity: number;
+  group: number;
+  index: number;
+  profile: number;
+  show: number;
+  share: number;
 }
 
-class ShareView {
-  private shareId: string;
-  private status: string;
-  private token: string;
-  private shareRevision: number;
-  private shareTimestamp: number;
+export class EmigoSubjectId {
+  emigoId: string;  
+  subjectId: string
+}
 
-  constructor(id: string, status: string, token: string, revision: number, timestamp: number) {
-    this.shareId = id;
-    this.status = status;
-    this.token = token;
-    this.shareRevision = revision;
-    this.shareTimestamp = timestamp;
-  }
-
-  public getId(): string {
-    return this.shareId;
-  }
-
-  public getStatus(): string {
-    return this.status;
-  }
-
-  public getToken(): string {
-    return this.token;
-  }
-
-  public getRevision(): number {
-    return this.shareRevision;
-  }
-
-  public getTimestamp(): number {
-    return this.shareTimestamp;
-  }
+class MapEntry{
+  id: string;
+  value: any;
 }
 
 @Injectable()
 export class EmigoService {
 
-  private attributeFilter: string[] = [];
-  private token: string = null;
-  private node: string = null;
-  private serviceNode: string = null;
-  private serviceToken: string = null;
-  private emigoId: string = null;
-  private access: any = null;
-  private registry: string = null;
-  private handle: string = null;
-  private emigoStatus: string[] = ['connected'];
-  private emigoFilter: string = null;
-  private emigoLabels: string[] = null;
-  private selectedEmigoId: string = null;
-  private revision: Revision = null;
-  private syncInterval: any = null;
-  private syncCount: number = null;
-  private pendingView: PendingEmigoView[];
-  private indexView: Map<string, string>;
-  private shareView: Map<string, ShareView>;
-  private stale: number = (24 * 60 * 60);
-  private refresh: number = 60;
-  private identityError: boolean = false;
-  private registryError: boolean = false;
-  private profileError: boolean = false;
-  private groupError: boolean = false;
-  private indexError: boolean = false;
-  private shareError: boolean = false;    
+  private emigoId: string; // active account
+  private registry: string;
+  private node: string;
+  private token: string;
+  private serviceNode: string;
+  private serviceToken: string;
+  private attributeFilter: string[];
+  private subjectFilter: string[];
+  private tagFilter: string;
+  private stale: number;
+  private revision: Revision;
+  private access: ServiceAccess;
+  private emigo: string;
+  private emigoLabel: string;
+  private emigoSearch: string;
+  private showLabel: string;
+  private showSearch: string;
+  private viewLabel: string;
+  private viewSearch: string;
+  private syncInterval: any;
+  private searchableSubject: any;
+  private searchableEmigo: any;
 
-  // observables
-  private syncProgress: BehaviorSubject<number>;
-  private emigoIdentity: BehaviorSubject<Emigo>;
+  private selectedEmigo: BehaviorSubject<EmigoContact>;
+  private attributeEntries: BehaviorSubject<AttributeEntry[]>;
   private labelEntries: BehaviorSubject<LabelEntry[]>;
-  private attributeEntries: BehaviorSubject<AttributeEntity[]>;
-  private selected: BehaviorSubject<EmigoContact>;
-  private updated: BehaviorSubject<EmigoContact>;
-  private filteredEmigos: BehaviorSubject<EmigoView[]>;
-  private pendingEmigos: BehaviorSubject<PendingEmigoView[]>;
-  private connectedEmigos: BehaviorSubject<EmigoView[]>;
-  private requestedEmigos: BehaviorSubject<EmigoView[]>;
-  private receivedEmigos: BehaviorSubject<EmigoView[]>;
-  private savedEmigos: BehaviorSubject<EmigoView[]>;
-  private registryFlag: BehaviorSubject<boolean>;
-  private nodeFlag: BehaviorSubject<boolean>;
+  private filteredEmigos: BehaviorSubject<EmigoContact[]>;
+  private connectedEmigos: BehaviorSubject<EmigoContact[]>;
+  private requestedEmigos: BehaviorSubject<EmigoContact[]>;
+  private receivedEmigos: BehaviorSubject<EmigoContact[]>;
+  private savedEmigos: BehaviorSubject<EmigoContact[]>;
+  private allEmigos: BehaviorSubject<EmigoContact[]>;
+  private hiddenEmigos: BehaviorSubject<EmigoContact[]>;
+  private pendingEmigos: BehaviorSubject<PendingContact[]>;
+  private identityEmigo: BehaviorSubject<Emigo>;
+  private showSubjects: BehaviorSubject<FeedSubjectEntry[]>;
+  private viewSubjects: BehaviorSubject<FeedSubject[]>;
 
   constructor(private registryService: RegistryService,
       private accessService: AccessService,
@@ -169,22 +119,82 @@ export class EmigoService {
       private indexService: IndexService,
       private shareService: ShareService,
       private contactService: ContactService,
+      private tokenService: TokenService,
+      private showService: ShowService,
+      private viewService: ViewService,
       private storeService: StoreService) {
 
-    this.syncProgress = new BehaviorSubject<number>(null);
-    this.emigoIdentity = new BehaviorSubject<Emigo>({ emigoId: null, node: null, revision: null, version: null });
+    this.selectedEmigo = new BehaviorSubject<EmigoContact>(null);
+    this.attributeEntries = new BehaviorSubject<AttributeEntry[]>([]);
     this.labelEntries = new BehaviorSubject<LabelEntry[]>([]);
-    this.attributeEntries = new BehaviorSubject<AttributeEntity[]>([]);
-    this.selected = new BehaviorSubject<EmigoContact>(null);
-    this.updated = new BehaviorSubject<EmigoContact>(null);
-    this.filteredEmigos = new BehaviorSubject<EmigoView[]>([]);
-    this.pendingEmigos = new BehaviorSubject<PendingEmigoView[]>([]);
-    this.connectedEmigos = new BehaviorSubject<EmigoView[]>([]);
-    this.requestedEmigos = new BehaviorSubject<EmigoView[]>([]);
-    this.receivedEmigos = new BehaviorSubject<EmigoView[]>([]);
-    this.savedEmigos = new BehaviorSubject<EmigoView[]>([]);
-    this.registryFlag = new BehaviorSubject<boolean>(false);
-    this.nodeFlag = new BehaviorSubject<boolean>(false);
+    this.filteredEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.connectedEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.requestedEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.receivedEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.savedEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.allEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.hiddenEmigos = new BehaviorSubject<EmigoContact[]>([]);
+    this.pendingEmigos = new BehaviorSubject<PendingContact[]>([]);
+    this.showSubjects = new BehaviorSubject<FeedSubjectEntry[]>([]);
+    this.viewSubjects = new BehaviorSubject<FeedSubject[]>([]);
+    this.identityEmigo = new BehaviorSubject<Emigo>(null);
+    this.syncInterval = null;
+  }
+
+  get identity() {
+    return this.identityEmigo.asObservable();
+  }
+
+  get labels() {
+    return this.labelEntries.asObservable();
+  }
+
+  get attributes() {
+    return this.attributeEntries.asObservable();
+  }
+
+  get selectedContact() {
+    return this.selectedEmigo.asObservable();
+  }
+
+  get filteredContacts() {
+    return this.filteredEmigos.asObservable();
+  }
+
+  get connectedContacts() {
+    return this.connectedEmigos.asObservable();
+  }
+
+  get requestedContacts() {
+    return this.requestedEmigos.asObservable();
+  }
+
+  get receivedContacts() {
+    return this.receivedEmigos.asObservable();
+  }
+
+  get savedContacts() {
+    return this.savedEmigos.asObservable();
+  }
+
+  get allContacts() {
+    return this.allEmigos.asObservable();
+  }
+
+  get hiddenContacts() {
+    return this.hiddenEmigos.asObservable();
+  }
+
+  get pendingContacts() {
+    return this.pendingEmigos.asObservable();
+  }
+
+  get showFeed() {
+    return this.showSubjects.asObservable();
+  }
+
+  get viewFeed() {
+    return this.viewSubjects.asObservable();
   }
 
   public init(db: string): Promise<any> {
@@ -199,2520 +209,1604 @@ export class EmigoService {
     return this.storeService.clearAppContext();
   }
 
-  public getAppProperty(key: string): Promise<any> {
-    return this.storeService.getAppProperty(this.emigoId + "_" + key);
-  }
-
   public setAppProperty(key: string, obj: any): Promise<void> {
-    return this.storeService.setAppProperty(this.emigoId + "_" + key, obj);
+    return this.storeService.setAppProperty(this.emigoId, "app_" + key, obj);
   }
 
-  public clearAppProperty(key: string): Promise<void> {
-    return this.storeService.clearAppProperty(this.emigoId + "_" + key);
+  public getAppProperty(key: string): Promise<any> {
+    return this.storeService.getAppProperty(this.emigoId, "app_" + key);
   }
 
-  get nodeAlert() {
-    return this.nodeFlag.asObservable();
-  }
-
-  get registryAlert() {
-    return this.registryFlag.asObservable();
-  }
-
-  // observe syncrhonizing percent
-  get synchronizing() {
-    return this.syncProgress.asObservable();
+  public clearAppProperty(key: string, obj: any): Promise<void> {
+    return this.storeService.clearAppProperty(this.emigoId, "app_" + key);
   }
 
   // set account, validate token, return permissions, and periodically synchronize
-  public setEmigo(emigoId: string, registry: string, token: string, filter: string[], serviceNode: string, serviceToken: string, 
-      stale: number = 86400, refresh: number = 60): Promise<ServiceAccess> {
+  public async setEmigo(emigoId: string, registry: string, token: string, serviceNode: string, serviceToken: string, 
+      attributeFilter: string[], subjectFilter: string[], tagFilter: string,
+      searchableEmigo: any, searchableSubject: any,
+      stale: number = 86400, refresh: number = 60) {
 
     // clear any perviously set account
     this.clearEmigo();
-
-    // init observables
-    this.syncProgress.next(null);
-    this.emigoIdentity.next({ emigoId: emigoId, node: null, revision: null, version: null });
-    this.labelEntries.next([]);
-    this.attributeEntries.next([]);
-    this.selected.next(null);
-    this.updated.next(null);
-    this.filteredEmigos.next([]);
-    this.connectedEmigos.next([]);
-    this.requestedEmigos.next([]);
-    this.receivedEmigos.next([]);
-    this.savedEmigos.next([]);
-    this.registryFlag.next(false);
-    this.nodeFlag.next(false);
-
-    // init cached values
-    this.indexView = new Map<string, string>();
-    this.shareView = new Map<string, ShareView>();
+    
+    // set new account
     this.emigoId = emigoId;
-    this.stale = stale;
-    this.refresh = refresh;
     this.token = token;
+    this.registry = registry;
     this.serviceNode = serviceNode;
     this.serviceToken = serviceToken;
-    this.emigoStatus = ['connected'];
-    this.emigoFilter = null;
-    this.emigoLabels = null;
-    this.selectedEmigoId = null;
-    this.revision = new Revision();
-    this.syncCount = 0;
-    this.identityError = false;
-    this.registryError = false;
-    this.profileError = false;
-    this.groupError = false;
-    this.indexError = false;
-    this.shareError = false;
-    if(filter == null) {
-      this.attributeFilter = [];
+    this.attributeFilter = attributeFilter;
+    this.subjectFilter = subjectFilter;
+    this.tagFilter = tagFilter;
+    this.searchableEmigo = searchableEmigo;
+    this.searchableSubject = searchableSubject;
+    this.stale = stale;
+
+    // init sync revision for each module
+    this.revision = { identity: 0, group: 0, index: 0, profile: 0, show: 0, share: 0 };
+
+    // import account if access and identity have not already been stored
+    let access: ServiceAccess = await this.storeService.setAccount(emigoId);
+    let emigo: Emigo = await this.storeService.getAppProperty(this.emigoId, Prop.IDENTITY);
+    if(access == null || emigo == null) {
+
+      // retrieve identity
+      let msg: EmigoMessage = await this.registryService.getMessage(registry, this.emigoId);
+      emigo = getEmigoObject(msg);
+      this.identityEmigo.next(emigo);
+      this.node = emigo.node;
+      this.registry = emigo.registry;
+      await this.storeService.setAppProperty(this.emigoId, Prop.IDENTITY, emigo);
+      this.revision.identity = emigo.revision;
+      this.identityEmigo.next(emigo);
+
+      // retrieve access
+      this.access = await this.tokenService.getAccess(this.node, this.token);
+
+      // import account but dont wait
+      try {
+        this.importAccount(registry);
+      }
+      catch(e) {
+        console.error(e);
+      }
     }
     else {
-      this.attributeFilter = filter;
+
+      // set module access
+      this.access = access;      
+
+      // retrieve identity
+      this.identityEmigo.next(emigo);
+      this.registry = emigo.registry;
+      this.node = emigo.node;
+      this.identityEmigo.next(emigo);
+
+      // retrieve attributes
+      let a: AttributeEntry[] = await this.storeService.getAttributes(this.emigoId);
+      this.attributeEntries.next(a);
+
+      // retrieve labels
+      let l: LabelEntry[] = await this.storeService.getLabels(this.emigoId);
+      this.labelEntries.next(l);
+
+      // refresh contacts
+      this.refreshEmigos();
+      this.refreshContacts();
+      this.refreshPending();
+      this.refreshShowFeed();
+      this.refreshViewFeed();
+
+      // retrieve revision
+      let r = await this.storeService.getAppProperty(this.emigoId, Prop.REVISION);
+      if(r != null) {
+        this.revision = r;
+      }
     }
 
-    return new Promise<ServiceAccess>((resolve, reject) => {
+    // periodically sync appdb
+    this.syncChanges();
+    this.syncInterval = setInterval(() => { this.syncChanges(); }, refresh * 1000);
 
-      // retrieve permission entry
-      this.storeService.getAppAccount(emigoId).then(p => {
-
-        if(p == null) {
-
-          // pull registry
-          this.registryService.getMessage(registry, emigoId).then(m => {
-            let emigo: Emigo = getEmigoObject(m);
-
-            // pull access
-            this.accessService.getAccess(emigo.node, token).then(a => {
-      
-              // save access
-              this.storeService.setAppAccount(emigoId, a).then(() => {
-                this.access = a;
-
-                // prepare account tables
-                this.storeService.setAccount(emigoId).then(() => {
-
-                  // set initial profile
-                  this.node = emigo.node;
-                  this.setNode().then(() => {
-                    this.syncNode();  // not waiting for sync to complete
-                    resolve(a);
-                  }).catch(err => {
-                    console.log("EmigoService.setNode failed");
-                    reject();
-                  });
-                }).catch(err => {
-                  console.log("StoreService.setAccount failed");
-                  reject();
-                });
-              }).catch(err => {
-                console.log("StoreService.setAppAccount failed");
-                reject();
-              });
-            }).catch(err => {
-              console.log("AccessService.getAccess failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("RegistryService.getMessage failed");
-            reject();
-          });
-        }
-        else {
-
-          // prepare account tables
-          this.access = p;
-          this.storeService.setAccount(emigoId).then(() => {
-            this.loadNode().then(() => {
-              this.setEmigos();
-              resolve(p);
-            }).catch(err => {
-              console.log("EmigoService.loadNode failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("StoreService.setAccount failed");
-            reject();
-          });
-        }
-      }).catch(err => {
-        console.log("StoreService.getAppAccount failed");
-        reject();
-      });
-    });
+    return this.access; 
   }
 
   // clear account
   public clearEmigo(): void {
 
-    // reset observables
-    this.syncProgress.next(null);
-    this.emigoIdentity.next({ emigoId: null, node: null, revision: null, version: null });
-    this.labelEntries.next([]);
-    this.attributeEntries.next([]);
-    this.selected.next(null);
-    this.updated.next(null);
-    this.filteredEmigos.next([]);
-    this.pendingEmigos.next([]);
-    this.connectedEmigos.next([]);
-    this.requestedEmigos.next([]);
-    this.receivedEmigos.next([]);
-    this.savedEmigos.next([]);
-    this.registryFlag.next(false);
-    this.nodeFlag.next(false);
     if(this.syncInterval != null) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
     }
+
+    this.viewService.clearAuth();
+    this.contactService.clearAuth();
+
+    this.emigoLabel = null;
+    this.emigoSearch = null;
+    this.showLabel = null;
+    this.showSearch = null;
+    this.viewLabel = null;
+    this.viewSearch = null;
     this.emigoId = null;
-  }
-
-  // set node url
-  private setNode(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.setProfileObject(this.emigoId, "node", this.node).then(() => {
-        this.setAttributeFilter().then(() => {
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.setAttributeFilter failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("EmigoService.setProfileObject node failed");
-        reject();
-      });    
-    });
-  }
-
-  // set attribute filter
-  private setAttributeFilter(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.setProfileObject(this.emigoId, "filter", this.attributeFilter).then(() => {
-        this.storeService.clearProfileObject(this.emigoId, "attributes").then(() => {
-          resolve();
-        }).catch(err => {
-          console.log("StoreService.clearProfileObject attributes failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.setProfileObject filter failed");
-        reject();
-      });
-    });
-  }   
-
-  // sync node
-  public async syncNode() {
-    
-    this.syncProgress.next(0);
-    await this.syncIdentity();
-      
-    this.syncProgress.next(10);
-    await this.syncLabels();
-        
-    this.syncProgress.next(20);
-    await this.syncAttributes();
-          
-    this.syncProgress.next(30);
-    await this.syncEmigos();
-
-    this.syncProgress.next(40);
-    await this.syncShares();
-
-    this.syncProgress.next(50);
-    let ids: string[] = [];
-    this.indexView.forEach((value, key) => {
-      ids.push(key);
-    });
-    for(let i = 0; i < ids.length; i++) {
-      await this.syncContact(ids[i]);
-      this.syncProgress.next(Math.floor(50 + 50 * (i / ids.length)));
-    }
-    this.syncProgress.next(null);
-
-    // display contacts
-    this.setEmigos();               
-
-    // update in background
-    this.syncCount = 0;
-    this.syncChanges();
-    this.syncInterval = setInterval(() => {
-      this.syncChanges();
-    }, 1000);
-  }
-  
-  private syncContact(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-
-      this.indexService.getEmigo(this.node, this.token, id).then(e => {
-        this.storeService.insertEmigo(this.emigoId, id).then(() => {
-          this.storeService.updateEmigoIdentity(this.emigoId, id, e.emigo).then(() => {
-            let share: ShareView = this.shareView.get(id);
-            if(share != null && share.getStatus() == "connected") {
-              // sync attributes 
-              this.storeService.updateEmigoAttributes(this.emigoId, id, 0, []).then(() => {
-                this.contactService.getRevision(this.serviceNode, this.serviceToken, e.emigo.node, share.getToken()).then(r => {
-                  this.contactService.getAttributes(this.serviceNode, this.serviceToken, e.emigo.node, share.getToken(),
-                      this.attributeFilter).then(a => {
-                    this.storeService.updateEmigoAttributes(this.emigoId, id, r, a).then(() => {
-                      this.updateEmigoContact(id);
-                      resolve();
-                    }).catch(err => {
-                      console.log("StoreService.updateEmigoAttributes failed");
-                      resolve();
-                    });
-                  }).catch(err => {
-                    console.log("ContactService.getAttributes failed");
-                    resolve();
-                  });
-                }).catch(err => {
-                  console.log("ContactService.getRevision failed");
-                  resolve();
-                });
-              }).catch(err => {
-                console.log("StoreService.updateEmigoAttributes failed");
-                resolve();
-              });
-            }
-            else {
-              // no attributes to sync
-              resolve();
-            }
-          }).catch(err => {
-            console.log("StoreService.updateEmigoIdenntity failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("StoreService.insertEmigo failed");
-          resolve();
-        });
-      }).catch(err => {
-        console.log("IndexService.getEmigo failed");
-        resolve();
-      });
-    });
-  }
-
-  // sync identity
-  public syncIdentity(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("not synchronizing identity module");
-        resolve();
-      }
-      else {
-        this.identityService.getMessage(this.node, this.token).then(m => {
-          let emigo: Emigo = getEmigoObject(m);
-          this.handle = emigo.handle;
-          this.registry = emigo.registry;
-          this.emigoIdentity.next(emigo);
-          this.storeService.setProfileObject(this.emigoId, "emigo", emigo).then(() => {
-            this.revision.identity = emigo.revision;
-            this.setRevision();
-            resolve();
-          }).catch(err => {
-            console.log("StoreService.setProfileObject failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("IdentityService.getMessage failed");
-          resolve();
-        });
-      }
-    });
-  }
-
-  // sync labels
-  public syncLabels(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableGroup != true) {
-        console.log("not synchronizing group module");
-        resolve();
-      }
-      else {
-        this.groupService.getLabels(this.node, this.token).then(l => {
-          if(l == null) {
-            l = [];
-          }
-          this.labelEntries.next(l);
-          this.storeService.setProfileObject(this.emigoId, "labels", l).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("StoreService.setProfileObject failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("GroupService.getLabels failed");
-          resolve();
-        });
-      }
-    });
-  }
-
-  // sync attributes
-  public syncAttributes(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("not synchronizing profile module");
-        resolve();
-      }
-      else {
-        this.profileService.getRevision(this.node, this.token).then(r => {
-          this.profileService.getAttributes(this.node, this.token, this.attributeFilter).then(a => {
-            if(a == null) {
-              a = [];
-            }
-            this.attributeEntries.next(this.parseAttributes(a));
-            this.storeService.setProfileObject(this.emigoId, "attributes", a).then(() => {
-              this.revision.profile = r;
-              this.setRevision();
-              resolve();
-            }).catch(err => {
-              console.log("StoreService.setProfileObject failed");
-              resolve();
-            });
-          }).catch(err => {
-            console.log("ProfileService.getAttributes failed");
-            resolve();
-          });
-        }).catch(err => {;
-          console.log("ProfileService.getRevision failed");
-          resolve();
-        });
-      }
-    });
-  }
-
-  // sync index
-  public syncEmigos(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("not synchronizing index module");
-        resolve();
-      }
-      else {
-        this.indexService.getRevision(this.node, this.token).then(r => {
-          this.indexService.getRequestIds(this.node, this.token).then(s => {
-            this.storeService.setProfileObject(this.emigoId, "requests", s).then(() => {
-              this.pendingView = s;
-              this.indexService.getEmigoIds(this.node, this.token).then(async e => {
-                if(e == null) {
-                  e = [];
-                }
-                this.indexView.clear();
-                for(let i = 0; i < e.length; i++) {
-                  this.indexView.set(e[i].emigoId, e[i].notes);
-                }
-                await this.storeService.setEmigoLabels(this.emigoId, e);
-                this.storeService.setProfileObject(this.emigoId, "index", e).then(() => {
-                  this.revision.index = r;
-                  this.setRevision();
-                  resolve();
-                }).catch(err => {
-                  console.log("StoreService.setProfileObject index failed");
-                  resolve();
-                });
-              }).catch(err => {
-                console.log("IndexService.getEmigoIds failed");
-                resolve();
-              });
-            }).catch(err => {
-              console.log("StoreService.setProfileObjet requests failed");
-              resolve();
-            });
-          }).catch(err => {
-            console.log("IndexService.getRequestIds failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("IndexService.getRevision failed");
-          resolve();
-        });
-      }
-    });
-  }
-
-  // sync shares
-  private syncShares(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableShare != true) {
-        console.log("not synchronizing share module");
-        resolve();
-      }
-      else {
-        this.shareService.getRevision(this.node, this.token).then(r => {
-          this.shareService.getConnections(this.node, this.token).then(s => {
-            if(s == null) {
-              s = [];
-            }
-            this.shareView.clear();
-            for(let i = 0; i < s.length; i++) {
-              this.shareView.set(s[i].emigoId, new ShareView(s[i].shareId, s[i].status, s[i].token, s[i].revision, s[i].updated));
-            }
-            this.storeService.setProfileObject(this.emigoId, "share", s).then(() => {
-              this.revision.share = r;
-              this.setRevision();
-              resolve();
-            }).catch(err => {
-              console.log("StoreService.setProfileObject share failed");
-              resolve();
-            });
-          }).catch(err => {
-            console.log("ShareService.getConnections failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("ShareService.getRevision failed");
-          resolve();
-        });
-      }
-    });
-  }
-
-  // load node data
-  private loadNode(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "node").then(n => {
-        this.node = n;
-        this.loadRevision().then(() => {
-          
-          // update in background
-          this.syncCount = 0;
-          this.syncChanges();
-          this.syncInterval = setInterval(() => {
-            this.syncChanges();
-          }, 1000);
-          
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.ge failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.getProfileObject failed");
-        reject();
-      });
-    });
-  }
-
-  // load revision object
-  private loadRevision(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "revision").then(r => {
-        if(r != null) {
-          this.revision = r;
-        }
-        this.loadIdentity().then(() => {
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.loadIdentity failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.getProfileObject failed");
-        reject();
-      });
-    });
-  }
-
-  // load identity data
-  private loadIdentity(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "emigo").then(e => {
-        this.handle = e.handle;
-        this.registry = e.registry;
-        this.emigoIdentity.next(e);
-        this.loadLabels().then(() => {
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.loadLabels failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.getProfileObject failed");
-        reject();
-      });
-    });
-  }
-
-  // load labels
-  private loadLabels(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "labels").then(l => {
-        if(l == null) {
-          l = [];
-        }
-        this.labelEntries.next(l);
-        this.loadAttributes().then(() => {
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.loadAttributes failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.getProfileObject labels failed");
-        reject();
-      });
-    });
-  }
-
-  // load attributes
-  private loadAttributes(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "filter").then(f => {
-        if(f == null) {
-          f = [];
-        }
-        if(JSON.stringify(f) != JSON.stringify(this.attributeFilter)) {
-          this.storeService.clearEmigos(this.emigoId).then(() => {
-            this.setAttributeFilter().then(() => {
-              this.attributeEntries.next([]);
-              this.loadEmigos().then(() => {
-                resolve(); 
-              }).catch(err => {
-                console.log("EmigoService.loadEmigos failed");
-                reject();
-              });
-            }).catch(err => {
-              console.log("EmigoService.syncAttributeFilter failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("StoreService.clearEmigos failed");
-            reject();
-          });
-        }
-        else {
-          this.storeService.getProfileObject(this.emigoId, "attributes").then(a => {
-            if(a == null) {
-              a = [];
-            }
-            this.attributeEntries.next(this.parseAttributes(a));
-            this.loadEmigos().then(() => {
-              resolve();
-            }).catch(err => {
-              console.log("EmigoService.loadEmigos failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("StoreService.getProfileObject attributes failed");
-            reject();
-          });
-        }
-      }).catch(err => {
-        console.log("StoreService.getProfileObject filter failed");
-        reject();
-      });
-    });
-  }
-
-  // private parse attributes
-  private parseAttributes(a: AttributeEntryView[]): AttributeEntity[] {
-    let entities: AttributeEntity[] = [];
-    for(let i = 0; i < a.length; i++) {
-      entities.push({ "id": a[i].attributeId, "schema": a[i].attribute.schema, 
-          "obj": JSON.parse(a[i].attribute.data), "labels": a[i].labels });
-    }
-    return entities;
-  }
-
-  // load emigo id list
-  private loadEmigos(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "requests").then(s => {
-        if(s == null) {
-          s = [];
-        }
-        this.pendingView = s;
-        this.storeService.getProfileObject(this.emigoId, "index").then(async e => {
-          if(e == null) {
-            e = [];
-          }
-          this.indexView.clear();
-          for(let i = 0; i < e.length; i++) {
-            this.indexView.set(e[i].emigoId, e[i].notes);
-          }
-          await this.storeService.setEmigoLabels(this.emigoId, e);
-          this.loadShares().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.loadShares failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("StoreService.getProfileObject index failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("StoreService.getProfileObject requests failed");
-        reject();
-      });
-    });
-  }
-
-  // load share list
-  private loadShares(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.getProfileObject(this.emigoId, "share").then(s => {
-        if(s == null) {
-          s = [];
-        }
-        this.shareView.clear();
-        for(let i = 0; i < s.length; i++) {
-          this.shareView.set(s[i].emigoId, new ShareView(s[i].shareId, s[i].status, s[i].token, s[i].revision, s[i].updated));
-        }
-        resolve();
-      }).catch(err => {
-        console.log("StoreService getProfileObject shares failed");
-        resolve();
-      });
-    });
-  }
-
-  // observe emigo object
-  get identity() {
-    return this.emigoIdentity.asObservable();
-  }
-
-  // set identity name
-  public setName(name: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.identityService.setName(this.node, this.token, name).then(m => {
-          this.refreshEmigo(m).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("IdentityService.setRegistry failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("IdentityService.setName failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set identity description
-  public setDescription(description: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.identityService.setDescription(this.node, this.token, description).then(m => {
-          this.refreshEmigo(m).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("IdentityService.setRegistry failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("IdentityService.setDescription failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set identity image
-  public setImage(image: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.identityService.setImage(this.node, this.token, image).then(m => {
-          this.refreshEmigo(m).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("IdentityService.setRegistry failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("IdentityService.setImage failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set identity location
-  public setLocation(location: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.identityService.setLocation(this.node, this.token, location).then(m => {
-          this.refreshEmigo(m).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("IdentityService.setRegistry failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("IdentityService.setLocation failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set identity registry
-  public setRegistry(registry: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.registryService.checkHandle(registry, this.handle, this.emigoId).then(f => {
-          if(f == false) {
-            console.log("RegistryService.checkHandle rejected");
-            reject();
-          }
-          else {
-            // there is a race condition where another user could claim handle
-            // so app should still be flexible allowing for unregistered handle
-            this.identityService.setRegistry(this.node, this.token, registry).then(m => {
-              this.refreshEmigo(m).then(() => {
-                resolve();
-              }).catch(err => {
-                console.log("IdentityService.setRegistry failed");
-                reject();
-              });
-            }).catch(err => {
-              console.log("IdentityService.setRegistry failed");
-              reject();
-            });
-          }
-        }).catch(err => {
-          console.log("RegistryService.checkHandle failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set identity handle
-  public setHandle(handle: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity != true) {
-        console.log("access denied to identity module");
-        reject();
-      }
-      else {
-        this.registryService.checkHandle(this.registry, handle, this.emigoId).then(f => {
-          if(f == false) {
-            console.log("RegistryService.checkHandle rejected");
-            reject();
-          }
-          else {
-            // there is a race condition where another user could claim handle
-            // so app should still be flexible allowing for unregistered handle
-            this.identityService.setHandle(this.node, this.token, handle).then(m => {
-              this.refreshEmigo(m).then(() => {
-                resolve();
-              }).catch(err => {
-                console.log("EmigoService.refreshEmigo failed");
-                reject();
-              });     
-            }).catch(err => {
-              console.log("IdentityService.setHandle failed");
-              reject();
-            });
-          }
-        }).catch(err => {
-          console.log("RegistryService.checkHandle failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // check if identity is available
-  public checkHandle(handle: string): Promise<boolean> {
-    return this.registryService.checkHandle(this.registry, handle, this.emigoId);
-  }
-
-  private refreshEmigo(msg: EmigoMessage): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      let emigo: Emigo = getEmigoObject(msg);
-      this.handle = emigo.handle;
-      this.registry = emigo.registry;
-      this.emigoIdentity.next(emigo);
-      this.storeService.setProfileObject(this.emigoId, "emigo", emigo).then(() => {
-        this.registryService.setMessage(this.registry, msg).then(() => {
-          this.identityService.clearDirty(this.node, this.token, emigo.revision).then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("IdentityService.clearDirty failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("RegistryService.setMessage failed");
-          resolve();
-        });
-      }).catch(err => {
-        console.log("StoreService.setProfileObject identity failed");
-        reject();
-      });
-     });
-  }
-
-  // observe list of LabelEntry
-  get labels() {
-    return this.labelEntries.asObservable();
-  }
-
-  // add new label
-  public addLabel(label: Label): Promise<LabelEntry> {
-    return new Promise<LabelEntry>((resolve, reject) => {
-      if(this.access.enableGroup != true) {
-        console.log("access denied to group module");
-        reject();
-      }
-      else {
-        this.groupService.addLabel(this.node, this.token, label).then(e => {
-          this.refreshLabels().then(() => {
-            resolve(e);
-          }).catch(err => {
-            console.log("EmigoService.refreshLabels failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("GroupService.addLabel failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // edit label
-  public updateLabel(id: string, label: Label): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableGroup != true) {
-        console.log("access denied to group module");
-        reject();
-      }
-      else {
-        this.groupService.updateLabel(this.node, this.token, id, label).then(e => {
-          this.refreshLabels().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshLabels failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("GroupService.updateLabel failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // remove label
-  public deleteLabel(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableGroup != true) {
-        console.log("access denied to group module");
-        reject();
-      }
-      else {
-        this.groupService.deleteLabel(this.node, this.token, id).then(e => {
-          this.refreshLabels().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshLabels failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("GroupService.deleteLabel failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  private refreshLabels(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.groupService.getRevision(this.node, this.token).then(r => {
-        this.groupService.getLabels(this.node, this.token).then(l => {
-          if(l == null) {
-            l = [];
-          }
-          this.labelEntries.next(l);
-          this.storeService.setProfileObject(this.emigoId, "labels", l).then(() => {
-            this.revision.group = r;
-            this.setRevision();
-            resolve();
-          }).catch(err => {
-            console.log("StoreService.setProfileObject failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("GroupService.getLabels failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("GroupService.getRevision failed");
-        reject();
-      });
-    });
-  }
-
-
-  // observe list of AttributeEntities
-  get attributes() {
-    return this.attributeEntries.asObservable();
-  }
-
-  // add a new attribute with labels
-  public addAttribute(schema: string, obj: any, labels: string[]): Promise<AttributeEntity> {
-    return new Promise<AttributeEntity>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("access denied to profile module");
-        reject();
-      }
-      else {
-        let a: AttributeData = { "schema": schema, "data": JSON.stringify(obj), "labels": labels };
-        this.profileService.addAttribute(this.node, this.token, a).then(e => {
-          let obj: any = null;
-          if(e.attribute.data != null) {
-            obj = JSON.parse(e.attribute.data);
-          }
-          let attribute: AttributeEntity = { id: e.attributeId, schema: e.attribute.schema, 
-              obj: obj, labels: [] };
-          this.refreshAttributes().then(() => {
-            resolve(attribute);
-          }).catch(err => {
-            console.log("EmigoService.refreshAttributes failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.addAttribute failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // update attribute
-  public updateAttribute(id: string, schema: string, obj: any) {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("access denied to profile module");
-        reject();
-      }
-      else {
-        let a: Attribute = { "schema": schema, "data": JSON.stringify(obj) };
-        this.profileService.updateAttribute(this.node, this.token, id, a).then(e => {
-          this.refreshAttributes().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshAttributes failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.updateAttribute failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // remove attribute
-  public deleteAttribute(id: string) {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("access denied to profile module");
-        reject();
-      }
-      else {
-        this.profileService.removeAttribute(this.node, this.token, id).then(e => {
-          this.refreshAttributes().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshAttributes failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.removeAttribute failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // set attribute label
-  public setAttributeLabel(attributeId: string, labelId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("access denied to profile module");
-        reject();
-      }
-      else {
-        this.profileService.setAttributeLabel(this.node, this.token, attributeId, labelId).then(e => {
-          this.refreshAttributes().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshAttributes failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.setAttributeLabel failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // clear attribute label
-  public clearAttributeLabel(attributeId: string, labelId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile != true) {
-        console.log("access denied to profile module");
-        reject();
-      }
-      else {
-        this.profileService.clearAttributeLabel(this.node, this.token, attributeId, labelId).then(e => {
-          this.refreshAttributes().then(() => {
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshAttributes failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.clearAttributeLabel failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  private refreshAttributes(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.profileService.getRevision(this.node, this.token).then(r => {
-        this.profileService.getAttributes(this.node, this.token, this.attributeFilter).then(a => {
-          if(a == null) {
-            a = [];
-          }
-          this.attributeEntries.next(this.parseAttributes(a));
-          this.storeService.setProfileObject(this.emigoId, "attributes", a).then(() => {
-            this.revision.profile = r;
-            this.setRevision();
-            resolve();
-          }).catch(err => {
-            console.log("StoreService.setProfileObject failed");
-            reject();
-          });
-        }).catch(err => {
-          console.log("ProfileService.getAttributes failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("ProfileService.getRevision failed");
-        reject();
-      });
-    });
-  }
-
-  // remove emigo request
-  public clearEmigoRequest(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        this.indexService.clearRequest(this.node, this.token, id).then(() => {
-          this.refreshEmigos().then(() => {
-            this.setEmigos();
-            resolve();
-          }).catch(err => {
-            console.log("EmigoService.refreshEmigos failed");
-            resolve();
-          });
-        }).catch(err => {
-          console.log("IndexService.clearRequest failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // retrieve message for requesting emigo
-  public getEmigoRequestMessage(id: string): Promise<EmigoMessage> {
-    return new Promise<EmigoMessage>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        this.indexService.getRequestMessage(this.node, this.token, id).then(m => {
-          resolve(m);
-        }).catch(err => {
-          console.log("IndexService.getRequestMessage failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // add emigo to index
-  public addEmigo(m: EmigoMessage): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        let emigo: Emigo = getEmigoObject(m);
-        if(this.indexView.has(emigo.emigoId)) {
-          console.log("emigo already added");
-          resolve();
-        }
-        else {
-          this.indexService.addEmigo(this.node, this.token, m).then(e => {
-            this.storeService.insertEmigo(this.emigoId, e.emigo.emigoId).then(() => {
-              this.storeService.updateEmigoIdentity(this.emigoId, e.emigo.emigoId, e.emigo).then(() => {
-                this.refreshEmigos().then(() => {
-                  this.refreshShares().then(() => {
-                    this.setEmigos();
-                    resolve(e.emigo.emigoId);
-                  }).catch(err => {
-                    console.log("EmigoService.refreshShares failed");
-                    reject();
-                  });
-                }).catch(err => {
-                  console.log("EmigoService.refreshEmigos failed");
-                  reject();
-                }); 
-              }).catch(err => {
-                console.log("StoreService.updateEmigoIdentity failed");
-                reject();
-              });
-            }).catch(err => {
-              console.log("StoreService.insertEmigo failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.addEmigo failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // remove emigo from index
-  public deleteEmigo(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        if(!this.indexView.has(id)) {
-          console.log("emigo already removed");
-          resolve();
-        }
-        else {
-          this.indexService.deleteEmigo(this.node, this.token, id).then(() => {
-            this.storeService.deleteEmigo(this.emigoId, id).then(() => {
-              this.refreshEmigos().then(() => {
-                this.refreshShares().then(() => {
-                  this.setEmigos();
-                  resolve();
-                }).catch(err => {
-                  console.log("EmigoService.refreshShares failed");
-                  reject();
-                });
-              }).catch(err => {
-                console.log("EmigoService.refreshEmigos failed");
-                reject();
-              }); 
-            }).catch(err => {
-              console.log("StoreService.deleteEmigo failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.deleteEmigo failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // add notes for emigo
-  public updateEmigo(id: string, notes: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        if(!this.indexView.has(id)) {
-          console.log("emigo entry not found");
-          reject();
-        }
-        else {
-          this.indexService.setEmigoNotes(this.node, this.token, id, notes).then(() => {
-            this.refreshEmigos().then(() => {
-              this.selectEmigoContact(this.selectedEmigoId);
-              resolve();
-            }).catch(err => {
-              console.log("EmigoService.refreshEmigos failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.setEmigoNotes failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // add a label for emigo
-  public setEmigoLabel(emigoId: string, labelId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        if(!this.indexView.has(emigoId)) {
-          console.log("emigo entry not found");
-          reject();
-        }
-        else {
-          this.indexService.setEmigoLabel(this.node, this.token, emigoId, labelId).then(e => {
-            this.refreshEmigos().then(() => {
-              this.setEmigos();
-              resolve();
-            }).catch(err => {
-              console.log("EmigoService.refreshEmigos failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.addEmigoLabel failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // clear a label from emigo
-  public clearEmigoLabel(emigoId: string, labelId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex != true) {
-        console.log("access denied to index module");
-        reject();
-      }
-      else {
-        if(!this.indexView.has(emigoId)) {
-          console.log("emigo entry not found");
-          reject();
-        }
-        else {
-          this.indexService.clearEmigoLabel(this.node, this.token, emigoId, labelId).then(() => {
-            this.refreshEmigos().then(() => {
-              this.setEmigos();
-              resolve();
-            }).catch(err => {
-              console.log("EmigoService.refreshEmigos failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.deleteEmigoLabel failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // reload emigos from database
-  private refreshEmigos(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.indexService.getRevision(this.node, this.token).then(r => {
-        if(this.revision.index == r) {
-          resolve();
-        }
-        else {
-          this.indexService.getRequestIds(this.node, this.token).then(s => {
-            this.pendingView = s;
-            this.storeService.setProfileObject(this.emigoId, "requests", s).then(() => {
-              this.indexService.getEmigoIds(this.node, this.token).then(async e => {
-                if(e == null) {
-                  e = [];
-                }
-                this.indexView.clear();
-                for(let i = 0; i < e.length; i++) {
-                  this.indexView.set(e[i].emigoId, e[i].notes);
-                }
-                await this.storeService.setEmigoLabels(this.emigoId, e);
-                this.storeService.setProfileObject(this.emigoId, "index", e).then(() => {
-                  this.revision.index = r;
-                  this.setRevision();
-                  resolve();
-                }).catch(err => {
-                  console.log("StoreService.setProfileObject index failed");
-                  resolve();
-                });
-              }).catch(err => {
-                console.log("IndexService.getEmigoIds failed");
-                resolve();
-              });
-            }).catch(err => {
-              console.log("IndexService.setProfileObject requests failed");
-              resolve();
-            });
-          }).catch(err => {
-            console.log("IndexService.getRequestIds failed");
-            resolve();
-          });
-        }
-      }).catch(err => {
-        console.log("IndexService.getRevision failed");
-        resolve();
-      });
-    });
-  }
-
-  // observe EmigoContact of selected id
-  get selectedEmigo() {
-    return this.selected.asObservable();
-  }
-
-  // observe EmigoContact when updated
-  get updatedEmigo() {
-    return this.updated.asObservable();
-  }
-
-  // select emigo for viewing
-  public selectEmigoContact(id: string): Promise<void> {
-    this.selected.next(null);
-    this.selectedEmigoId = id;
-    return new Promise<void>((resolve, reject) => {
-      if(this.selectedEmigoId != null) {
-        this.getEmigoContact(id).then(e => {
-          this.selected.next(e);
-          resolve();
-        }).catch(err => {
-          console.log("EmigoService.getEmigoContact failed");
-          reject();
-        });
-      }
-      else {
-        resolve();
-      }
-    });
-  }
-
-  // refresh emigo
-  public refreshEmigoContact(id: string): void {
-    this.refreshEmigos().then(() => {
-      this.refreshShares().then(() => {
-        this.setEmigos();
-        this.storeService.getEmigoUpdate(this.emigoId, id).then(u => {
-          this.updateContact(u);
-        }).catch(err => {
-          console.log("StoreService.getEmigoUpdate failed");
-        });
-      }).catch(err => {
-        console.log("EmigoService.refreshShares failed");
-      });
-    }).catch(err => {
-      console.log("EmigoService.refreshEmigos failed");
-    });
-  }
-
-  // notify app of change
-  private updateEmigoContact(id: string) {
-    this.getEmigoContact(id).then(e => {
-      this.updated.next(e);
-    }).catch(err => {
-      console.log("EmigoService.getEmigoContact failed");
-      this.updated.next(null);
-    });
-  }
-
-  public getEmigoContact(id: string): Promise<EmigoContact> {
-    return new Promise<EmigoContact>((resolve, reject) => {
-      this.storeService.getEmigo(this.emigoId, id).then(e => {
-        if(e == null) {
-          resolve({});
-        }
-        else {
-          let notes: string = this.indexView.get(id);
-          let share: ShareView = this.shareView.get(id);
-          if(share == null) {
-            share = new ShareView(id, null, null, null, null);
-          }
-          let attributes: AttributeEntityData[] = [];
-          if(e.attributes != null) {
-            for(let i = 0; i < e.attributes.length; i++) {
-              attributes.push({ schema: e.attributes[i].schema, obj: JSON.parse(e.attributes[i].data) });
-            }
-          }
-          let labels: Set<string> = new Set<string>();
-          if(e.labels != null) {
-            for(let i = 0; i < e.labels.length; i++) {
-              labels.add(e.labels[i]);
-            }
-          }
-          let contact: EmigoContact = { "emigo": e.emigo, "notes": notes, "labels": labels, 
-              "status": share.getStatus(), "attributeRevision": e.attributeRevision, "subjectRevision": e.subjectRevision,
-              "attributes": attributes, "appData": e.appData, "appState": e.appState, "error": e.identityError || e.attributeError || e.subjectError};
-          resolve(contact);
-        }
-      }).catch(err => {
-        console.log("StoreService.getEmigo failed");
-        reject();
-      });
-    });
-  }
-
-  // set emigo app data
-  public setEmigoData(id: string, revision: number, data: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.updateEmigoAppData(this.emigoId, id, revision, data).then(() => {
-        this.setEmigos();
-      }).catch(err => {
-        console.log("StoreService.updateEmigoAppData failed");
-        reject();
-      });
-    });
-  }
-
-  // set emigo app state
-  public setEmigoState(id: string, state: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.storeService.updateEmigoAppState(this.emigoId, id, state).then(() => {
-        this.setEmigos();
-      }).catch(err => {
-        console.log("StoreService.updateEmigoAppState failed");
-        reject();
-      });
-    });
-  }
-
-  // observe emigo view filtered list of emigos
-  get filteredContacts() {
-    return this.filteredEmigos.asObservable();
-  }
-
-  // observe pending contacts
-  get pendingContacts() {
-    return this.pendingEmigos.asObservable();
-  }
-
-  // observe connected contacts
-  get connectedContacts() {
-    return this.connectedEmigos.asObservable();
-  }
-
-  // observe requested contacts
-  get requestedContacts() {
-    return this.requestedEmigos.asObservable();
-  }
-
-  // observe received contacts
-  get receivedContacts() {
-    return this.receivedEmigos.asObservable();
-  }
-
-  // observe saved contacts
-  get savedContacts() {
-    return this.savedEmigos.asObservable();
-  }
-
-  // set current view
-  private setView(): void {
-    this.storeService.getEmigos(this.emigoId, this.emigoFilter, this.emigoLabels).then(e => {
-      this.filteredEmigos.next(this.getEmigoViews(e, this.emigoStatus));
-    }).catch(err => {
-      console.log("StoreService.getEmigos failed");
-      this.filteredEmigos.next([]);
-    });
-  }
-
-  // set contact filter view
-  public setFilter(filter: string): void {
-    this.emigoFilter = filter;
-    this.setView();
-  }
-
-  // set contact status view
-  public setStatus(status: string[]): void {
-    this.emigoStatus = status;
-    this.setView();
-  }
-
-  // set contact label view
-  public setLabels(ids: string[]): void {
-    this.emigoLabels = ids;
-    this.setView();
-  }
-
-  // request new contact
-  public requestContact(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableShare != true) {
-        console.log("access denied to share module");
-        reject();
-      }
-      else {
-        this.storeService.getEmigo(this.emigoId, id).then(c => {
-          if(c == null) {
-            console.log("contact not found");
-            reject();
-          }
-          else {
-            let share: ShareView = this.shareView.get(id);
-            if(share == null) {
-              this.shareService.addConnection(this.node, this.token, id).then(e => {
-                this.applyShareStatus(e.emigoId, c.emigo.node, e.shareId).then(() => {
-                  let emigo: EmigoUpdate = { "emigoId": c.emigo.emigoId, "revision": c.emigo.revision, 
-                      "node": c.emigo.node, "registry": c.emigo.registry, 
-                      "attributeRevision": c.attributeRevision, "subjectRevision": c.subjectRevision };
-                  this.updateContact(emigo);
-                  resolve();
-                }).catch(err => {
-                  console.log("EmigoSrevice.applyShareStatus failed");
-                  reject();
-                });
-              }).catch(err => {
-                console.log("ShareService.addConnection failed");
-                reject();
-              });
-            }
-            else {
-              this.shareService.updateStatus(this.node, this.token, share.getId(), "requesting", share.getToken()).then(e => {
-                this.applyShareStatus(e.emigoId, c.emigo.node, e.shareId).then(() => {
-                  let emigo: EmigoUpdate = { "emigoId": c.emigo.emigoId, "revision": c.emigo.revision,
-                      "node": c.emigo.node, "registry": c.emigo.registry,
-                      "attributeRevision": c.attributeRevision, "subjectRevision": c.subjectRevision };
-                  this.updateContact(emigo);
-                  resolve();
-                }).catch(err => {
-                  console.log("EmigoService.applyShareStatus failed");
-                  reject();
-                });
-              }).catch(err => {
-                console.log("ShareService.updateStatus failed");
-                reject();
-              });
-            }
-          }
-        }).catch(err => {
-          console.log("StoreService.getEmigo failed");
-          reject();
-        });
-      }
-    });
-  }
-
-  // accept new contact
-  public acceptContact(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableShare != true) {
-        console.log("access denied to share module");
-        reject();
-      }
-      else {
-        let share: ShareView = this.shareView.get(id);
-        if(share == null) {
-          console.log("share not found");
-          reject();
-        }
-        else {
-          this.storeService.getEmigo(this.emigoId, id).then(c => {
-            if(c == null) {
-              console.log("emigo not found");
-              reject();
-            }
-            else {
-              this.shareService.updateStatus(this.node, this.token, share.getId(), "requesting", null).then(e => {
-                this.applyShareStatus(id, c.emigo.node, share.getId()).then(() => {
-                  let emigo: EmigoUpdate = { "emigoId": c.emigo.emigoId, "revision": c.emigo.revision, 
-                      "node": c.emigo.node, "registry": c.emigo.registry, 
-                      "attributeRevision": c.attributeRevision, "subjectRevision": c.subjectRevision };
-                  this.updateContact(emigo);
-                  resolve();
-                }).catch(err => {
-                  console.log("EmigoService.applyShareStatus failed");
-                  reject();
-                });
-              }).catch(err => {
-                console.log("ShareService.updateStatus failed");
-                reject();
-              });
-            }
-          }).catch(err => {
-            console.log("StoreService.getEmigo failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // deny, cancel or disconnect contact
-  public closeContact(id: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableShare != true) {
-        console.log("access denied to share module");
-        reject();
-      }
-      else {
-        let share: ShareView = this.shareView.get(id);
-        if(share == null) {
-          console.log("share not found");
-          reject();
-        }
-        else {
-          this.storeService.getEmigo(this.emigoId, id).then(c => {
-            if(c == null) {
-              console.log("emigo not found");
-              reject();
-            }
-            else {
-              let share: ShareView = this.shareView.get(id);
-              if(share == null) {
-                console.log("share not found");
-                reject();
-              }
-              else {
-                this.shareService.updateStatus(this.node, this.token, share.getId(), "closing", null).then(e => {
-                  this.applyShareStatus(e.emigoId, c.emigo.node, e.shareId).then(() => {
-                    let emigo: EmigoUpdate = { "emigoId": c.emigo.emigoId, "revision": c.emigo.revision, 
-                        "node": c.emigo.node, "registry": c.emigo.registry, 
-                        "attributeRevision": c.attributeRevision, "subjectRevision": c.subjectRevision };
-                    this.refreshShares().then(() => {
-                      this.setEmigos();
-                      this.updateContact(emigo);
-                      resolve();
-                    }).catch(err => { // allow failure of refresh
-                      console.log("EmigoService.refreshEmigos failed");
-                      this.updateContact(emigo);
-                      resolve();
-                    });
-                  }).catch(err => { // allow failure of apply
-                    console.log("EmigoService.applyShareStatus failed");
-                    let emigo: EmigoUpdate = { "emigoId": c.emigo.emigoId, "revision": c.emigo.revision, 
-                        "node": c.emigo.node, "registry": c.emigo.registry, 
-                        "attributeRevision": c.attributeRevision, "subjectRevision": c.subjectRevision };
-                    this.refreshShares().then(() => {
-                      this.setEmigos();
-                      this.updateContact(emigo);
-                      resolve();
-                    }).catch(err => { // allow failure of refresh
-                      console.log("EmigoService.refreshEmigos failed");
-                      this.updateContact(emigo);
-                      resolve();
-                    });
-                  });
-                }).catch(err => {
-                  console.log("ShareService.updateStatus failed");
-                  reject();
-                });
-              }
-            }
-          }).catch(err => {
-            console.log("StoreService.getEmigo failed");
-            reject();
-          });
-        }
-      }
-    });
-  }
-
-  // update emigo observables
-  private setEmigos(): void {
-    // update selected emigo
-    this.selectEmigoContact(this.selectedEmigoId);
-
-    // update pending emigos
-    this.pendingEmigos.next(this.pendingView);
-
-    // update all emigos view
-    this.storeService.getEmigos(this.emigoId, this.emigoFilter, this.emigoLabels).then(e => {
-     this.filteredEmigos.next(this.getEmigoViews(e, this.emigoStatus));
-    }).catch(err => {
-      console.log("StoreService.getEmigos failed");
-    });
-
-    // update received emigos
-    this.storeService.getEmigos(this.emigoId, null, null).then(e => {
-      this.receivedEmigos.next(this.getEmigoViews(e, ['received']));
-      this.requestedEmigos.next(this.getEmigoViews(e, ['requested']));
-      this.connectedEmigos.next(this.getEmigoViews(e, ['connected']));
-      this.savedEmigos.next(this.getEmigoViews(e, [null, 'requesting', 'requested', 'receiving', 'received', 'closing', 'closed']));
-    }).catch(err => {
-      console.log("StoreService.getEmigos failed");
-    });
-  }
-
-  // deliver status to contact
-  private applyShareStatus(emigoId: string, node: string, shareId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.shareService.getMessage(this.node, this.token, shareId).then(m => {
-        this.shareService.setMessage(node, emigoId, m).then(s => {
-          let status: string = null;
-          let token: string = null;
-          if(s.connected) {
-            token = s.connected.token;
-          }
-          if(s.shareStatus == "received") {
-            status = "requested";
-          }
-          if(s.shareStatus == "connected") {
-            status = "connected";
-          }
-          if(s.shareStatus == "closed") {
-            status = "closed";
-          }
-          if(status != null) {
-            this.shareService.updateStatus(this.node, this.token, shareId, status, token).then(e => {
-              this.refreshShares().then(() => {
-                this.setEmigos();
-                resolve();
-              }).catch(err => {
-                console.log("EmigoService.refreshShares failed");
-                reject();
-              });
-            }).catch(err => {
-              console.log("ShareService.updateStatus failed");
-              reject();
-            });
-          }
-          else {
-            console.log("invalid share status");
-            reject();
-          }
-        }).catch(err => {
-          console.log("ShareService.setMessage failed");
-          reject();
-        });
-      }).catch(err => {
-        console.log("ShareService.getMessage failed");
-        reject();
-      });
-    });
-  }
-
-  // reload emigos from database
-  private refreshShares(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.shareService.getRevision(this.node, this.token).then(r => {
-        if(this.revision.share == r) {
-          resolve();
-        }
-        else {
-          this.shareService.getConnections(this.node, this.token).then(s => {
-            if(s == null) {
-              s = [];
-            }
-            this.shareView.clear();
-            for(let i = 0; i < s.length; i++) {
-              this.shareView.set(s[i].emigoId, new ShareView(s[i].shareId, s[i].status, s[i].token, s[i].revision, s[i].updated));
-            }
-            this.storeService.setProfileObject(this.emigoId, "share", s).then(() => {
-              this.revision.share = r;
-              this.setRevision();
-              resolve();
-            }).catch(err => {
-              console.log("StoreService.setProfileObject index failed");
-              resolve();
-            });
-          }).catch(err => {
-            console.log("ShareService.getConnections failed");
-            resolve();
-          });
-        }
-      }).catch(err => {
-        console.log("IndexService.getRevision failed");
-        resolve();
-      });
-    });
-  }
-
-  private hasStatus(arr: string[], val: string) {
-    if(arr == null) {
-      return false;
-    }
-    for(let i = 0; i < arr.length; i++) {
-      if(arr[i] == val) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // convert internal to external type
-  private getEmigoViews(base: EmigoBase[], status: string[]): EmigoView[] {
-    let views: EmigoView[] = [];
-    for(let i = 0; i < base.length; i++) {
-      let share: ShareView = this.shareView.get(base[i].emigoId);
-      if(status == null || (share != null && this.hasStatus(status, share.getStatus())) || (share == null && this.hasStatus(status, null))) {
-        let shareRevision: number = null;
-        let shareTimestamp: number = null;
-        if(share != null) {
-          shareRevision = share.getRevision();
-          shareTimestamp = share.getTimestamp();
-        }
-        views.push({ id: base[i].emigoId, name: base[i].name, thumb: base[i].icon, handle: base[i].handle, 
-        identityRevision: base[i].identityRevision, attributeRevision: base[i].attributeRevision, subjectRevision: base[i].subjectRevision,
-        appData: base[i].appData, appState: base[i].appState, shareRevision: shareRevision, shareTimestamp: shareTimestamp });
-      }
-    }
-    return views;
-  }
-
-  // save revision object
-  private setRevision() {
-    this.storeService.setProfileObject(this.emigoId, "revision", this.revision).then(() => {}).catch(err => {
-      console.log("StoreService setProfileObject revision failed");
-    });
-  }
-
-  // sync changes to identiy, profile, groups, and emigos
-  private syncChanges() {
-
-    // sync stale emigo (node, registry, contact)
-    if(this.access.enableIndex) {
-      if((this.syncCount % 60) == 0) { // check 1/min
-        let d: Date = new Date();
-        let epoch: number = Math.floor(d.getTime() / 1000);
-        this.storeService.getStaleEmigo(this.emigoId, epoch - this.stale).then(e => {
-          if(e != null) {
-            this.updateContact(e);
-          }
-        });
-      }
-    }
-
-    // sync once every 5min
-    if((this.syncCount % this.refresh) == 0) {
-   
-      this.updateIdentity().then(() => {
-        this.updateRegistry().then(() => {
-          this.updateProfile().then(() => {
-            this.updateGroup().then(() => {
-      
-              let index: number = this.revision.index;
-              let share: number = this.revision.share;
-              this.updateIndex().then(() => {
-                this.updateShare().then(() => {
-
-                  // update lists if change occured
-                  if(index != this.revision.index || share != this.revision.share) {
-                    this.setEmigos();
-                  }
-
-                  // check if account has been relocated
-                  let nodeError: boolean = this.identityError || this.profileError || 
-                      this.groupError || this.indexError || this.shareError;
-                  if(nodeError) {
-                    this.syncRegistry();
-                  }
-
-                  // update stored emigos
-                  this.syncStore();
-
-                }).catch(err => {
-                  console.log("EmigoService.updateShare failed");
-                });
-              }).catch(err => {
-                console.log("EmigoService.updateIndex failed");
-              });
-
-            }).catch(err => {
-              console.log("EmigoService.updateGroup failed");
-            });          
-          }).catch(err => {
-            console.log("EmigoService.updateProfile failed");
-          });
-        }).catch(err => {
-          console.log("EmigoService.updateRegistry failed");
-        });
-      }).catch(err => {
-        console.log("EmigoService.updateIdentity failed");
-      });
-    } 
-
-    this.syncCount++;
-  }
-
-  private updateError(): void {
-    // update error state
-    let nodeError: boolean = this.identityError || this.profileError || this.groupError ||
-        this.indexError || this.shareError;
-    this.nodeFlag.next(nodeError);
-    this.registryFlag.next(this.registryError);
-  }
-
-  private updateIdentity(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity) {
-        this.identityService.getRevision(this.node, this.token).then(r => {
-          if(this.revision.identity == null || this.revision.identity != r) {
-            this.identityService.getMessage(this.node, this.token).then(m => {
-              let emigo: Emigo = getEmigoObject(m);
-              this.handle = emigo.handle;
-              this.registry = emigo.registry;
-              this.emigoIdentity.next(emigo);
-              this.storeService.setProfileObject(this.emigoId, "emigo", emigo).then(() => {
-                this.revision.identity = r;
-                this.setRevision();
-                this.identityError = false;
-                this.updateError();
-                resolve();
-              }).catch(err => {
-                console.log("StoreService.setProfileObject failed");
-                this.identityError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("IdentityService.getMessage failed");
-              this.identityError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to update
-            this.identityError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("IdentityService.getRevision failed");
-          this.identityError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to update
-        this.identityError = false;
-        this.updateError();
-        resolve();
-      }
-    });
-  }
-
-  private updateRegistry(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIdentity) {
-        this.identityService.getDirty(this.node, this.token).then(d => {
-          if(d) {
-            this.identityService.getMessage(this.node, this.token).then(m => {
-              let emigo: Emigo = getEmigoObject(m);
-              this.registryService.setMessage(this.registry, m).then(() => {
-                this.identityService.clearDirty(this.node, this.token, emigo.revision).then(() => {
-                  this.registryError = false;
-                  this.updateError();
-                  resolve();
-                }).catch(err => {
-                  console.log("IdentityService.clearDirty failed");
-                  this.registryError = true;
-                  this.updateError();
-                  resolve();
-                });
-              }).catch(err => {
-                console.log("RegistryService.setMessage failed");
-                this.registryError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("EmigoService.getEmigoObject failed");
-              this.registryError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to do
-            this.registryError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("EmigoService.getDirty failed");
-          this.registryError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to do
-        this.registryError = false;
-        this.updateError();
-        resolve();
-      }
-    }); 
-  }
- 
-  private updateProfile(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableProfile) {
-        this.profileService.getRevision(this.node, this.token).then(r => {
-          if(this.revision.profile == null || this.revision.profile != r) {
-            this.profileService.getAttributes(this.node, this.token, this.attributeFilter).then(a => {
-              if(a == null) {
-                a = [];
-              }
-              this.attributeEntries.next(this.parseAttributes(a));
-              this.storeService.setProfileObject(this.emigoId, "attributes", a).then(() => {
-                this.revision.profile = r;
-                this.setRevision();
-                this.profileError = false;
-                this.updateError();
-                resolve();
-              }).catch(err => {
-                console.log("StoreService.setProfileObject attributes failed");
-                this.profileError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("ProfileService.getAttributes failed");
-              this.profileError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to update
-            this.profileError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("ProfileService getRevision failed");
-          this.profileError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to update
-        this.profileError = false;
-        this.updateError();
-        resolve();
-      }
-    });
-  }
-
-  private updateGroup(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableGroup) {
-        this.groupService.getRevision(this.node, this.token).then(r => {
-          if(this.revision.group == null || this.revision.group != r) {
-            this.groupService.getLabels(this.node, this.token).then(l => {
-              if(l == null) {
-                l = [];
-              }
-              this.labelEntries.next(l);
-              this.storeService.setProfileObject(this.emigoId, "labels", l).then(() => {
-                this.revision.group = r;
-                this.setRevision();
-                this.groupError = false;
-                this.updateError();
-                resolve();
-              }).catch(err => {
-                console.log("StoreService setProfileObject labels failed");
-                this.groupError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("GroupService.getLabels failed");
-              this.groupError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to do
-            this.groupError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("GroupService.getRevision failed");
-          this.groupError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to do
-        resolve();
-        this.groupError = false;
-        this.updateError();
-      }
-    });
-  }
-
-  private updateIndex(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableIndex) {
-        this.indexService.getRevision(this.node, this.token).then(r => {
-          if(this.revision.index == null || this.revision.index != r) {
-            this.indexService.getRequestIds(this.node, this.token).then(s => {
-              if(s == null) {
-                s = [];
-              }
-              this.storeService.setProfileObject(this.emigoId, "requests", s).then(() => {
-                this.pendingView = s;
-                this.indexService.getEmigoIds(this.node, this.token).then(async e => {
-                  if(e == null) {
-                    e = [];
-                  }
-                  this.indexView.clear();
-                  for(let i = 0; i < e.length; i++) {
-                    this.indexView.set(e[i].emigoId, e[i].notes);
-                  }
-                  await this.storeService.setEmigoLabels(this.emigoId, e);
-                  this.storeService.setProfileObject(this.emigoId, "index", e).then(() => {
-                    this.revision.index = r;
-                    this.setRevision();
-                    this.indexError = false;
-                    this.updateError();
-                    resolve();
-                  }).catch(err => {
-                    console.log("StoreService.setProfileObject index failed");
-                    this.indexError = true;
-                    this.updateError();
-                    resolve();
-                  });
-                }).catch(err => {
-                  console.log("IndexService.getEmigoIds failed");
-                  this.indexError = true;
-                  this.updateError();
-                  resolve();
-                });
-              }).catch(err => {
-                console.log("StoreService.setProfileObject requests failed");
-                this.indexError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("IndexService.getRequestIds failed");
-              this.indexError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to do
-            this.indexError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("IndexService.getRevision failed");
-          this.indexError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to do
-        this.indexError = false;
-        this.updateError();
-        resolve();
-      }
-    });
-  }
-
-  private updateShare(): Promise<void> {
-
-    return new Promise<void>((resolve, reject) => {
-      if(this.access.enableShare) {
-        this.shareService.getRevision(this.node, this.token).then(r => {
-          if(this.revision.share == null || this.revision.share != r) {
-            this.shareService.getConnections(this.node, this.token).then(s => {
-              if(s == null) {
-                s = [];
-              }
-              this.shareView.clear();
-              for(let i = 0; i < s.length; i++) {
-                this.shareView.set(s[i].emigoId, new ShareView(s[i].shareId, s[i].status, s[i].token, s[i].revision, s[i].updated));
-              }
-              this.storeService.setProfileObject(this.emigoId, "share", s).then(() => {
-                this.revision.share = r;
-                this.setRevision();
-                this.shareError = false;
-                this.updateError();
-                resolve();
-              }).catch(err => {
-                console.log("StoreService.setProfileObject share failed");
-                this.shareError = true;
-                this.updateError();
-                resolve();
-              });
-            }).catch(err => {
-              console.log("ShareService.getConnections failed");
-              this.shareError = true;
-              this.updateError();
-              resolve();
-            });
-          }
-          else {
-            // nothing to do
-            this.shareError = false;
-            this.updateError();
-            resolve();
-          }
-        }).catch(err => {
-          console.log("ShareService.getRevision failed");
-          this.shareError = true;
-          this.updateError();
-          resolve();
-        });
-      }
-      else {
-        // nothing to do
-        this.shareError = false;
-        this.updateError();
-        resolve();
-      }
-    });
-  }
-
-
-  private syncRegistry(): void {
-  
-    this.registryService.getRevision(this.registry, this.emigoId).then(r => {
-      if(this.revision.identity == null || this.revision.identity < r) {
-        this.registryService.getMessage(this.registry, this.emigoId).then(m => {
-          let emigo: Emigo = getEmigoObject(m);
-          this.node = emigo.node;
-          this.storeService.setProfileObject(this.emigoId, "node", this.node).then(() => {
-            console.log("detected account migration");
-          }).catch(err => {
-            console.log("StoreService.setProfileObject failed");
-          });
-        }).catch(err => {
-          console.log("RegistryService.getMessage failed");
-        });
-      }
-    }).catch(err => {
-      console.log("RegistryService.getRevision failed");
-    });
-  }
-
-  private syncStore(): void {
-    
-    if(this.access.enableIndex) {
-      this.storeService.getEmigoIds(this.emigoId).then(e => {
-      
-        // update stored emigos
-        e.forEach((value, key) => {
-          if(!this.indexView.has(key)) {
-            this.storeService.deleteEmigo(this.emigoId, key).then(() => {
-              this.setEmigos();
-            }).catch(err => {
-              console.log("StoreService.deleteEmigo failed");
-            });
-          }
-          else {
-            let share: ShareView;
-            if(this.shareView.has(key)) {
-              share = this.shareView.get(key);
-            }
-            else {
-              share = new ShareView(key, null, null, null, null);
-            }
-            if(share.getStatus() == "connected" && value == null) {
-              // first init contact
-              this.storeService.updateEmigoAttributes(this.emigoId, key, 0, []).then(() => {
-                // then query server
-                this.storeService.getEmigoUpdate(this.emigoId, key).then(u => {
-                  this.updateContact(u);
-                }).catch(err => {
-                  console.log("StoreService.getEmigoUpdate failed");
-                });
-              }).catch(err => {
-                console.log("StoreService.updateEmigoAttributes failed");
-              });
-            }
-            if(share.getStatus() != "connected" && value != null) {
-              this.storeService.getEmigoUpdate(this.emigoId, key).then(u => {
-                this.updateContact(u);
-              }).catch(err => {
-                console.log("StoreService.getEmigoUpdate failed"); 
-              });
-            }
-          }
-        });
-
-        // insert any missing emigos
-        this.indexView.forEach((value, key) => {
-          if(!e.has(key)) {
-            this.storeService.insertEmigo(this.emigoId, key).then(() => {
-              this.storeService.getEmigoUpdate(this.emigoId, key).then(u => {
-                this.updateContact(u);
-              }).catch(err => {
-                console.log("StoreService.getEmigoUpdate failed");
-              });
-            }).catch(err => {
-              console.log("StoreService.insertEmigo failed");
-            });
-          }
-        });
-
-      }).catch(err => {
-        console.log("StoreService.getEmigoIds failed");
-      });
-    }
-  }
-
-  public updateContactIdentity(e: EmigoUpdate): Promise<EmigoUpdate> {
-
-    return new Promise<EmigoUpdate>((resolve, reject) => {
-      this.indexService.getEmigoRevision(this.node, this.token, e.emigoId).then(r => {
-        if(e.revision == null || e.revision < r) {
-          this.indexService.getEmigo(this.node, this.token, e.emigoId).then(i => {
-            this.storeService.updateEmigoIdentity(this.emigoId, e.emigoId, i.emigo).then(() => {
-              this.setEmigos();
-              this.storeService.getEmigoUpdate(this.emigoId, e.emigoId).then(u => {
-                resolve(u);
-              });
-            }).catch(err => {
-              console.log("StoreService.updateEmigoIdentity failed");
-              reject();
-            });
-          }).catch(err => {
-            console.log("IndexService.getEmigo failed");
-            reject();
-          });
-        }
-        else {
-          resolve(e);
-        }
-      }).catch(err => {
-        console.log("IndexService.getEmigoRevision failed");
-        reject();
-      });
-    });
-  }
-
-  public updateContact(emigo: EmigoUpdate): void {
-
-    if(this.access.enableIndex) {
-      // update stale time
+    this.selectedEmigo.next(null);
+    this.labelEntries.next([]);
+    this.attributeEntries.next([]);
+    this.filteredEmigos.next([]);
+    this.connectedEmigos.next([]);
+    this.receivedEmigos.next([]);
+    this.requestedEmigos.next([]);
+    this.savedEmigos.next([]);
+    this.allEmigos.next([]);
+    this.pendingEmigos.next([]);
+    this.showSubjects.next([]);
+    this.viewSubjects.next([]);
+    this.identityEmigo.next(null);
+  }
+
+  private async importAccount(registry: string) {
+
+    try {
+      // sync each module
+      await this.syncIdentity();
+      await this.syncGroup();
+      await this.syncShare();
+      await this.syncIndex();
+      await this.syncProfile();
+      await this.syncShow();
+
+      // retrieve each contact
       let d: Date = new Date();
-      let epoch: number = Math.floor(d.getTime() / 1000);
-      this.storeService.setStaleEmigo(this.emigoId, emigo.emigoId, epoch).then(() => {}).catch(err => {
-        console.log("StoreService.setStaleEmigo failed");
-      });
+      let cur: number = Math.floor(d.getDate() / 1000);
+      let updates: EmigoUpdate[] = await this.storeService.getEmigoUpdates(this.emigoId);
+      for(let i = 0; i < updates.length; i++) {
 
-      // first try and sync with index
-      this.updateContactIdentity(emigo).then(e => {
-        let emigoId = e.emigoId;    
-        
-        // sync with registry
-        this.registryService.getRevision(e.registry, emigoId).then(r => {
-          if(r != e.revision) {
-            this.registryService.getMessage(e.registry, emigoId).then(msg => {
-              let emigo: Emigo = getEmigoObject(msg);
-              this.storeService.updateEmigoIdentity(this.emigoId, emigoId, emigo).then(() => {
-                this.setEmigos();
-              }).catch(err => {
-                console.log("StoreService.updateEmigoIdentity failed");
-              });
-              this.indexService.getEmigoRevision(this.node, this.token, emigoId).then(n => {
-                if(r != n) {
-                  this.indexService.setEmigo(this.node, this.token, msg).then(e => {}).catch(err => {
-                    console.log("IndexService.setEmigo failed");
-                  });
-                }
-              }).catch(err => {
-                console.log("IndexService.getEmigoRevision failed");
-              });
-            }).catch(err => {
-              console.log("RegistryService.getMessage failed");
-            });
-          }
-          else {
-            this.indexService.getEmigoRevision(this.node, this.token, emigoId).then(r => {
-              if(e.revision != r) {
-                this.indexService.getEmigo(this.node, this.token, emigoId).then(i => {
-                  this.storeService.updateEmigoIdentity(this.emigoId, emigoId, i.emigo).then(() => {}).catch(err => {
-                    console.log("StoreService.updateEmigoIdentity failed");
-                  });
-                }).catch(err => {
-                  console.log("IndexService.getEmigo failed");
-                });
-              }
-            });
-          }
-        }).catch(err => {
-          console.log("RegistryService.getRevision failed");
-        });
+        // update identity
+        await this.syncEmigoIdentity(updates[i]);
 
         // update attributes
-        if(this.access.enableShare) {
-          let share: ShareView = this.shareView.get(emigoId);
-          if(share != null && share.getStatus() == "connected") {
-  
-            // update emigo attributes
-            this.contactService.getRevision(this.serviceNode, this.serviceToken, e.node, share.getToken()).then(r => { 
-              if(r != e.attributeRevision) {
-                this.contactService.getAttributes(this.serviceNode, this.serviceToken, e.node, share.getToken(),
-                    this.attributeFilter).then(a => {
-                  this.storeService.updateEmigoAttributes(this.emigoId, emigoId, r, a).then(() => {
-                    this.updateEmigoContact(emigoId);
-                    this.setEmigos();
-                  }).catch(err => {
-                    console.log("StoreService.updateEmigoAttributes failed");
-                  });
-                }).catch(err => {
-                  console.log("ContactService.getAttributes failed");
-                });
-              }
-            }).catch(err => {
-              console.log("ContactService.getRevision failed");
-            });
+        await this.syncEmigoAttributes(updates[i]);
 
-            // update emigo subjects
-          }
-          else {
-            if(e.attributeRevision != null) {
-              this.storeService.updateEmigoAttributes(this.emigoId, emigoId, null, []).then(() => {
-                this.updateEmigoContact(emigoId);
-                this.setEmigos();
-              });
-            }
-          }
-        }
-      }).catch(err => {
-        console.log("EmigoService.updateContactIdentity failed");
-      });
+        // update subjects
+        await this.syncEmigoSubjects(updates[i]);
+
+        // set updated timestamp
+        await this.storeService.setEmigoUpdateTimestamp(this.emigoId, updates[i].emigoId, cur);
+      }
+
+      // store revision
+      await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+
+      // store access
+      await this.storeService.setAppAccount(this.emigoId, this.access);
+    }
+    catch(e) {
+      console.log("import failed");
+      console.log(e);
     }
   }
 
+  private async syncEmigoIdentity(update: EmigoUpdate) {
+
+    // sync with index
+    if(this.access.enableIndex == true) {
+
+      // flag if contacts should refresh
+      let refresh: boolean = false;
+
+      try {
+        let indexRevision: number = await this.indexService.getEmigoRevision(this.node, this.token, update.emigoId);
+        if(indexRevision != update.identityRevision) {
+          let emigo: Emigo = await this.indexService.getEmigoIdentity(this.node, this.token, update.emigoId);
+          update.node = emigo.node;
+          update.registry = emigo.registry;
+          update.identityRevision = emigo.revision;
+          await this.storeService.setEmigoIdentity(this.emigoId, update.emigoId, emigo, this.searchableEmigo);
+          update.identityRevision = indexRevision;
+          refresh = true;
+        }
+
+        // sync with registry
+        if(update.registry != null) {
+          let registryRevision: number = await this.registryService.getRevision(update.registry, update.emigoId);
+          if(registryRevision != update.identityRevision) {
+            let msg: EmigoMessage = await this.registryService.getMessage(update.registry, update.emigoId);
+            let emigo: Emigo = await this.indexService.setEmigo(this.node, this.token, msg);
+            update.node = emigo.node;
+            update.registry = emigo.registry;
+            update.identityRevision = emigo.revision;
+            await this.storeService.setEmigoIdentity(this.emigoId, update.emigoId, emigo, this.searchableEmigo);
+            update.identityRevision = registryRevision;
+            refresh = true;
+          }
+        }
+
+        // if contacts should refresh
+        if(refresh) {
+          await this.refreshEmigos();
+          await this.refreshContacts();
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  private async syncEmigoAttributes(update: EmigoUpdate) {
+
+    // flag if contacts should refresh
+    let refresh: boolean = false;
+    
+    try {
+      if(update.shareStatus == "connected") {
+
+        // sync with contact module
+        let revision: number = await this.contactService.getRevision(this.serviceNode, this.serviceToken, update.node, update.token);
+        if(revision != update.attributeRevision) {
+          
+          // get remote attributes
+          let remote: AttributeView[] = await this.contactService.getAttributeViews(this.serviceNode, this.serviceToken, 
+              update.node, update.token, this.attributeFilter);
+          let remoteMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].attributeId, remote[i].revision);
+          }
+
+          // get local attributes
+          let local: AttributeView[] = await this.storeService.getEmigoAttributeViews(this.emigoId, update.emigoId);
+          let localMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].attributeId, local[i].revision);
+          }
+
+          // add remote entry not in local
+          await this.asyncForEach(remoteMap, async (value, key) => {
+            if(!localMap.has(key)) {
+              let a: Attribute = await this.contactService.getAttribute(this.serviceNode, this.serviceToken,
+                update.node, update.token, key);
+              await this.storeService.addEmigoAttribute(this.emigoId, update.emigoId, a);
+              refresh = true;
+            }
+            else if(localMap.get(key) != value) {
+              let a: Attribute = await this.contactService.getAttribute(this.serviceNode, this.serviceToken,
+                update.node, update.token, key);
+              await this.storeService.updateEmigoAttribute(this.emigoId, update.emigoId, a);
+              refresh = true;
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeEmigoAttribute(this.emigoId, update.emigoId, key);
+              refresh = true;
+            }
+          });
+
+          // set updated revision
+          await this.storeService.setEmigoAttributeRevision(this.emigoId, update.emigoId, revision);
+          update.attributeRevision = revision;
+        }
+      }
+      else {
+
+        // remove any attributes
+        let local: AttributeView[] = await this.storeService.getEmigoAttributeViews(this.emigoId, update.emigoId);
+        for(let i = 0; i < local.length; i++) {
+          await this.storeService.removeEmigoAttribute(this.emigoId, update.emigoId, local[i].attributeId);
+          refresh = true;
+        }
+        
+        // clear revision
+        if(update.attributeRevision != null) {  
+          await this.storeService.setEmigoAttributeRevision(this.emigoId, update.emigoId, null);
+        }
+      }
+
+      // refresh contacst
+      if(refresh) {
+        await this.refreshEmigos();
+        await this.refreshContacts();
+      }
+    }
+    catch(e) {
+      if(this.emigoId != null) {
+        console.error(e);
+      }
+    }
+  }
+
+  private async syncEmigoSubjects(update: EmigoUpdate) {
+
+    // flag if contacts should refresh
+    let refresh: boolean = false;
+
+    try {
+      if(update.shareStatus == "connected") {
+        
+        // sync with view module
+        let revision: number = await this.viewService.getRevision(this.serviceNode, this.serviceToken, update.node, update.token);
+        if(revision != update.subjectRevision) {
+
+          // get remote subjects
+          let remote: SubjectView[] = await this.viewService.getSubjectViews(this.serviceNode, this.serviceToken, 
+              update.node, update.token, this.subjectFilter);
+          let remoteMap: Map<string, any> = new Map<string, any>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].subjectId, { subjet: remote[i].revision, tag: remote[i].tagRevision });
+          }
+
+          // get local subjects
+          let local: SubjectView[] = await this.storeService.getEmigoSubjectViews(this.emigoId, update.emigoId);
+          let localMap: Map<string, any> = new Map<string, any>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].subjectId, { subject: local[i].revision, tag: local[i].tagRevision });
+          }
+
+          // add remote entry not in local
+          await this.asyncForEach(remoteMap, async (value, key) => {
+            if(!localMap.has(key)) {
+              let subject: Subject = await this.viewService.getSubject(this.serviceNode, this.serviceToken, update.node, update.token, key);
+              await this.storeService.addEmigoSubject(this.emigoId, update.emigoId, subject, this.searchableSubject);
+              if(value.tag != null) {
+                let tag: SubjectTag = await this.viewService.getSubjectTags(this.serviceNode, this.serviceToken, update.node, update.token, 
+                    key, this.tagFilter);
+                await this.storeService.updateEmigoSubjectTags(this.emigoId, update.emigoId, key, tag.revision, tag.tags);
+              }
+              refresh = true;
+            }
+            else {
+              if(localMap.get(key).subject != value.subject) {
+                let subject: Subject = await this.viewService.getSubject(this.serviceNode, this.serviceToken, update.node, update.token, key);
+                await this.storeService.updateEmigoSubject(this.emigoId, update.emigoId, subject, this.searchableSubject);
+                refresh = true;
+              }
+
+              if(localMap.get(key).tag != value.tag) {
+                let tag: SubjectTag = await this.viewService.getSubjectTags(this.serviceNode, this.serviceToken, update.node, update.token, 
+                    key, this.tagFilter);
+                await this.storeService.updateEmigoSubjectTags(this.emigoId, update.emigoId, key, tag.revision, tag.tags);
+                refresh = true;
+              }
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeEmigoSubject(this.emigoId, update.emigoId, key);
+              refresh = true;
+            }
+          });
+
+          // set updated revision
+          await this.storeService.setEmigoSubjectRevision(this.emigoId, update.emigoId, revision);
+          update.subjectRevision = revision;
+        }
+      }
+      else {
+
+        // remove any subjects
+        let local: SubjectView[] = await this.storeService.getEmigoSubjectViews(this.emigoId, update.emigoId);
+        for(let i = 0; i < local.length; i++) {
+          await this.storeService.removeEmigoSubject(this.emigoId, update.emigoId, local[i].subjectId);
+          refresh = true;
+        }
+
+        // clear revision
+        if(update.subjectRevision != null) {
+          await this.storeService.setEmigoSubjectRevision(this.emigoId, update.emigoId, null);
+        }
+      }
+
+      // refresh contacts
+      if(refresh) {
+        this.refreshViewFeed();
+      }
+    }
+    catch(e) {
+      if(this.emigoId != null) {
+        console.error(e);
+      } 
+    }
+  }
+
+  private async syncShow() {
+
+    if(this.access.enableShow == true) {
+      try {
+        let r = await this.showService.getRevision(this.node, this.token);
+        if(this.revision.show != r) {
+      
+          // flag if feed should refresh
+          let refresh: boolean = false;
+
+          // get remote subject entries
+          let remote: SubjectView[] = await this.showService.getSubjectViews(this.node, this.token, this.subjectFilter);
+          let remoteMap: Map<string, any> = new Map<string, any>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].subjectId, { subject: remote[i].revision, tag: remote[i].tagRevision });
+          }
+
+          // get local subject entries
+          let local: SubjectView[] = await this.storeService.getSubjectViews(this.emigoId);
+          let localMap: Map<string, any> = new Map<string, any>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].subjectId, { subject: local[i].revision, tag: local[i].tagRevision });
+          }
+
+          // add remote entry not in local
+          await this.asyncForEach(remoteMap, async (value, key) => {
+            if(!localMap.has(key)) {
+              let entry: SubjectEntry = await this.showService.getSubject(this.node, this.token, key);
+              await this.storeService.addSubject(this.emigoId, entry, this.searchableSubject);
+              await this.storeService.clearSubjectLabels(this.emigoId, key);
+              for(let i = 0; i < entry.labels.length; i++) {
+                await this.storeService.setSubjectLabel(this.emigoId, key, entry.labels[i]);
+              }
+              if(value.tag != 0) {
+                let tag: SubjectTag = await this.showService.getSubjectTags(this.node, this.token, key, this.tagFilter);
+                await this.storeService.updateSubjectTags(this.emigoId, key, tag.revision, tag.tags);
+              }
+              refresh = true;
+            }
+            else {
+              if(localMap.get(key).subject != value.subject) {
+                let entry: SubjectEntry = await this.showService.getSubject(this.node, this.token, key);
+                await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+                await this.storeService.clearSubjectLabels(this.emigoId, key);
+                for(let i = 0; i < entry.labels.length; i++) {
+                  await this.storeService.setSubjectLabel(this.emigoId, key, entry.labels[i]);
+                }
+                refresh = true;
+              }
+
+              if(localMap.get(key).tag != value.tag) {
+                let tag: SubjectTag = await this.showService.getSubjectTags(this.node, this.token, key, this.tagFilter);
+                await this.storeService.updateSubjectTags(this.emigoId, key, tag.revision, tag.tags);
+                refresh = true;
+              }
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeSubject(this.emigoId, key);
+              refresh = true;
+            }
+          });
+
+          // refresh feed
+          if(refresh) {
+            await this.refreshShowFeed();
+          }
+
+          // upldate group revision
+          this.revision.show = r;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.error(e);
+        }
+      }
+    }
+  }
+ 
+  private async syncProfile() {
+
+    if(this.access.enableProfile == true) {
+      try {
+        let r = await this.profileService.getRevision(this.node, this.token);
+
+        if(this.revision.profile != r) {
+
+          // flag set if attributes should refresh
+          let refresh: boolean = false;
+
+          // get remote attribute entries
+          let remote: AttributeView[] = await this.profileService.getAttributeViews(this.node, this.token, this.attributeFilter);
+          let remoteMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].attributeId, remote[i].revision);
+          }
+
+          // get local attribute entries
+          let local: AttributeView[] = await this.storeService.getAttributeViews(this.emigoId);
+          let localMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].attributeId, local[i].revision);
+          }
+
+          await this.asyncForEach(remoteMap, async (value, key) => {
+
+            if(!localMap.has(key)) {
+
+              // add any remote entry not local
+              let entry: AttributeEntry = await this.profileService.getAttribute(this.node, this.token, key);
+              await this.storeService.addAttribute(this.emigoId, entry.attribute);
+              await this.storeService.clearAttributeLabels(this.emigoId, entry.attribute.attributeId);
+              for(let i = 0; i < entry.labels.length; i++) {
+                await this.storeService.setAttributeLabel(this.emigoId, key, entry.labels[i]);
+              }
+              refresh = true;  
+            }
+            else if(localMap.get(key) != value) {
+
+              // update any entry with different revision
+              let entry: AttributeEntry = await this.profileService.getAttribute(this.node, this.token, key);
+              await this.storeService.updateAttribute(this.emigoId, entry.attribute);
+              await this.storeService.clearEmigoLabels(this.emigoId, entry.attribute.attributeId);
+              for(let i = 0; i < entry.labels.length; i++) {
+                await this.storeService.setAttributeLabel(this.emigoId, entry.attribute.attributeId, entry.labels[i]);
+              }
+              refresh = true
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeAttribute(this.emigoId, key);
+              refresh = true;
+            }
+          });
+
+          // upldate group revision
+          this.revision.profile = r;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+          
+          // push attributes to app
+          if(refresh) {
+            let entries: AttributeEntry[] = await this.storeService.getAttributes(this.emigoId);
+            this.attributeEntries.next(entries);
+          }
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.error(e);
+        }
+      }
+    }
+  }
+ 
+  private async syncIndex() {
+
+
+    if(this.access.enableIndex == true) {
+      try {
+
+        let r = await this.indexService.getRevision(this.node, this.token);
+        if(this.revision.index != r) {
+
+          // flag if emigos should refresh
+          let refresh: boolean = false;
+
+          // get remote view
+          let remote: EmigoView[] = await this.indexService.getEmigoViews(this.node, this.token);
+          let remoteMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].emigoId, remote[i].revision);
+          }
+
+          // get local view
+          let local: EmigoView[] = await this.storeService.getEmigoViews(this.emigoId);
+          let localMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].emigoId, local[i].revision);
+          }
+
+          await this.asyncForEach(remoteMap, async (value, key) => {
+          
+            if(!localMap.has(key)) {
+              
+              // add any remote entry not local
+              let emigo: EmigoEntry = await this.indexService.getEmigo(this.node, this.token, key);
+              await this.storeService.addEmigo(this.emigoId, emigo.emigoId, emigo.notes, emigo.revision);
+              await this.storeService.clearEmigoLabels(this.emigoId, emigo.emigoId);
+              for(let i = 0; i < emigo.labels.length; i++) {
+                await this.storeService.setEmigoLabel(this.emigoId, key, emigo.labels[i]);
+              }
+              refresh = true;  
+            }
+            else if(localMap.get(key) != value) {
+
+              // update any entry with different revision
+              let emigo: EmigoEntry = await this.indexService.getEmigo(this.node, this.token, key);
+              await this.storeService.updateEmigo(this.emigoId, emigo.emigoId, emigo.notes, emigo.revision);
+              await this.storeService.clearEmigoLabels(this.emigoId, emigo.emigoId);
+              for(let i = 0; i < emigo.labels.length; i++) {
+                await this.storeService.setEmigoLabel(this.emigoId, emigo.emigoId, emigo.labels[i]);
+              }
+              refresh = true
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeEmigo(this.emigoId, key);
+              refresh = true;
+            }
+          });
+
+          // retrieve remote list of pending shares
+          let remoteReq: PendingEmigoView[] = await this.indexService.getPendingRequests(this.node, this.token);
+          let remoteReqMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remoteReq.length; i++) {
+            remoteReqMap.set(remoteReq[i].shareId, remoteReq[i].revision);
+          }
+
+          // retrieve local list of pending shares
+          let localReq: PendingEmigoView[] = await this.storeService.getPendingViews(this.emigoId);
+          let localReqMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < localReq.length; i++) {
+            localReqMap.set(localReq[i].shareId, localReq[i].revision);
+          } 
+
+          // flag if pending emigos should refresh
+          let pending: boolean = false;
+
+          // add any new pending requests
+          await this.asyncForEach(remoteReqMap, async (value, key) => {
+
+            if(!localReqMap.has(key)) {
+
+              // add any remote entry not local
+              let emigo: PendingEmigo = await this.indexService.getPendingRequest(this.node, this.token, key);
+              await this.storeService.addPending(this.emigoId, emigo);
+              pending = true;
+            }
+            else if(localReqMap.get(key) != value) {
+  
+              // add any entry with different revision
+              let emigo: PendingEmigo = await this.indexService.getPendingRequest(this.node, this.token, key);
+              await this.storeService.updatePending(this.emigoId, key, emigo);
+              pending = true; 
+            }
+          });
+
+          // remove old pending requests
+          this.asyncForEach(localReqMap, async (value, key) => {
+            if(!remoteReqMap.has(key)) {
+              await this.storeService.removePending(this.emigoId, key);
+              pending = true;
+            }
+          });
+
+          // refresh contacts
+          if(refresh) {
+            await this.refreshEmigos();
+            await this.refreshContacts();
+          }
+
+          // refresh pending list
+          if(pending) {
+            await this.refreshPending();
+          }
+
+          // upldate group revision
+          this.revision.index = r;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.log(e);
+        }
+      }
+    }
+  }
+  
+  private async syncShare() {
+
+    if(this.access.enableShare == true) {
+      try {
+        let r = await this.shareService.getRevision(this.node, this.token);
+        if(this.revision.share != r) {
+
+          // if contact should refresh
+          let refresh: boolean = false;
+      
+          // get remote share entries
+          let remote: ShareView[] = await this.shareService.getConnectionViews(this.node, this.token);
+          let remoteMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].shareId, remote[i].revision);
+          }
+
+          // get local share entries
+          let local: ShareView[] = await this.storeService.getConnectionViews(this.emigoId);
+          let localMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].shareId, local[i].revision);
+          }
+
+          // add remote entry not in local
+          await this.asyncForEach(remoteMap, async (value, key) => {
+            if(!localMap.has(key)) {
+              let entry: ShareEntry = await this.shareService.getConnection(this.node, this.token, key);
+              await this.storeService.addConnection(this.emigoId, entry);
+              refresh = true;
+            }
+            else if(localMap.get(key) != value) {
+              let entry: ShareEntry = await this.shareService.getConnection(this.node, this.token, key);
+              await this.storeService.updateConnection(this.emigoId, entry);
+              refresh = true;
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeConnection(this.emigoId, key);
+              refresh = true;
+            }
+          });
+    
+          // upldate group revision
+          this.revision.share = r;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+
+          // if contacts should refresh
+          if(refresh) {
+            this.refreshEmigos();
+            this.refreshContacts();
+          }
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.log(e);
+        }
+      }
+    }
+  }
+  
+  private async syncGroup() {
+
+    if(this.access.enableGroup == true) {
+      try {
+        let r = await this.groupService.getRevision(this.node, this.token);
+        if(this.revision.group != r) {
+
+          // flag if shoudl refresh
+          let refresh: boolean = false;
+
+          // get remote label entries
+          let remote: LabelView[] = await this.groupService.getLabelViews(this.node, this.token);
+          let remoteMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < remote.length; i++) {
+            remoteMap.set(remote[i].labelId, remote[i].revision);
+          }
+
+          // get local label entries
+          let local: LabelView[] = await this.storeService.getLabelViews(this.emigoId);
+          let localMap: Map<string, number> = new Map<string, number>();
+          for(let i = 0; i < local.length; i++) {
+            localMap.set(local[i].labelId, local[i].revision);
+          }
+
+          // add remote entry not in local
+          await this.asyncForEach(remoteMap, async (value, key) => {
+            if(!localMap.has(key)) {
+              let entry = await this.groupService.getLabel(this.node, this.token, key);
+              await this.storeService.addLabel(this.emigoId, entry);
+              refresh = true;
+            }
+            else if(localMap.get(key) != value) {
+              let entry = await this.groupService.getLabel(this.node, this.token, key);
+              await this.storeService.updateLabel(this.emigoId, entry);
+              refresh = true;
+            }
+          });
+
+          // remove any local entry not in remote
+          await this.asyncForEach(localMap, async (value, key) => {
+            if(!remoteMap.has(key)) {
+              await this.storeService.removeLabel(this.emigoId, key);
+              refresh = true;
+            }
+          });
+          
+          // upldate group revision
+          this.revision.group = r;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+
+          // push labels
+          if(refresh) {
+            let labels: LabelEntry[] = await this.storeService.getLabels(this.emigoId);
+            this.labelEntries.next(labels);
+          }
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  private async syncIdentity() {
+
+    if(this.access.enableIdentity == true) {
+
+      try {
+        let r = await this.identityService.getRevision(this.node, this.token);
+        if(this.revision.identity != r) {  
+          let emigo: Emigo = await this.identityService.getEmigo(this.node, this.token);
+          this.identityEmigo.next(emigo);
+          this.node = emigo.node;
+          this.registry = emigo.registry;
+          await this.storeService.setAppProperty(this.emigoId, Prop.IDENTITY, emigo);
+          this.revision.identity = emigo.revision;
+          await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+        }
+      }
+      catch(e) {
+        console.error(e);
+      }
+
+      try {
+        if(this.registry != null) {
+          let r = await this.registryService.getRevision(this.registry, this.emigoId);
+          if(this.revision.identity < r) {
+            let msg: EmigoMessage = await this.registryService.getMessage(this.node, this.token);
+            let emigo: Emigo = getEmigoObject(msg);
+            this.identityEmigo.next(emigo);
+            this.node = emigo.node;
+            this.registry = emigo.registry;
+            await this.storeService.setAppProperty(this.emigoId, Prop.IDENTITY, emigo);
+            this.revision.identity = emigo.revision;
+            await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+          }
+          if(this.revision.identity > r) {
+            let msg: EmigoMessage = await this.identityService.getMessage(this.node, this.token);
+            let emigo: Emigo = getEmigoObject(msg);
+            await this.registryService.setMessage(emigo.registry, msg);
+            await this.identityService.clearDirty(this.node, this.token, emigo.revision);
+          }
+        }
+      }
+      catch(e) {
+        if(this.emigoId != null) {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  private async setIdentity(msg: EmigoMessage) {
+
+    // update with identity message
+    let emigo: Emigo = getEmigoObject(msg);
+    this.identityEmigo.next(emigo);
+    this.node = emigo.node;
+    this.registry = emigo.registry;
+    await this.storeService.setAppProperty(this.emigoId, Prop.IDENTITY, emigo);
+    this.revision.identity = emigo.revision;
+    await this.storeService.setAppProperty(this.emigoId, Prop.REVISION, this.revision);
+
+    // update registry
+    try {
+      if(emigo.registry != null) {
+        await this.registryService.setMessage(this.registry, msg);
+        await this.identityService.clearDirty(this.node, this.token, emigo.revision);
+      }
+    }
+    catch(e) {
+      console.log(e);
+    }
+  }
+
+  public async setContact(emigoId: string) {
+
+    this.emigo = emigoId;
+    let contact: EmigoContact = await this.storeService.getContact(this.emigoId, emigoId);
+    this.selectedEmigo.next(contact);
+  }
+
+  public async setEmigoLabelFilter(l: string) {
+    this.emigoLabel = l;
+    await this.refreshEmigos();
+  }
+
+  public async setEmigoSearchFilter(s: string) {
+    this.emigoSearch = s;
+    await this.refreshEmigos();
+  }
+
+  private async refreshEmigos() {
+    
+    try {
+      // pull filtered emigos
+      let filtered: EmigoContact[] = await this.storeService.getContacts(this.emigoId, this.emigoLabel, 
+          this.emigoSearch, "connected", null);
+      this.filteredEmigos.next(filtered);
+    }
+    catch(e) {
+      console.error(e);
+    }
+  }
+
+  public async setShowLabelFilter(l: string) {
+    this.showLabel = l;
+    await this.refreshShowFeed();
+  }
+
+  public async setShowSearchFilter(l: string) {
+  }
+
+  private async refreshShowFeed() {
+    try {
+      let subjects: FeedSubjectEntry[] = await this.getShowFeed(this.showLabel, this.showSearch, null);
+      this.showSubjects.next(subjects);
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
+
+  public async setViewLabelFilter(l: string) {
+    this.viewLabel = l;
+    await this.refreshViewFeed();
+  }
+
+  public async setViewSearchFilter(l: string) {
+  }
+
+  private async refreshViewFeed() {
+    try {
+      let subjects: FeedSubject[] = await this.storeService.getEmigoFeed(this.emigoId, null, 
+          this.viewLabel, this.viewSearch, null);
+      this.viewSubjects.next(subjects);
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
+
+  private async refreshContacts() {
+
+    try {
+      // pull unfiltered emigos
+      let contacts: EmigoContact[] = await this.storeService.getContacts(this.emigoId, null, null, null, null);
+      
+      let contact: EmigoContact = null;
+      let connected: EmigoContact[] = [];
+      let saved: EmigoContact[] = [];
+      let received: EmigoContact[] = [];
+      let requested: EmigoContact[] = [];
+      let all: EmigoContact[] = [];
+      let hidden: EmigoContact[] = [];
+      for(let i = 0; i < contacts.length; i++) {
+
+        // updated selected contact
+        if(this.emigo == contacts[i].emigoId) {
+          contact = contacts[i];
+        }
+
+        // recevied - received
+        if(contacts[i].status == "received") {
+          received.push(contacts[i]);
+        }
+
+        // requested - requested
+        if(contacts[i].status == "requested") {
+          requested.push(contacts[i]);
+        }
+
+        // connected - connected
+        if(contacts[i].status == "connected") {
+          connected.push(contacts[i]);
+        }
+
+        // saved - null, requesting, requested, receiving, received, closing, closed
+        if(contacts[i].status != "connected") {
+          saved.push(contacts[i]);
+        }
+
+        // any hidden contact
+        if(contacts[i].hidden) {
+          hidden.push(contacts[i]);
+        }
+
+        // add to all list
+        all.push(contacts[i]);
+      }
+      this.selectedEmigo.next(contact);
+      this.connectedEmigos.next(connected);
+      this.savedEmigos.next(saved);
+      this.receivedEmigos.next(received);
+      this.requestedEmigos.next(requested);
+      this.allEmigos.next(all);
+      this.hiddenEmigos.next(hidden);
+    }
+    catch(e) {
+      console.error(e);
+    }   
+  }
+
+  private async refreshPending() {
+   
+    try { 
+      // pull pending emigos
+      let emigos: PendingContact[] = await this.storeService.getPendingContacts(this.emigoId);
+      this.pendingEmigos.next(emigos);
+    }
+    catch(e) {
+      console.error(e);
+    }
+  }
+
+  public async setName(value: string) {
+    let msg: EmigoMessage = await this.identityService.setName(this.node, this.token, value);
+    await this.setIdentity(msg);
+  }
+
+  public async setDescription(value: string) {
+    let msg: EmigoMessage = await this.identityService.setDescription(this.node, this.token, value);
+    await this.setIdentity(msg);
+  }
+
+  public async setLocation(value: string) {
+    let msg: EmigoMessage = await this.identityService.setLocation(this.node, this.token, value);
+    await this.setIdentity(msg);
+  }
+
+  public async setImage(value: string) {
+    let msg: EmigoMessage = await this.identityService.setImage(this.node, this.token, value);
+    await this.setIdentity(msg);
+  }
+
+  public async checkHandle(value: string): Promise<boolean> {
+    
+    if(this.registry != null) {
+      return this.registryService.checkHandle(this.registry, value, this.emigoId);
+    }
+    return true;
+  }
+
+  public async setHandle(value: string) {
+   
+    // limit race condition where handle gets claimed in registry 
+    let check: boolean = await this.checkHandle(value);
+    if(!check) {
+      throw new Error("handle not available");
+    }
+
+    // update handle
+    let msg: EmigoMessage = await this.identityService.setHandle(this.node, this.token, value);
+    await this.setIdentity(msg);
+  }
+
+  public async getLabels(): Promise<LabelEntry[]> {
+    return await this.storeService.getLabels(this.emigoId);
+  }
+
+  public async getLabel(labelId: string): Promise<LabelEntry> {
+    return await this.storeService.getLabel(this.emigoId, labelId);
+  }
+
+  public async addLabel(name: string): Promise<LabelEntry> {
+
+    let label: LabelEntry = await this.groupService.addLabel(this.node, this.token, name);
+    await this.syncGroup();
+    return label;
+  }
+
+  public async updateLabel(labelId: string, name: string) {
+
+    let label: LabelEntry = await this.groupService.updateLabel(this.node, this.token, labelId, name);
+    await this.syncGroup();
+    return label;
+  }
+
+  public async removeLabel(labelId: string) {
+  
+    await this.groupService.removeLabel(this.node, this.token, labelId);
+    await this.syncGroup();
+  }
+
+  public async getAttributes(): Promise<AttributeEntry[]> {
+    return await this.storeService.getAttributes(this.emigoId);
+  }
+
+  public async getAttribute(attributeId: string): Promise<AttributeEntry> {
+    return await this.storeService.getAttribute(this.emigoId, attributeId);
+  }
+
+  public async addAttribute(schema: string, data: string): Promise<AttributeEntry> {
+    
+    let attribute: AttributeEntry = await this.profileService.addAttribute(this.node, this.token, schema, data);
+    await this.syncProfile();
+    return attribute;
+  }
+
+  public async updateAttribute(attributeId: string, schema: string, data: string): Promise<AttributeEntry> {
+    
+    let attribute: AttributeEntry = await this.profileService.updateAttribute(this.node, this.token, attributeId, schema, data);
+    await this.syncProfile();
+    return attribute;
+  }
+
+  public async removeAttribute(attributeId: string) {
+   
+    await this.profileService.removeAttribute(this.node, this.token, attributeId);
+    await this.syncProfile();
+  }
+
+  public async setAttributeLabels(attributeId: string, labelIds: string[]): Promise<AttributeEntry> {
+    
+    let entry: AttributeEntry = await this.profileService.setAttributeLabels(this.node, this.token, attributeId, labelIds);
+    await this.syncProfile();
+    return entry;
+  }
+
+  public async setAttributeLabel(attributeId: string, labelId: string): Promise<AttributeEntry> {
+    
+    let entry: AttributeEntry = await this.profileService.setAttributeLabel(this.node, this.token, attributeId, labelId);
+    await this.syncProfile();
+    return entry;
+  }
+
+  public async clearAttributeLabel(attributeId: string, labelId: string): Promise<AttributeEntry> {
+    
+    let entry: AttributeEntry = await this.profileService.clearAttributeLabel(this.node, this.token, attributeId, labelId);
+    await this.syncProfile();
+    return entry;
+  }
+
+  public async addSubject(schema: string): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.addSubject(this.node, this.token, schema);
+    await this.storeService.addSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async getSubject(subjectId: string): Promise<SubjectEntry> {
+    return await this.storeService.getSubject(this.emigoId, subjectId);
+  }
+
+  public async updateSubject(subjectId: string): Promise<FeedSubjectEntry> {
+  
+    // refresh unversioned asset state (asset state not versioned)
+    let entry: SubjectEntry = await this.showService.getSubject(this.node, this.token, subjectId);
+    let stored: SubjectEntry = await this.storeService.getSubject(this.emigoId, subjectId);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    if(entry.subject.revision != stored.subject.revision) {
+      await this.refreshShowFeed();
+    }
+    return await this.storeService.getFeedSubjectEntry(this.emigoId, subjectId);
+  }
+
+  public async updateSubjectData(subjectId: string, schema: string, data: string): Promise<SubjectEntry> {
+  
+    let entry: SubjectEntry = await this.showService.updateSubjectData(this.node, this.token, subjectId, schema, data);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async updateSubjectShare(subjectId: string, share: boolean): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.updateSubjectShare(this.node, this.token, subjectId, share);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async updateSubjectExpire(subjectId: string, expire: number): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.updateSubjectExpire(this.node, this.token, subjectId, expire);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async removeSubject(subjectId: string): Promise<void> {
+
+    await this.showService.removeSubject(this.node, this.token, subjectId);
+    await this.storeService.removeSubject(this.emigoId, subjectId);
+    await this.refreshShowFeed();
+  }
+
+  public async removeSubjectAsset(subjectId: string, assetId: string): Promise<void> {
+
+    await this.showService.removeSubjectAsset(this.node, this.token, subjectId, assetId);
+    await this.refreshShowFeed();
+  }
+
+  public async setSubjectLabels(subjectId: string, labelIds: string[]): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.setSubjectLabels(this.node, this.token, subjectId, labelIds);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async setSubjectLabel(subjectId: string, labelId: string): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.setSubjectLabel(this.node, this.token, subjectId, labelId);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async clearSubjectLabel(subjectId: string, labelId: string): Promise<SubjectEntry> {
+
+    let entry: SubjectEntry = await this.showService.clearSubjectLabel(this.node, this.token, subjectId, labelId);
+    await this.storeService.updateSubject(this.emigoId, entry, this.searchableSubject);
+    await this.refreshShowFeed();
+    return entry;
+  }
+
+  public async getSubjectTags(subjectId: string): Promise<Tag[]> {
+    return await this.storeService.getSubjectTags(this.emigoId, subjectId);
+  }
+
+  public async getEmigoSubjectTags(emigoId: string, subjectId: string): Promise<Tag[]> {
+    return await this.storeService.getEmigoSubjectTags(this.emigoId, emigoId, subjectId);
+  }
+
+  public async addSubjectTag(subjectId: string, data: string): Promise<Tag[]> {
+    let t = await this.showService.addSubjectTag(this.node, this.token, subjectId, this.tagFilter, data);
+    await this.storeService.updateSubjectTags(this.emigoId, subjectId, t.revision, t.tags);
+    await this.refreshShowFeed();
+    return t.tags;
+  }
+
+  public async addEmigoSubjectTag(emigoId: string, subjectId: string, data: string): Promise<Tag[]> {
+    let update: EmigoUpdate = await this.storeService.getEmigoUpdate(this.emigoId, emigoId);
+    let t = await this.viewService.addSubjectTags(this.serviceNode, this.serviceToken, update.node, update.token,
+        subjectId, this.tagFilter, data);
+    await this.storeService.updateEmigoSubjectTags(this.emigoId, emigoId, subjectId, t.revision, t.tags);
+    await this.refreshViewFeed();
+    return t.tags;
+  }
+
+  public async removeSubjectTag(subjectId: string, tagId: string): Promise<Tag[]> {
+    let t = await this.showService.removeSubjectTag(this.node, this.token, subjectId, tagId, this.tagFilter);
+    await this.storeService.updateSubjectTags(this.emigoId, subjectId, t.revision, t.tags);
+    await this.refreshShowFeed();
+    return t.tags;
+  }
+
+  public async removeEmigoSubjectTag(emigoId: string, subjectId: string, tagId: string): Promise<Tag[]> {
+    let update: EmigoUpdate = await this.storeService.getEmigoUpdate(this.emigoId, emigoId);
+    let t = await this.viewService.removeSubjectTags(this.serviceNode, this.serviceToken, update.node, update.token,
+        subjectId, tagId, this.tagFilter);
+    await this.storeService.updateEmigoSubjectTags(this.emigoId, emigoId, subjectId, t.revision, t.tags);
+    await this.refreshViewFeed();
+    return t.tags;
+  }
+
+  public getUploadUrl(subjectId: string, transforms: string[]): string {
+    return this.showService.getUploadUrl(this.node, this.token, subjectId, transforms);
+  }
+
+  public getLogoUrl(revision: number): string {
+    return this.identityService.getImageUrl(this.node, this.token, revision);
+  } 
+
+  public getEmigoLogoUrl(emigoId: string, revision: number): string {
+    return this.indexService.getEmigoLogoUrl(this.node, this.token, emigoId, revision);
+  }
+
+  public getShowAssetUrl(subjectId: string, assetId: string): string {
+    return this.showService.getAssetUrl(this.node, this.token, subjectId, assetId);
+  }
+
+  public async getViewAssetUrl(emigoId: string, subjectId: string, assetId: string): Promise<string> {
+
+    let update: EmigoUpdate = await this.storeService.getEmigoUpdate(this.emigoId, emigoId);
+    return await this.viewService.getAssetUrl(this.serviceNode, this.serviceToken, update.node, update.token, 
+        subjectId, assetId);
+  }
+
+  public async addConnection(emigo: string): Promise<ShareEntry> {
+    
+    let share: ShareEntry = await this.shareService.addConnection(this.node, this.token, emigo);
+    await this.syncShare();
+    return share;
+  }
+
+  public async openConnection(emigo: string, share: string, node: string): Promise<string> {
+
+    let entry: ShareEntry = await this.shareService.updateStatus(this.node, this.token, share, "requesting", null);
+    await this.syncShare();
+
+    let msg: ShareMessage = await this.shareService.getMessage(this.node, this.token, share);
+    let status: ShareStatus = await this.shareService.setMessage(node, emigo, msg);
+    if(status.shareStatus == ShareStatus.ShareStatusEnum.Connected) {
+      await this.shareService.updateStatus(this.node, this.token, share, "connected", status.connected);
+      await this.syncShare();
+      return "connected";
+    }
+    if(status.shareStatus == ShareStatus.ShareStatusEnum.Closed) {
+      await this.shareService.updateStatus(this.node, this.token, share, "closed", null);
+      await this.syncShare();
+      return "closed";
+    }
+    if(status.shareStatus == ShareStatus.ShareStatusEnum.Received) {
+      await this.shareService.updateStatus(this.node, this.token, share, "requested", null);
+      await this.syncShare();
+      return "requested";
+    }
+    throw new Error("unexpected connection state");
+  }
+
+  public async closeConnection(emigo: string, share: string, node: string): Promise<string> {
+
+    let entry: ShareEntry = await this.shareService.updateStatus(this.node, this.token, share, "closing", null);
+  
+    try {
+      let msg: ShareMessage = await this.shareService.getMessage(this.node, this.token, share);
+      let status: ShareStatus = await this.shareService.setMessage(node, emigo, msg);
+      if(status.shareStatus == ShareStatus.ShareStatusEnum.Closed) {
+        await this.shareService.updateStatus(this.node, this.token, share, "closed", null);
+        await this.syncShare();
+        return "closed";
+      }
+      console.error("unexpected connection state");
+      await this.syncShare();
+      return "closing";
+    }
+    catch(e) {
+      console.error(e);
+      await this.syncShare();
+      return "closing";
+    }
+  }
+
+  public async removeConnection(emigo: string, share: string) {
+
+    await this.shareService.removeConnection(this.node, this.token, share);
+    await this.syncShare();
+  }
+
+  public async getEmigo(emigoId: string): Promise<EmigoEntry> {
+    return await this.storeService.getEmigo(this.emigoId, emigoId);
+  }
+
+  public async addEmigo(msg: EmigoMessage): Promise<EmigoEntry> {
+
+    let entry: EmigoEntry = await this.indexService.addEmigo(this.node, this.token, msg);
+    await this.syncIndex();
+    await this.syncShare();
+    let update = await this.storeService.getEmigoUpdate(this.emigoId, entry.emigoId);
+    await this.syncEmigoIdentity(update);
+    return entry;
+  }
+
+  public async updateEmigoNotes(emigoId: string, notes: string): Promise<EmigoEntry> {
+    
+    let entry: EmigoEntry = await this.indexService.setEmigoNotes(this.node, this.token, emigoId, notes);
+    await this.syncIndex();
+    return entry;
+  }
+
+  public async removeEmigo(emigoId: string) {
+
+    await this.indexService.removeEmigo(this.node, this.token, emigoId);
+    await this.syncIndex();
+  }
+
+  public async setEmigoLabels(emigoId: string, labelIds: string[]): Promise<EmigoEntry> {
+
+    let view: EmigoEntry = await this.indexService.setEmigoLabels(this.node, this.token, emigoId, labelIds);
+    await this.syncIndex();
+    return view;
+  }
+
+  public async setEmigoLabel(emigoId: string, labelId: string): Promise<EmigoEntry> {
+
+    let view: EmigoEntry = await this.indexService.setEmigoLabel(this.node, this.token, emigoId, labelId);
+    await this.syncIndex();
+    return view;
+  }
+
+  public async clearEmigoLabel(emigoId: string, labelId: string): Promise<EmigoEntry> {
+
+    let view: EmigoEntry = await this.indexService.clearEmigoLabel(this.node, this.token, emigoId, labelId);
+    await this.syncIndex();
+    return view;
+  }
+
+  public async getPending(shareId: string): Promise<PendingEmigo> {
+    return await this.storeService.getPending(this.emigoId, shareId);
+  }
+
+  public async clearEmigoRequest(shareId: string) {
+
+    await this.indexService.clearRequest(this.node, this.token, shareId);
+    await this.syncIndex();
+  }
+
+  public async setContactShareData(share: string, obj: any): Promise<void> {
+    await this.storeService.setShareData(this.emigoId, share, obj);
+    this.refreshEmigos();
+  }
+
+  public async setPendingEmigoData(share: string, obj: any): Promise<void> {
+    await this.storeService.setPendingData(this.emigoId, share, obj);
+  }
+
+  public async setEmigoFeed(emigo: string, hidden: boolean) {
+    await this.storeService.setEmigoFeed(this.emigoId, emigo, hidden);
+    this.refreshContacts();
+    this.refreshViewFeed();
+  }
+
+  public async setContactIdentityData(emigo: string, obj: any): Promise<void> {
+    await this.storeService.setEmigoIdentityData(this.emigoId, emigo, obj);
+    this.refreshEmigos();
+  }
+
+  public async getContactIdentity(emigo: string): Promise<Emigo> {
+    return await this.storeService.getEmigoIdentity(this.emigoId, emigo);
+  }
+
+  public async getContactShare(emigo: string): Promise<ShareEntry> {
+    return await this.storeService.getEmigoShare(this.emigoId, emigo);
+  }
+
+  public async setContactProfileData(emigo: string, obj: any): Promise<void> {
+    await this.storeService.setEmigoAttributeData(this.emigoId, emigo, obj);
+    this.refreshEmigos();
+  }
+
+  public async getContactProfile(emigo: string): Promise<Attribute[]> {
+    return await this.storeService.getEmigoAttributes(this.emigoId, emigo);
+  }
+
+  public async setViewSubjectFeed(emigo: string, subject: string, hidden: boolean) {
+    await this.storeService.setViewSubjectFeed(this.emigoId, emigo, subject, hidden);
+    this.refreshViewFeed();
+  }
+
+  public async getShowFeedSubject(subjectId: string): Promise<FeedSubjectEntry> {
+    return await this.storeService.getFeedSubjectEntry(this.emigoId, subjectId);
+  }
+
+  public async getContact(emigoId: string): Promise<EmigoContact> {
+    return await this.storeService.getContact(this.emigoId, emigoId);
+  }
+  
+  public async getContacts(label: string, search: string, status: string, hidden: boolean): Promise<EmigoContact[]> {
+    return await this.storeService.getContacts(this.emigoId, label, search, status, hidden);
+  }
+
+  public async getShowFeed(label: string, search: string, limit: number): Promise<FeedSubjectEntry[]> {
+    return await this.storeService.getSubjectFeed(this.emigoId, label, search, limit);
+  }
+
+  public async getViewFeed(emigo: string, label:string, search: string, limit: number): Promise<FeedSubject[]> {
+    return await this.storeService.getEmigoFeed(this.emigoId, emigo, label, search, limit);
+  }
+
+  public async getHiddenFeed(label: string, search: string, limit: number): Promise<FeedSubject[]> {
+    return await this.storeService.getHiddenFeed(this.emigoId, label, search, limit);
+  }
+
+  private async syncChanges() {
+      
+    console.log("sync changes");
+    try {
+
+      // sync all modules
+      await this.syncIdentity();
+      await this.syncGroup();
+      await this.syncShare();
+      await this.syncIndex();
+      await this.syncProfile();
+      await this.syncShow();
+
+      // retrieve any stale contact
+      let d: Date = new Date();
+      let cur: number = Math.floor(d.getTime() / 1000);
+      let updates: EmigoUpdate[] = await this.storeService.getStaleEmigos(this.emigoId, cur - this.stale);
+
+      for(let i = 0; i < updates.length; i++) {
+
+        // set updated timestamp
+        await this.storeService.setEmigoUpdateTimestamp(this.emigoId, updates[i].emigoId, cur);
+ 
+        // update identity
+        await this.syncEmigoIdentity(updates[i]);
+
+        // update attributes
+        await this.syncEmigoAttributes(updates[i]);
+
+        // update subjects
+        await this.syncEmigoSubjects(updates[i]);
+
+      }
+    }
+    catch(e) {
+      if(this.emigoId != null) {
+        console.error(e);
+      }
+    }
+    console.log("sync changes: done");
+  }
+
+  public async refreshContact(emigo: string) {
+
+    // update profile of specified contact
+    let d: Date = new Date();
+    let cur: number = Math.floor(d.getTime() / 1000);
+    try {
+      let update: EmigoUpdate = await this.storeService.getEmigoUpdate(this.emigoId, emigo);
+      await this.storeService.setEmigoUpdateTimestamp(this.emigoId, update.emigoId, cur);
+      await this.syncEmigoIdentity(update);
+      await this.syncEmigoAttributes(update);
+      await this.syncEmigoSubjects(update);
+    }
+    catch(err) {
+      console.log(err);
+    }
+  }
+
+  public async refreshAllContacts() {
+  
+    // retrieve any stale contact
+    let d: Date = new Date();
+    let cur: number = Math.floor(d.getTime() / 1000);
+    let updates: EmigoUpdate[] = await this.storeService.getStaleEmigos(this.emigoId, cur);
+
+    // sync each view
+    for(let i = 0; i < updates.length; i++) {
+
+      try {
+
+        // set updated timestamp
+        await this.storeService.setEmigoUpdateTimestamp(this.emigoId, updates[i].emigoId, cur);
+
+        // update identity
+        await this.syncEmigoIdentity(updates[i]);
+
+        // update attributes
+        await this.syncEmigoAttributes(updates[i]);
+
+        // update subjects
+        await this.syncEmigoSubjects(updates[i]);
+      }
+      catch(e) {
+        console.log(e);
+      }
+    }
+
+    // lag a little for visual
+    await this.delay(2000);
+  }
+
+  private async asyncForEach(map, handler) {
+    
+    let arr = [];
+    map.forEach((value, key) => {
+      arr.push({ id: key, obj: value });
+    });
+    for(let i = 0; i < arr.length; i++) {
+      await handler(arr[i].obj, arr[i].id);
+    }
+  }
+
+  private async delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms)); 
+  } 
+
 }
+
+
+
+

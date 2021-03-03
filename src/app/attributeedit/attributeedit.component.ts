@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute } from '@angular/router'
 import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import * as application from "tns-core-modules/application";
@@ -12,10 +13,9 @@ import { HomeAddress } from '../model/homeAddress';
 import { WorkAddress } from '../model/workAddress';
 import { SocialLink } from '../model/socialLink';
 
-import { ContextService } from '../service/context.service';
 import { AttributeUtil } from '../attributeUtil';
 
-import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 
 import { LabelEntry } from '../appdb/labelEntry';
 import { Attribute } from '../appdb/attribute';
@@ -32,66 +32,63 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
   private sub: Subscription[] = [];
   private busy: boolean = false;
   private applySave: boolean = false;
-  private applyDelete: boolean = false;
-  public applyText: string = "";
-  private attribute: AttributeEntity;
-  private attr: any;
-  private addFlag: boolean;
+  private applyDelete: boolean = true;
+  public applyText: string = "DELETE";
+  private attr: any = null;
+  private attributeId: string = null;
+  private schema: string = null;
+  private labelSet: Set<string> = null;
   public name: string = "";
   public dropActive: boolean = false;
   private attributeKey: string;
-  private labelSet: Set<string>;
   private iOS: boolean;
   private handled: boolean = false;
   private discard: any;
 
   constructor(private router: RouterExtensions,
-      private contextService: ContextService,
+      private route: ActivatedRoute,
       private emigoService: EmigoService) {
     this.iOS = (device.os == "iOS");
-    this.attribute = this.contextService.getAttribute();
-    this.attr = this.attr = JSON.parse(JSON.stringify(this.attribute.obj));
 
-    // set attribute map
-    this.labelSet = new Set<string>();
-    if(this.attribute != null && this.attribute.labels != null) {
-      for(let i = 0; i < this.attribute.labels.length; i++) {
-        this.labelSet.add(this.attribute.labels[i]);
-      }
-    }
+    // retrieve specified attribute
+    this.route.params.forEach(p => {
 
-    // allow for delete until an update is made
-    if(this.attribute.id == null) {
-      this.applyDelete = false;
-      this.addFlag = true
-      this.applyText = "";
-    }
-    else {
-      this.applyDelete = true;
-      this.addFlag = false;
-      this.applyText = "DELETE";
-    }
+      // retrieve attribute data
+      this.emigoService.getAttribute(p.id).then(a => {
+
+        // extract attribute data
+        this.attributeId = a.attribute.attributeId;
+        this.schema = a.attribute.schema;
+        this.attr = JSON.parse(a.attribute.data);
+
+        // extract attribute labels
+        this.labelSet = new Set<string>();
+        for(let i = 0; i < a.labels.length; i++) {
+          this.labelSet.add(a.labels[i]);
+        }
+      });
+    });
 
     // configure for each type of attribute
-    if(AttributeUtil.isEmail(this.attribute)) {
+    if(AttributeUtil.WEBSITE == this.schema) {
       this.name = "Email";
     }
-    else if(AttributeUtil.isPhone(this.attribute)) {
+    else if(AttributeUtil.PHONE == this.schema) {
       this.name = "Phone";
     }
-    else if(AttributeUtil.isHome(this.attribute)) {
+    else if(AttributeUtil.HOME == this.schema) {
       this.name = "Home Address";
     }
-    else if(AttributeUtil.isWork(this.attribute)) {
+    else if(AttributeUtil.WORK == this.schema) {
       this.name = "Workplace";
     }
-    else if(AttributeUtil.isSocial(this.attribute)) {
+    else if(AttributeUtil.SOCIAL == this.schema) {
       this.name = "Social & Messaging";
     }
-    else if(AttributeUtil.isWebsite(this.attribute)) {
+    else if(AttributeUtil.WEBSITE == this.schema) {
       this.name = "Website";
     }
-    else if(AttributeUtil.isCard(this.attribute)) {
+    else if(AttributeUtil.CARD == this.schema) {
       this.name = "Business Card";
     }
     else {
@@ -139,31 +136,31 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
   }
 
   public isEmailAddress(): boolean {
-    return AttributeUtil.isEmail(this.attribute);
+    return AttributeUtil.EMAIL == this.schema;
   }
 
   public isPhoneNumber(): boolean {
-    return AttributeUtil.isPhone(this.attribute);
+    return AttributeUtil.PHONE == this.schema;
   }
 
   public isHomeAddress(): boolean {
-    return AttributeUtil.isHome(this.attribute);
+    return AttributeUtil.HOME == this.schema;
   }
 
   public isWorkAddress(): boolean {
-    return AttributeUtil.isWork(this.attribute);
+    return AttributeUtil.WORK == this.schema;
   }
 
   public isSocialLink(): boolean {
-    return AttributeUtil.isSocial(this.attribute);
+    return AttributeUtil.SOCIAL == this.schema;
   }
 
   public isWebsite(): boolean {
-    return AttributeUtil.isWebsite(this.attribute);
+    return AttributeUtil.WEBSITE == this.schema;
   }
 
   public isBusinessCard(): boolean {
-    return AttributeUtil.isCard(this.attribute);
+    return AttributeUtil.CARD == this.schema;
   }
 
   public onBack(): void {
@@ -183,7 +180,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
   public onApply(): void {
     if(!this.busy && this.applySave) {
       this.busy = true;
-      this.emigoService.updateAttribute(this.attribute.id, this.attribute.schema, this.attr).then(e => {
+      this.emigoService.updateAttribute(this.attributeId, this.schema, JSON.stringify(this.attr)).then(e => {
         this.applySave = false;
         this.applyText = "";
         this.busy = false;
@@ -193,12 +190,12 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
         dialogs.alert({ message: "Error: failed to save attribute", okButtonText: "ok" });
       });
     }
-    if(!this.busy && this.applyDelete && this.attribute.id != null) {
+    if(!this.busy && this.applyDelete) {
       dialogs.confirm({ message: "Are you sure you want to delete this info?",
           okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
         if(flag) {
           this.busy = true;
-          this.emigoService.deleteAttribute(this.attribute.id).then(e => {
+          this.emigoService.removeAttribute(this.attributeId).then(e => {
             this.applySave = false;
             this.applyText = "";
             this.busy = false;
@@ -213,29 +210,34 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
   }
 
   public isSelected(id: string): boolean {
+    if(this.labelSet == null) {
+      return false;
+    }
     return this.labelSet.has(id);
   }
 
   public toggleSelected(id: string) {
-    if(this.labelSet.has(id)) {
-      this.busy = true;
-      this.emigoService.clearAttributeLabel(this.attribute.id, id).then(() => {
-        this.busy = false;
-        this.labelSet.delete(id);
-      }).catch(err => {
-        this.busy = false;
-        dialogs.alert({ message: "Error: failed to clear attribute label", okButtonText: "ok"});
-      });
-    }
-    else {
-      this.busy = true;
-      this.emigoService.setAttributeLabel(this.attribute.id, id).then(() => {
-        this.busy = false;
-        this.labelSet.add(id);
-      }).catch(err => {
-        this.busy = false;
-        dialogs.alert({ message: "Error: failed to set attribute label", okButtonText: "ok"});
-      });
+    if(this.labelSet != null) {
+      if(this.labelSet.has(id)) {
+        this.busy = true;
+        this.emigoService.clearAttributeLabel(this.attributeId, id).then(() => {
+          this.busy = false;
+          this.labelSet.delete(id);
+        }).catch(err => {
+          this.busy = false;
+          dialogs.alert({ message: "Error: failed to clear attribute label", okButtonText: "ok"});
+        });
+      }
+      else {
+        this.busy = true;
+        this.emigoService.setAttributeLabel(this.attributeId, id).then(() => {
+          this.busy = false;
+          this.labelSet.add(id);
+        }).catch(err => {
+          this.busy = false;
+          dialogs.alert({ message: "Error: failed to set attribute label", okButtonText: "ok"});
+        });
+      }
     }
   }
 

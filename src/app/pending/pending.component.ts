@@ -17,11 +17,13 @@ import { NgZone } from "@angular/core";
 
 import { getEmigoObject } from '../appdb/emigo.util';
 import { Emigo } from '../appdb/emigo';
-import { ContextService } from '../service/context.service';
-import { EmigoService, EmigoView } from '../appdb/emigo.service';
-import { PendingEmigoView } from '../appdb/pendingEmigoView';
-import { MonitorService, EmigoStatus } from '../service/monitor.service';
+import { EmigoContact } from '../appdb/emigoContact';
+import { PendingContact } from '../appdb/pendingContact';
+import { EmigoService } from '../appdb/emigo.service';
 import { ScaleService } from '../service/scale.service';
+import { EntryService } from '../service/entry.service';
+import { ContactEntry, ContactLayoutType } from '../contactEntry';
+import { PendingEntry, PendingLayoutType } from '../pendingEntry';
 
 @Component({
     selector: "pending",
@@ -37,81 +39,76 @@ export class PendingComponent implements OnInit, OnDestroy {
   private notifyBorderColor: string = "#F0F8FF";
   private requestedBorderColor: string = "#F0F8FF";
   private receivedBorderColor: string = "#F0F8FF";
-  @ViewChild("res", {static: false}) emigos: ElementRef;
+  @ViewChild("con", {static: false}) connectedStack: ElementRef;
+  @ViewChild("req", {static: false}) requestedStack: ElementRef;
+  @ViewChild("rec", {static: false}) receivedStack: ElementRef;
+  @ViewChild("pen", {static: false}) pendingStack: ElementRef;
   private iOS: boolean;
-  private pendingEmigos: PendingEmigoView[] = [];
-  private requestedEmigos: EmigoView[] = [];
-  private receivedEmigos: EmigoView[] = [];
-  private notifyEmigos: EmigoStatus[] = [];
-  private grids: Map<string, GridLayout>;
-  private scaleMap: Map<string, Image>;
+
+  private requested: EmigoContact[] = [];
+  private received: EmigoContact[] = [];
+  private connected: EmigoContact[] = [];
+  private pending: PendingContact[] = [];
+
+  private contactEntries: Map<string, ContactEntry>;
+  private pendingEntries: Map<string, PendingEntry>;
 
   constructor(private router: RouterExtensions,
       private emigoService: EmigoService,
-      private contextService: ContextService,
-      private monitorService: MonitorService,
+      private entryService: EntryService,
       private scaleService: ScaleService,
       private zone: NgZone) {
-    this.scaleMap = new Map<string, Image>();
-    this.grids = new Map<string, GridLayout>();
     this.iOS = (device.os == "iOS");
   }
 
   ngOnInit(): void {
     
-    // load mask
-    this.maskSrc = ImageSource.fromFileSync("~/assets/mask.png");
-
-    // load default icon
-    this.avatarSrc = ImageSource.fromFileSync("~/assets/savatar.png");
-
     // set default tab
     this.tab = "notify"
     this.notifyBorderColor = "#909097"
     this.requestedBorderColor = "#F0F8FF";
     this.receivedBorderColor = "#F0F0FF";
-
-    // clear notify icon
-    this.monitorService.clearNotify();
-
-    // set scaled image 
-    this.sub.push(this.scaleService.image.subscribe(s => {
-      if(s != null && this.scaleMap.has(s.id)) {
-        this.scaleMap.get(s.id).src = s.imgSource;
-      }
-    }));
+    this.contactEntries = new Map<string, ContactEntry>();
+    this.pendingEntries = new Map<string, PendingEntry>();
+    this.entryService.setNotified();
   }
 
   ngAfterViewInit(): void {
     
-    this.sub.push(this.emigoService.pendingContacts.subscribe(c => {
-      this.pendingEmigos = c;
+    this.sub.push(this.entryService.requestedContacts.subscribe(async c => {
+      this.requested = c;
       if(this.tab == "requested") {
-        this.applyRequested();
+        await this.applySaved(<StackLayout>this.requestedStack.nativeElement, this.requested);
       }
     }));
 
-    this.sub.push(this.emigoService.requestedContacts.subscribe(c => {
-      this.requestedEmigos = c;
-      if(this.tab == "requested") {
-        this.applyRequested();
-      }
-    }));
-
-    this.sub.push(this.emigoService.receivedContacts.subscribe(c => {
-      this.receivedEmigos = c;
+    this.sub.push(this.entryService.receivedContacts.subscribe(async c => {
+      this.received = c;
       if(this.tab == "received") {
-        this.applyReceived();
+        await this.applySaved(<StackLayout>this.receivedStack.nativeElement, this.received);
+      }
+      if(this.tab == "notify") {
+        await this.notifySaved(<StackLayout>this.receivedStack.nativeElement, this.received);
       }
     }));
 
-    this.sub.push(this.monitorService.notifyEmigos.subscribe(e => {
-      this.notifyEmigos = e;
+    this.sub.push(this.entryService.connectedContacts.subscribe(async c => {
+      this.connected = c;
       if(this.tab == "notify") {
-        this.applyNotify();
+        await this.notifySaved(<StackLayout>this.connectedStack.nativeElement, this.connected);
       }
-      this.monitorService.clearNotify();
     }));
+
+    this.sub.push(this.entryService.pendingContacts.subscribe(async c => {
+      this.pending = c;
+      if(this.tab == "received") {
+        await this.applyUnsaved(<StackLayout>this.pendingStack.nativeElement, this.pending);
+      }
+      if(this.tab == "notify") {
+        await this.notifyUnsaved(<StackLayout>this.pendingStack.nativeElement, this.pending);
+      }
+    }));
+
   }
 
   ngOnDestroy(): void {
@@ -120,433 +117,118 @@ export class PendingComponent implements OnInit, OnDestroy {
     }
   }
 
-  public setNotify() {
-    this.tab = "notify";
-    this.notifyBorderColor = "#909097"
-    this.requestedBorderColor = "#F0F8FF"
-    this.receivedBorderColor = "#F0F8FF"
-    this.applyNotify();
+  private resetStack() {
+    (<StackLayout>this.connectedStack.nativeElement).removeChildren();
+    (<StackLayout>this.receivedStack.nativeElement).removeChildren();
+    (<StackLayout>this.requestedStack.nativeElement).removeChildren();
+    (<StackLayout>this.pendingStack.nativeElement).removeChildren();
+  }
+
+  public async setNotify() {
+    if(this.tab != "notify") {
+      this.resetStack();
+      this.tab = "notify";
+      this.notifyBorderColor = "#909097"
+      this.requestedBorderColor = "#F0F8FF"
+      this.receivedBorderColor = "#F0F8FF"
+      await this.notifySaved(<StackLayout>this.connectedStack.nativeElement, this.connected);
+      await this.notifySaved(<StackLayout>this.receivedStack.nativeElement, this.received);
+      await this.notifyUnsaved(<StackLayout>this.pendingStack.nativeElement, this.pending);
+      this.entryService.setNotified();
+    }
   }
 
   public setRequested() {
-    this.tab = "requested";
-    this.notifyBorderColor = "#F0F8FF";
-    this.requestedBorderColor = "#909097";
-    this.receivedBorderColor = "#F0F8FF";
-    this.applyRequested();
+    if(this.tab != "requested") {
+      this.resetStack();
+      this.tab = "requested";
+      this.notifyBorderColor = "#F0F8FF";
+      this.requestedBorderColor = "#909097";
+      this.receivedBorderColor = "#F0F8FF";
+      this.applySaved(<StackLayout>this.requestedStack.nativeElement, this.requested);
+    }
   }
 
   public setReceived() {
-    this.tab = "received";
-    this.notifyBorderColor = "#F0F8FF";
-    this.requestedBorderColor = "#F0F8FF";
-    this.receivedBorderColor = "#909097";
-    this.applyReceived();
+    if(this.tab != "received") {
+      this.resetStack();
+      this.tab = "received";
+      this.notifyBorderColor = "#F0F8FF";
+      this.requestedBorderColor = "#F0F8FF";
+      this.receivedBorderColor = "#909097";
+      this.applySaved(<StackLayout>this.receivedStack.nativeElement, this.received);
+      this.applyUnsaved(<StackLayout>this.pendingStack.nativeElement, this.pending);
+    }
   }
 
-  private applyNotify() {
-    
-    // populate list of requested emigos
-    let stack = <StackLayout>this.emigos.nativeElement;
-    let views: Map<string, GridLayout> = new Map<string, GridLayout>();
+  private async applySaved(stack: StackLayout, c: EmigoContact[]) { 
 
-    for(let i = 0; i < this.notifyEmigos.length; i++) {
-      let emigo: EmigoStatus = this.notifyEmigos[i];
-      let id: string;
-      if(emigo.active != null) {
-        id = emigo.active.id + "-" + emigo.status + "-" + emigo.active.shareRevision;
+    // load saved contacts
+    stack.removeChildren();
+    for(let i = 0; i < c.length; i++) {
+      let e: ContactEntry = this.contactEntries.get(c[i].emigoId);
+      if(e == null) {
+        e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
+        this.contactEntries.set(c[i].emigoId, e);
       }
-      if(emigo.pending != null) {
-        id = emigo.pending.emigoId + "-" + emigo.status + "-" + emigo.pending.revision;
-      }
-      if(this.grids.has(id)) {
-        let g: GridLayout = this.grids.get(id);
-        if(stack.getChildAt(i) != g) {
-          stack.removeChild(g);
-          stack.insertChild(g, i);
-          views.set(id, g);
+      e.setContact(c[i], ContactLayoutType.Basic);
+      stack.addChild(e.getLayout());
+    }
+  }
+
+  private async notifySaved(stack: StackLayout, c: EmigoContact[]) {
+
+    // load saved contacts
+    stack.removeChildren();
+    for(let i = 0; i < c.length; i++) {
+      let d: Date = new Date();
+      if(c[i].updated != null && (d.getTime()/1000) < (c[i].updated + 2419200)) {
+        if(c[i].shareData == null || c[i].shareData.notified != c[i].shareRevision) {
+          let e: ContactEntry = this.contactEntries.get(c[i].emigoId);
+          if(e == null) {
+            e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
+            this.contactEntries.set(c[i].emigoId, e);
+          }
+          e.setContact(c[i], ContactLayoutType.Updates);
+          stack.addChild(e.getLayout());
         }
       }
-      else {
-        let g: GridLayout;
-        if(emigo.active != null) {
-          g = this.getSavedNotify(emigo.active, emigo.status);
-        }
-        if(emigo.pending != null) {
-          g = this.getPendingNotify(emigo.pending);
-        }
-        stack.insertChild(g, i);
-        views.set(id, g);
-      }
     }
-    while(stack.getChildrenCount() > this.notifyEmigos.length) {
-      stack.removeChild(stack.getChildAt(this.notifyEmigos.length));
-    }
-    this.grids = views;
   }
 
-  private applyRequested() {
-  
-    // populate list of requested emigos
-    let stack = <StackLayout>this.emigos.nativeElement;
-    let views: Map<string, GridLayout> = new Map<string, GridLayout>();
-    for(let i = 0; i < this.requestedEmigos.length; i++) {
-      let emigo: EmigoView = this.requestedEmigos[i];
-      let id: string = emigo.id + "-" + emigo.identityRevision + "-" + emigo.attributeRevision;
-      if(this.grids.has(id)) {
-        let g: GridLayout = this.grids.get(id);
-        if(stack.getChildAt(i) != g) {
-          stack.removeChild(g);
-          stack.insertChild(g, i);
-          views.set(id, g);
-        }
+  private async applyUnsaved(stack: StackLayout, c: PendingContact[]) {
+
+    // load unsaved contacts
+    stack.removeChildren();
+    for(let i = 0; i < c.length; i++) {
+      let e: PendingEntry = this.pendingEntries.get(c[i].shareId);
+      if(e == null) {
+        e = new PendingEntry(this.emigoService, this.entryService, this.router, this.zone);
+        this.pendingEntries.set(c[i].shareId, e);
       }
-      else {
-        let g: GridLayout = this.getSavedView(emigo);
-        stack.insertChild(g, i);
-        views.set(id, g);
-      }
+      e.setPending(c[i], PendingLayoutType.Basic);
+      stack.addChild(e.getLayout());
     }
-    while(stack.getChildrenCount() > this.requestedEmigos.length) {
-      stack.removeChild(stack.getChildAt(this.requestedEmigos.length));
-    }
-    this.grids = views;
   }
 
-  private applyReceived() {
-  
-    let stack = <StackLayout>this.emigos.nativeElement;
-    let views: Map<string, GridLayout> = new Map<string, GridLayout>();
-    
-    // populate list of received emigos
-    for(let i = 0; i < this.receivedEmigos.length; i++) {
-      let emigo: EmigoView = this.receivedEmigos[i];
-      let id: string = emigo.id + "-" + emigo.identityRevision + "-" + emigo.attributeRevision;
-      if(this.grids.has(id)) {
-        let g: GridLayout = this.grids.get(id);
-        if(stack.getChildAt(i) != g) {
-          stack.removeChild(g);
-          stack.insertChild(g, i);
-          views.set(id, g);
+  private async notifyUnsaved(stack: StackLayout, c: PendingContact[]) {
+
+    // load unsaved contacts
+    stack.removeChildren();
+    for(let i = 0; i < c.length; i++) {
+      let d: Date = new Date();
+      if(c[i].updated != null && (d.getTime()/1000) < (c[i].updated + 2419200)) {
+        if(c[i].pendingData == null || c[i].pendingData.notified != c[i].revision) {
+          let e: PendingEntry = this.pendingEntries.get(c[i].shareId);
+          if(e == null) {
+            e = new PendingEntry(this.emigoService, this.entryService, this.router, this.zone);
+            this.pendingEntries.set(c[i].shareId, e);
+          }
+          e.setPending(c[i], PendingLayoutType.Updates);
+          stack.addChild(e.getLayout());
         }
       }
-      else {
-        let g: GridLayout = this.getSavedView(emigo);
-        stack.insertChild(g, i);
-        views.set(id, g);
-      }
     }
-
-    // populate list of pending emigos
-    for(let i = 0; i < this.pendingEmigos.length; i++) {
-      let idx: number = i + this.receivedEmigos.length;
-      let emigo: PendingEmigoView = this.pendingEmigos[i]
-      let id: string = emigo.shareId + "-" + emigo.emigoId;
-      if(this.grids.has(id)) {
-        let g: GridLayout = this.grids.get(id);
-        if(stack.getChildAt(idx) != g) {
-          stack.removeChild(g);
-          stack.insertChild(g, idx);
-          views.set(id, g);
-        }
-      }
-      else {
-        let g: GridLayout = this.getPendingView(emigo);
-        stack.insertChild(g, idx);
-        views.set(id, g);
-      }
-    } 
-
-    let count: number = this.receivedEmigos.length + this.pendingEmigos.length;
-    while(stack.getChildrenCount() > count) {
-      stack.removeChild(stack.getChildAt(count));
-    }
-    this.grids = views;
-  }
-
-  private getPendingView(e: PendingEmigoView): GridLayout {
-
-    let icon: Image = new Image();
-    icon = new Image();
-    icon.width = 48;
-    icon.height = 48;
-
-    let mask: Image = new Image();
-    mask.width = 48;
-    mask.height = 48;
-    mask.src = this.maskSrc;
-
-    let g: GridLayout = new GridLayout();
-    g.height = 64;
-    g.marginLeft = 16;
-    g.paddingTop = 8;
-    g.paddingBottom = 8;
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addColumn(new ItemSpec(1, "star"));
-    g.addChildAtCell(icon, 0, 0);
-    g.addChildAtCell(mask, 0, 0);
-
-    this.emigoService.getEmigoRequestMessage(e.shareId).then(msg => {
-      let emigo: Emigo = getEmigoObject(msg);
-
-      g.on(Button.tapEvent, () => {
-   
-        // retrieve contact for rendering
-        this.emigoService.selectEmigoContact(emigo.emigoId);
-
-        // set whether contact can be stored
-        this.contextService.setEmigo({ id: emigo.emigoId, handle: emigo.handle, registry: emigo.registry,
-          pending: true, shareId: e.shareId, available: true });
-
-        this.zone.run(() => { 
-          this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-            transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-        });
-      });
-
-      // scale image
-      this.scaleMap.set(emigo.emigoId, icon);
-      icon.src = this.scaleService.setImage(emigo.emigoId, emigo.logo);
-
-      let name: Label = new Label();
-      name.text = emigo.name;
-      name.fontSize = 18;
-      name.className = "text";
-
-      let handle: Label = new Label();
-      handle.text = emigo.handle;
-      handle.fontSize = 16;
-      handle.className = "text";
-
-      let s: StackLayout = new StackLayout();
-      s.paddingLeft = 16;
-      s.verticalAlignment = VerticalAlignment.middle;
-      s.addChild(name);
-      s.addChild(handle);
-
-      g.addColumn(new ItemSpec(1, "star"));
-      g.addChildAtCell(s, 0, 1);
-    });
-  
-    return g;
-  }
-
-  private getSavedView(e: EmigoView): GridLayout {
-    let name: Label = new Label();
-    name.text = e.name;
-    name.fontSize = 18;
-    name.className = "text";
-
-    let handle: Label = new Label();
-    handle.text = e.handle;
-    handle.fontSize = 16;
-    handle.className = "text";
-
-    let mask: Image = new Image();
-    mask.width = 48;
-    mask.height = 48;
-    mask.src = this.maskSrc;
-
-    let icon: Image = new Image();
-    icon = new Image();
-    icon.width = 48;
-    icon.height = 48;
-    if(e.thumb != null) {
-      icon.src = ImageSource.fromBase64Sync(e.thumb);
-    }
-    else {
-      icon.src = this.avatarSrc;
-    }
-
-    let s: StackLayout = new StackLayout();
-    s.paddingLeft = 16;
-    s.verticalAlignment = VerticalAlignment.middle;
-    s.addChild(name);
-    s.addChild(handle);
-
-    let g: GridLayout = new GridLayout();
-    g.on(Button.tapEvent, () => {
- 
-      // retrieve contact for rendering
-      this.emigoService.selectEmigoContact(e.id);
-
-      // set whether contact can be stored
-      this.contextService.setEmigo({ id: e.id, handle: e.handle, registry: null,
-        pending: false, available: true });
-
-      this.zone.run(() => { 
-        this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-          transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-      });
-    });
-    g.height = 64;
-    g.marginLeft = 16;
-    g.paddingTop = 8;
-    g.paddingBottom = 8;
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addColumn(new ItemSpec(1, "star"));
-    g.addChildAtCell(icon, 0, 0);
-    g.addChildAtCell(mask, 0, 0);
-    g.addChildAtCell(s, 0, 1);
-    return g;
-  }
-
-  private getPendingNotify(e: PendingEmigoView): GridLayout {
-
-    let icon: Image = new Image();
-    icon = new Image();
-    icon.width = 48;
-    icon.height = 48;
-
-    let mask: Image = new Image();
-    mask.width = 48;
-    mask.height = 48;
-    mask.src = this.maskSrc;
-
-    let date: Label = new Label();
-    date.text = this.getOffset(e.updated);;
-    date.fontSize = 14;
-    date.className = "text";
-    date.verticalAlignment = VerticalAlignment.middle;
-
-    let g: GridLayout = new GridLayout();
-    g.height = 64;
-    g.marginLeft = 16;
-    g.marginRight = 16;
-    g.paddingTop = 8;
-    g.paddingBottom = 8;
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addColumn(new ItemSpec(1, "star"));
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addChildAtCell(icon, 0, 0);
-    g.addChildAtCell(mask, 0, 0);
-    g.addChildAtCell(date, 0, 2);
-
-    this.emigoService.getEmigoRequestMessage(e.shareId).then(msg => {
-      let emigo: Emigo = getEmigoObject(msg);
-
-      g.on(GestureTypes.swipe, () => {
-        this.monitorService.unnotify(e.emigoId, e.revision);
-      });
-
-      g.on(Button.tapEvent, () => {
-   
-        // retrieve contact for rendering
-        this.emigoService.selectEmigoContact(emigo.emigoId);
-
-        // set whether contact can be stored
-        this.contextService.setEmigo({ id: emigo.emigoId, handle: emigo.handle, registry: emigo.registry,
-          pending: true, shareId: e.shareId, available: true });
-
-        this.zone.run(() => { 
-          this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-            transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-        });
-      });
-
-      // scale image
-      this.scaleMap.set(emigo.emigoId, icon);
-      icon.src = this.scaleService.setImage(emigo.emigoId, emigo.logo);
-
-      let name: Label = new Label();
-      name.text = emigo.name;
-      name.fontSize = 18;
-      name.className = "text";
-
-      let message: Label = new Label();
-      message.text = "Sent you a request";
-      message.fontSize = 14;
-      message.className = "text";
-
-      let s: StackLayout = new StackLayout();
-      s.paddingLeft = 16;
-      s.verticalAlignment = VerticalAlignment.middle;
-      s.addChild(name);
-      s.addChild(message);
-
-      g.addChildAtCell(s, 0, 1);
-    });
-  
-    return g;
-  }
- 
-  private getSavedNotify(e: EmigoView, status: string): GridLayout {
-    let name: Label = new Label();
-    name.text = e.name;
-    name.fontSize = 18;
-    name.className = "text";
-
-    let message: Label = new Label();
-    if(status == "connected") {
-      message.text = "Is now connected";
-    }
-    else {
-      message.text = "Sent you a request";
-    }
-    message.fontSize = 14;
-    message.className = "text";
-
-    let date: Label = new Label();
-    date.text = this.getOffset(e.shareTimestamp);;
-    date.fontSize = 14;
-    date.className = "text";
-    date.verticalAlignment = VerticalAlignment.middle;
-
-    let mask: Image = new Image();
-    mask.width = 48;
-    mask.height = 48;
-    mask.src = this.maskSrc;
-
-    let icon: Image = new Image();
-    icon = new Image();
-    icon.width = 48;
-    icon.height = 48;
-    if(e.thumb != null) {
-      icon.src = ImageSource.fromBase64Sync(e.thumb);
-    }
-    else {
-      icon.src = this.avatarSrc;
-    }
-
-    let s: StackLayout = new StackLayout();
-    s.paddingLeft = 16;
-    s.verticalAlignment = VerticalAlignment.middle;
-    s.addChild(name);
-    s.addChild(message);
-
-    let g: GridLayout = new GridLayout();
-
-    g.on(GestureTypes.swipe, () => {
-      this.monitorService.unnotify(e.id, e.shareRevision);
-    });
-
-    g.on(Button.tapEvent, () => {
- 
-      // retrieve contact for rendering
-      this.emigoService.selectEmigoContact(e.id);
-
-      // set whether contact can be stored
-      this.contextService.setEmigo({ id: e.id, handle: e.handle, registry: null,
-        pending: false, available: true });
-
-      this.zone.run(() => { 
-        this.router.navigate(["/contactprofile"], { clearHistory: false, animated: true,
-          transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
-      });
-    });
-    g.height = 64;
-    g.marginLeft = 16;
-    g.marginRight = 16;
-    g.paddingTop = 8;
-    g.paddingBottom = 8;
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addColumn(new ItemSpec(1, "star"));
-    g.addColumn(new ItemSpec(1, "auto"));
-    g.addChildAtCell(icon, 0, 0);
-    g.addChildAtCell(mask, 0, 0);
-    g.addChildAtCell(s, 0, 1);
-    g.addChildAtCell(date, 0, 2);
-    return g;
   }
 
   public getOffset(t: number) {

@@ -18,7 +18,7 @@ import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { AnimationCurve } from "tns-core-modules/ui/enums";
 
 import { AttributeUtil } from '../attributeUtil';
-import { EmigoService, AttributeEntity } from '../appdb/emigo.service';
+import { EmigoService } from '../appdb/emigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -27,7 +27,8 @@ import { LabelEntry } from '../appdb/labelEntry';
     templateUrl: "./labelview.component.xml"
 })
 export class LabelViewComponent implements OnInit, OnDestroy {
-
+i
+  private imageObj: any = null;
   public imageSrc: ImageSource = null;
   public avatarSrc: ImageSource = null;
   public menuSet: boolean = false;
@@ -56,8 +57,7 @@ export class LabelViewComponent implements OnInit, OnDestroy {
   private orientation: any;
   private sub: Subscription[] = [];
   public labels: LabelEntry[] = [];
-  public attributes: AttributeEntity[] = [];
-  @ViewChild("img", {static: false}) img: ElementRef;
+  public attributes: any[] = [];
   @ViewChild("stk", {static: false}) stk: ElementRef;
   @ViewChild("tvn", {static: false}) tvn: ElementRef;
   @ViewChild("rmu", {static: false}) menu: ElementRef;
@@ -74,12 +74,29 @@ export class LabelViewComponent implements OnInit, OnDestroy {
     // load default logo
     this.avatarSrc = ImageSource.fromFileSync("~/assets/avatar.png");
 
-    this.sub.push(this.emigoService.attributes.subscribe(a => {
-      this.attributes = a;
-    }));
+    this.emigoService.getAttributes().then(a => {
+      for(let i = 0; i < a.length; i++) {
+
+        // construct label set
+        let labels: Set<string> = new Set<string>();
+        for(let j = 0; j < a[i].labels.length; j++) {
+          labels.add(a[i].labels[j]);
+        }
+
+        // construct data object
+        this.attributes.push({ 
+          id: a[i].attribute.attributeId, 
+          schema: a[i].attribute.schema, 
+          obj: JSON.parse(a[i].attribute.data),
+          labels: labels,
+        });
+      }
+    });
+
     this.sub.push(this.emigoService.labels.subscribe(l => {
       this.labels = l;
     }));
+
     this.sub.push(this.emigoService.identity.subscribe(i => {
       this.name = i.name;
       this.handle = i.handle;
@@ -91,12 +108,9 @@ export class LabelViewComponent implements OnInit, OnDestroy {
       else {
         this.imageSrc = this.avatarSrc;
       }  
-      setTimeout(() => {
-        let logo: Image = new Image();
-        logo.src = this.imageSrc;
-        let frame = <GridLayout>this.img.nativeElement;
-        frame.addChildAtCell(logo, 2, 1);
-      }, 24);
+      if(this.imageObj != null) {
+        this.imageObj.imageSource = this.imageSrc;
+      } 
     }));
 
     this.application.on(this.application.orientationChangedEvent, this.orientation);
@@ -107,6 +121,13 @@ export class LabelViewComponent implements OnInit, OnDestroy {
 
     for(let i = 0; i < this.sub.length; i++) {
       this.sub[i].unsubscribe();
+    }
+  }
+
+  public onImageLoaded(args: EventData) {
+    this.imageObj = args.object;
+    if(this.imageSrc != null) {
+      this.imageObj.imageSource = this.imageSrc;
     }
   }
 
@@ -145,43 +166,41 @@ export class LabelViewComponent implements OnInit, OnDestroy {
       this.labelName = "No Label / User Directory";
     }
     else {
-      this.labelName = l.label.name;
+      this.labelName = l.name;
       for(let i = 0; i < this.attributes.length; i++) {
-        for(let j = 0; j < this.attributes[i].labels.length; j++) {
-          if(l.labelId == this.attributes[i].labels[j]) {
-            this.labeled.push(this.attributes[i]);
-            break;
-          }
+        let a = this.attributes[i];
+        if(a.labels.has(l.labelId)) {
+          this.labeled.push(a);
         }
       }
     }
   }
 
-  public isEmail(a: AttributeEntity): boolean {
+  public isEmail(a): boolean {
     return AttributeUtil.isEmail(a);
   }
 
-  public isPhone(a: AttributeEntity): boolean {
+  public isPhone(a): boolean {
     return AttributeUtil.isPhone(a);
   }
 
-  public isHome(a: AttributeEntity): boolean {
+  public isHome(a): boolean {
     return AttributeUtil.isHome(a);
   }
 
-  public isWork(a: AttributeEntity): boolean {
+  public isWork(a): boolean {
     return AttributeUtil.isWork(a);
   }
 
-  public isSocial(a: AttributeEntity): boolean {
+  public isSocial(a): boolean {
     return AttributeUtil.isSocial(a);
   }
 
-  public isWebsite(a: AttributeEntity): boolean {
+  public isWebsite(a): boolean {
     return AttributeUtil.isWebsite(a);
   }
 
-  public isCard(a: AttributeEntity): boolean {
+  public isCard(a): boolean {
     return AttributeUtil.isCard(a);
   }
 
@@ -238,6 +257,7 @@ export class LabelViewComponent implements OnInit, OnDestroy {
     }
     return "";
   }
+
   public isSms(sms: boolean): boolean {
     if(sms == true) {
       return true;

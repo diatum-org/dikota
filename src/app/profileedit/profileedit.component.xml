@@ -26,16 +26,6 @@
       </GridLayout>
 
       <GridLayout rows="auto" paddingLeft="32" paddingRight="32" paddingBottom="16">
-        <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="your username" autocapitalizationType="none"
-            fontSize="18" (textChange)="onUpdateHandle($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
-            [text]="handle" borderBottomWidth="1" [borderColor]="handleColor" (focus)="onFocus()" (blur)="onBlur()"></TextField>
-        <Label *ngIf="ready&&!alpha" color="#71717E" fontSize="12" text="(use letters)" horizontalAlignment="right" paddingRight="32"></Label>
-        <Label *ngIf="ready&&alpha&&!available" color="#71717E" fontSize="12" text="(not available)" horizontalAlignment="right" paddingRight="32"></Label>
-        <Image src="~/assets/clear.png" width="24" height="24" horizontalAlignment="right" verticalAlignment="center"
-            (tap)="onClearHandle()"></Image>
-      </GridLayout>
-
-      <GridLayout rows="auto" paddingLeft="32" paddingRight="32" paddingBottom="16">
         <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="your location" autocapitalizationType="words"
             fontSize="18" (textChange)="onUpdateLocation($event.value)" returnKeyType="next" (returnPress)="onSet($event)"
             [text]="location" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onFocus()" (blur)="onBlur()"></TextField>

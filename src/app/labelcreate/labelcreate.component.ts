@@ -6,9 +6,6 @@ import { device, screen, platformNames } from 'tns-core-modules/platform';
 
 import { EmigoService } from '../appdb/emigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
-import { Label } from '../appdb/label';
-
-import { ContextService } from '../service/context.service';
 
 @Component({
     selector: "labelcreate",
@@ -27,7 +24,6 @@ export class LabelCreateComponent implements OnInit {
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private contextService: ContextService,
       private emigoService: EmigoService) { 
     this.all = ['Acquaintance', 'Best Friend', 'Business', 'Client', 'Colleague', 
         'Family', 'Friend', 'New Friend', 'Classmate', 'Neighbor' ];
@@ -65,7 +61,7 @@ export class LabelCreateComponent implements OnInit {
       // must not already been set
       let set: boolean = false;
       for(let l = 0; l < this.labels.length; l++) {
-        if(this.labels[l].label.name == this.all[a]) {
+        if(this.labels[l].name == this.all[a]) {
           set = true;
         }
       }
@@ -103,17 +99,16 @@ export class LabelCreateComponent implements OnInit {
 
   public onCreate(): void {
     if(this.name != null && this.name != "") {
-      let l: Label = { name: this.name };
       this.busy = true;
-      this.emigoService.addLabel(l).then(e => {
+      this.emigoService.addLabel(this.name).then(e => {
         this.name = null;
         this.color = "#888888";
         this.filterSuggested();
         this.busy = false;
-        this.contextService.setLabel(e);
-        this.router.navigate(["/labelprofile"]);
+        this.router.navigate(["/labelprofile", e.labelId]);
       }).catch(err => {
         this.busy = false;
+        console.log(err);
         dialogs.alert({ message: "Error: failed to create account label", okButtonText: "ok" });
       });
     }
