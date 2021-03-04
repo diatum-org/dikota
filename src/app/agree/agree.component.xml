@@ -7,27 +7,41 @@
   </GridLayout>
 </ActionBar>
 
-<GridLayout rows="*,*" paddingLeft="16" paddingRight="16" backgroundColor="#ffffff">
+<GridLayout rows="*,*,*" paddingLeft="16" paddingRight="16" backgroundColor="#ffffff">
   <StackLayout row="0" verticalAlignment="top" padding="32">
 
-    <Label class="text" text="I agreee to the Jupstream Terms of Service and Privacy Policy."
+    <Label class="text" text="I agreee to the Dikota Terms of Service and Privacy Policy."
         fontSize="18" fontWeight="Bold" textWrap="true" paddingBottom="64" textAlignment="center"></Label>
 
     <GridLayout rows="auto" columns="*,*">
-      <Label col="0" class="text" text="Cancel" fontSize="18" fontWeight="Bold" (tap)="onCancel()"
-          textAlignment="center" verticalAlignment="top"></Label>
-      <Label col="1" class="link" text="Agree" fontSize="18" fontWeight="Bold" (tap)="onAgree()"
-          textAlignment="center" verticalAlignment="top"></Label>
+      <GridLayout col="0" rows="auto" columns="96" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" backgroundColor="#eeeeee"
+           (tap)="onCancel()" horizontalAlignment="center" verticalAlignment="center">
+        <Label class="text" text="Cancel" fontSize="18" fontWeight="Bold" textAlignment="center"></Label>
+      </GridLayout>
+
+      <GridLayout col="1" rows="auto" columns="96" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" backgroundColor="#eeeeee"
+           (tap)="onAgree()" horizontalAlignment="center" verticalAlignment="center">
+        <Label class="link" text="I Agree" fontSize="18" fontWeight="Bold" textAlignment="center"></Label>
+      </GridLayout>
+
     </GridLayout>
 
     <ActivityIndicator color="#1172FE" [busy]="busy"></ActivityIndicator>
   
   </StackLayout>
-  <StackLayout row="1" verticalAlignment="center" height="96">
 
+  <StackLayout row="1" verticalAlignment="center" paddingLeft="32" paddingRight="32">
+    <Label class="text" fontSize="16" fontWeight="Bold" text="Before you tap Agree..."
+      horizontalAlignment="center" paddingBottom="8"></Label>
+    <Label class="text" fontSize="16" textWrap="true" horizontalAlignment="center"
+      text="The Diatum Diatabase and Dikota have a unique set of terms and data policies that set us apart."></Label>
+  </StackLayout>
+
+  <StackLayout row="2" verticalAlignment="center" height="96">
     <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" paddingBottom="32" text="Terms of Service" (tap)="onTerms()"></Label>
 
     <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" text="Data Policy" (tap)="onData()"></Label>
-
   </StackLayout>
 </GridLayout>
