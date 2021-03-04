@@ -1,39 +1,41 @@
-<GridLayout backgroundColor="#FFFFFF" [rows]="getScreenGrid()">
-  <GridLayout row="0" rows="*,auto,*,auto,*,auto,*,auto" paddingRight="32" paddingLeft="32">
+<GridLayout backgroundColor="#FFFFFF">
+  <GridLayout rows="*,*,*,*" paddingRight="32" paddingLeft="32">
 
-    <StackLayout row="1" paddingTop="32">
-      <Image height="64" src="~/assets/logo.png"></Image>
-      <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="8"></ActivityIndicator>
-    </StackLayout>
+    <Image row="0" height="64" src="~/assets/logo.png"
+      verticalAlignment="center"></Image>
 
-    <StackLayout row="3">
-      <GridLayout rows="auto" paddingBottom="16">
-        <Image src="~/assets/login.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
-        <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" [hint]="hint"
-            autocapitalizationType="none" fontSize="16" paddingLeft="32" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
-            (returnPress)="onLoginSet()" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
-      </GridLayout>    
-      <GridLayout rows="auto" paddingBottom="16">
-        <Image src="~/assets/password.png" height="28" width="28" horizontalAlignment="left" verticalAlignment="center"></Image>
-        <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Password" [secure]="!show" 
-            fontSize="16" paddingLeft="32" (textChange)="onUpdatePassword($event.value)" returnKeyType="go" (returnPress)="onPasswordSet()"
-            autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"></TextField>
-        <Image *ngIf="!show" src="~/assets/view.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="center"
-            (tap)="onShow(true)"></Image>
-        <Image *ngIf="show" src="~/assets/look.png" height="28" width="28" horizontalAlignment="right" verticalAlignment="center"
-            (tap)="onShow(false)"></Image>
+    <GridLayout *ngIf="loginFocus||passFocus" rowSpan="4" (tap)="onDismiss()"></GridLayout>
+
+    <StackLayout row="1" verticalAlignment="center">
+      <GridLayout rows="auto" padding="16">
+        <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
+            autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
+            (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
+            (tap)="onLoginFocus()"></TextField>
       </GridLayout>
-      <Label fontSize="16" fontWeight="Bold" text="LOGIN" paddingBottom="16" paddingTop="8" textAlignment="center" 
-          [color]="loginColor" (tap)="onLogin()"></Label>
+      <GridLayout rows="auto" padding="16">
+        <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
+            fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
+            autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
+            (tap)="onPassFocus()"></TextField>
+      </GridLayout>
     </StackLayout>
 
-    <GridLayout row="5">
-      <Label fontSize="16" textAlignment="center" color="#2C508F" (tap)="onCreate()">
-        <Span text="Attach an Identity" fontWeight="Bold"></Span>
-      </Label>
+    <GridLayout row="2" rows="auto" columns="*,auto,*" verticalAlignment="center">
+      <Label col="1" fontSize="18" textAlignment="center" [backgroundColor]="getColor()" color="#ffffff" (tap)="onAttach()"
+          paddingLeft="32" paddingRight="32" paddingTop="8" paddingBottom="8" text="Attach App" borderRadius="8"></Label>
     </GridLayout>
 
-    <Label row="7" class="text-light" height="32" [text]="version" fontSize="12" verticalAlignment="center" horizontalAlignment="center"></Label>
-    
+    <GridLayout row="3">
+      <Label fontSize="16" textAlignment="center" textWrap="true" height="64"
+          verticalAlignment="center" (tap)="onPortal()">
+        <Span class="text" text="New or logged-out users can create an attachment code in your"></Span>
+        <Span class="link" text=" Diatabase Portal. "></Span>
+      </Label>
+      <Label class="text-light" [text]="version" fontSize="12" paddingBottom="16"
+          verticalAlignment="bottom" horizontalAlignment="center"></Label>
+    </GridLayout>
+
   </GridLayout>
 </GridLayout>
+

@@ -119,7 +119,7 @@ export class CreateP8Component implements OnInit, OnDestroy {
     this.registryService.getIdentity(registry, address[0]).then(m => {
       let e: Emigo = getEmigoObject(m);
 
-      this.dikotaService.attachAccount(pass, e.emigoId, e.node, this.code).then(l => {
+      this.dikotaService.attach(e.emigoId, e.node, this.code).then(l => {
 
         let context: AppContext = { emigoId: l.account.emigoId, registry: registry, token: l.account.token,
             appNode: l.service.node, appToken: l.service.token, serviceToken: l.token };

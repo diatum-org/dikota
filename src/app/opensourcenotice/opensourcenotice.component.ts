@@ -29,8 +29,8 @@ export class OpenSourceNoticeComponent implements OnInit, OnDestroy {
   }
 
   public openURL(url: string) {
-    console.log(AppSettings.EMIGO + "/assets/" + url);
-    utils.openUrl(AppSettings.EMIGO + "/assets/" + url);
+    console.log(AppSettings.AMIGO + "/assets/" + url);
+    utils.openUrl(AppSettings.AMIGO + "/assets/" + url);
   }
 }
 

@@ -1,0 +1,33 @@
+<ActionBar backgroundColor="#ffffff" flat="true">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" (tap)="goBack()"></Image>
+    </StackLayout>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout rows="*,*" paddingLeft="16" paddingRight="16" backgroundColor="#ffffff">
+  <StackLayout row="0" verticalAlignment="top" padding="32">
+
+    <Label class="text" text="I agreee to the Jupstream Terms of Service and Privacy Policy."
+        fontSize="18" fontWeight="Bold" textWrap="true" paddingBottom="64" textAlignment="center"></Label>
+
+    <GridLayout rows="auto" columns="*,*">
+      <Label col="0" class="text" text="Cancel" fontSize="18" fontWeight="Bold" (tap)="onCancel()"
+          textAlignment="center" verticalAlignment="top"></Label>
+      <Label col="1" class="link" text="Agree" fontSize="18" fontWeight="Bold" (tap)="onAgree()"
+          textAlignment="center" verticalAlignment="top"></Label>
+    </GridLayout>
+
+    <ActivityIndicator color="#1172FE" [busy]="busy"></ActivityIndicator>
+  
+  </StackLayout>
+  <StackLayout row="1" verticalAlignment="center" height="96">
+
+    <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" paddingBottom="32" text="Terms of Service" (tap)="onTerms()"></Label>
+
+    <Label class="link" fontSize="16" fontWeight="Bold" textAlignment="center" text="Data Policy" (tap)="onData()"></Label>
+
+  </StackLayout>
+</GridLayout>

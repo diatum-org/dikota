@@ -1,6 +1,6 @@
 export class Environment {
   public static REGISTRY="https://registry.dev.coredb.org/app";
-  public static EMIGO="https://dikota.dev.coredb.org/app";
+  public static AMIGO="https://dikota.dev.coredb.org/app";
   public static DB="dev.";
   public static ENV="dev";
 }

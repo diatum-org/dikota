@@ -62,7 +62,7 @@ export class DikotaService {
 
   public getAvailable(): Promise<number> {
     return new Promise<number>((resolve, reject) => {
-      this.httpClient.get<Result>(AppSettings.EMIGO + "/accounts/status",
+      this.httpClient.get<Result>(AppSettings.AMIGO + "/accounts/status",
           { headers: this.headers, observe: 'body' }).toPromise().then(r => {
         if(r != null) {
           resolve(r.numValue);
@@ -78,32 +78,25 @@ export class DikotaService {
   }
 
   public emigoIdLogin(emigoId: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.EMIGO + "/accounts/token?emigoId=" + emigoId +
+    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?emigoId=" + emigoId +
         "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public emailLogin(email: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.EMIGO + "/accounts/token?email=" + email +
+    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?email=" + email +
         "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
   }
  
   public phoneLogin(phone: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.EMIGO + "/accounts/token?phone=" + 
+    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?phone=" + 
         phone.replace(/\+/g, "%2B") + "&password=" + password, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public attachAccount(password: string, emigoId: string, node: string, code: string): Promise<EmigoLogin> {
+  public attach(emigoId: string, node: string, code: string): Promise<EmigoLogin> {
 
-    // construct auth
-    let d: Date = new Date();
-    let t: number = Math.floor(d.getTime() / 1000);
-    var SHA256 = require('nativescript-toolbox/crypto-js/sha256');
-    let auth = SHA256(this.SEMI_SECRET + ":" + t);
-
-    return this.httpClient.post<EmigoLogin>(AppSettings.EMIGO + "/accounts/attached?password=" + 
-        password + "&emigoId=" + emigoId + "&node=" + node + "&code=" + code + "&timestamp=" + t + "&auth=" + auth, 
-        { headers: this.headers, observe: 'body' }).toPromise();
+    return this.httpClient.post<EmigoLogin>(AppSettings.AMIGO + "/accounts/attached?emigoId=" + emigoId 
+        + "&node=" + node + "&code=" + code, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public createAccount(phone: string, email: string, password: string): Promise<EmigoLogin> {
@@ -122,7 +115,7 @@ export class DikotaService {
     var SHA256 = require('nativescript-toolbox/crypto-js/sha256');
     let auth = SHA256(this.SEMI_SECRET + ":" + t);
 
-    return this.httpClient.post<EmigoLogin>(AppSettings.EMIGO + "/accounts/created?password=" + password + e + p + "&timestamp=" + t + "&auth=" + auth, 
+    return this.httpClient.post<EmigoLogin>(AppSettings.AMIGO + "/accounts/created?password=" + password + e + p + "&timestamp=" + t + "&auth=" + auth, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -151,29 +144,29 @@ export class DikotaService {
   }
 
   public updatePassword(password: string, update: string): Promise<void> {
-    return this.httpClient.put<void>(AppSettings.EMIGO + "/profile/password?token=" + this.token + "&password=" + password + "&update=" + update,
+    return this.httpClient.put<void>(AppSettings.AMIGO + "/profile/password?token=" + this.token + "&password=" + password + "&update=" + update,
       { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public getIdentityRevision(): Promise<number> {
-    return this.httpClient.get<number>(AppSettings.EMIGO + "/accounts/revision?token=" + this.token,
+    return this.httpClient.get<number>(AppSettings.AMIGO + "/accounts/revision?token=" + this.token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public getProfileRevision(): Promise<number> {
-    return this.httpClient.get<number>(AppSettings.EMIGO + "/profile/revision?token=" + this.token,
+    return this.httpClient.get<number>(AppSettings.AMIGO + "/profile/revision?token=" + this.token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public getProfile(): Promise<Profile> {
-    return this.httpClient.get<Profile>(AppSettings.EMIGO + "/profile/all?token=" + this.token, 
+    return this.httpClient.get<Profile>(AppSettings.AMIGO + "/profile/all?token=" + this.token, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public setRegistry(registry: string, revision: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       // trigger emigo update
-      this.httpClient.put<Emigo>(AppSettings.EMIGO + "/accounts/registry?token=" + this.token + "&registry=" + registry + "&revision=" + revision,
+      this.httpClient.put<Emigo>(AppSettings.AMIGO + "/accounts/registry?token=" + this.token + "&registry=" + registry + "&revision=" + revision,
           { headers: this.headers, observe: 'body' }).toPromise().then(e => {
         resolve();
       }).catch(err => {
@@ -183,53 +176,53 @@ export class DikotaService {
   }
 
   public setAvailable(flag: boolean): Promise<Profile> {
-    return this.httpClient.put<Profile>(AppSettings.EMIGO + "/profile/available?token=" + this.token + "&flag=" + flag,
+    return this.httpClient.put<Profile>(AppSettings.AMIGO + "/profile/available?token=" + this.token + "&flag=" + flag,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public setSearchable(flag: boolean): Promise<Profile> {
-    return this.httpClient.put<Profile>(AppSettings.EMIGO + "/profile/searchable?token=" + this.token + "&flag=" + flag,
+    return this.httpClient.put<Profile>(AppSettings.AMIGO + "/profile/searchable?token=" + this.token + "&flag=" + flag,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public confirm(): Promise<void> {
-    return this.httpClient.put<void>(AppSettings.EMIGO + "/profile/confirm?token=" + this.token,
+    return this.httpClient.put<void>(AppSettings.AMIGO + "/profile/confirm?token=" + this.token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public setPhoneNumber(phone: string): Promise<Profile> {
-    return this.httpClient.put<Profile>(AppSettings.EMIGO + "/profile/phone?token=" + this.token + "&phoneNumber=" + 
+    return this.httpClient.put<Profile>(AppSettings.AMIGO + "/profile/phone?token=" + this.token + "&phoneNumber=" + 
         phone.replace(/\+/g, "%2B"), { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public setEmailAddress(email: string): Promise<Profile> {
-    return this.httpClient.put<Profile>(AppSettings.EMIGO + "/profile/email?token=" + this.token + "&emailAddress=" + 
+    return this.httpClient.put<Profile>(AppSettings.AMIGO + "/profile/email?token=" + this.token + "&emailAddress=" + 
         email, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public setLocation(gps: GpsLocation): Promise<Profile> {
-    return this.httpClient.put<Profile>(AppSettings.EMIGO + "/profile/location?token=" + this.token,
+    return this.httpClient.put<Profile>(AppSettings.AMIGO + "/profile/location?token=" + this.token,
         gps, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public reset(email: string, phone: string): Promise<void> {
     if(email != null) {
-      return this.httpClient.put<void>(AppSettings.EMIGO + "/profile/reset?emailAddress=" + email,
+      return this.httpClient.put<void>(AppSettings.AMIGO + "/profile/reset?emailAddress=" + email,
           { headers: this.headers, observe: 'body' }).toPromise();
     }
     else {
-      return this.httpClient.put<void>(AppSettings.EMIGO + "/profile/reset?phoneNumber=" + phone.replace(/\+/g, "%2B"),
+      return this.httpClient.put<void>(AppSettings.AMIGO + "/profile/reset?phoneNumber=" + phone.replace(/\+/g, "%2B"),
           { headers: this.headers, observe: 'body' }).toPromise();
     }
   }
 
   public search(match: string): Promise<Contact[]> {
-    return this.httpClient.get<Contact[]>(AppSettings.EMIGO + "/search/accounts?token=" + this.token + "&limit=32&match=" + match, 
+    return this.httpClient.get<Contact[]>(AppSettings.AMIGO + "/search/accounts?token=" + this.token + "&limit=32&match=" + match, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public scan(area: SearchArea): Promise<Contact[]> {
-    return this.httpClient.post<Contact[]>(AppSettings.EMIGO + "/search/accounts?token=" + this.token + "&limit=32",
+    return this.httpClient.post<Contact[]>(AppSettings.AMIGO + "/search/accounts?token=" + this.token + "&limit=32",
         area, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -262,7 +255,7 @@ export class DikotaService {
       }
       params += "token=" + this.token;
     }
-    return this.httpClient.post<boolean>(AppSettings.EMIGO + "/accounts/contact" + params,
+    return this.httpClient.post<boolean>(AppSettings.AMIGO + "/accounts/contact" + params,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
