@@ -2,10 +2,10 @@
   <Label row="0" text="Search for new contacts in the Directory, or temporarily turn on your location to search for contacts nearby."
       paddingLeft="16" paddingRight="16" class="text" textWrap="true" fontSize="18" fontWeight="Bold"></Label>
     
-  <GridLayout row="1" columns="*,*" rows="auto" verticalAlignment="center">
+  <GridLayout row="1" columns="*,auto" rows="auto" verticalAlignment="center">
     <Label col="0" text="The Directory shows your name, username, a photo and description for friends to find you."
       verticalAlignment="center" paddingLeft="16" paddignRight="16" class="text" textWrap="true" fontSize="15"></Label>
-    <StackLayout col="1">
+    <StackLayout col="1" paddingRight="8">
       <StackLayout orientation="horizontal" horizontalAlignment="center">
         <Label text="Directory" class="text" fontSize="15" fontWeight="Bold" paddingRight="8"></Label>
         <Image src="~/assets/boardSearch.png" width="16"></Image>
@@ -13,21 +13,21 @@
       <Label text="Sarah H|" borderWidth="1" borderColor="#888888" class="text" borderRadius="4" marginTop="4" 
           fontSize="16" fontWeight="Bold" paddingLeft="8" marginRight="16" marginLeft="16"></Label>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardHailey.png" width="32"></Image>
+        <Image src="~/assets/boardHailey.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15">
           <Span text="Sarah H" fontWeight="Bold"></Span>
           <Span text="ailey"></Span>
         </Label>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardHawkins.png" width="32"></Image>
+        <Image src="~/assets/boardHawkins.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15">
           <Span text="Sarah H" fontWeight="Bold"></Span>
           <Span text="awkins"></Span>
         </Label>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardHenderson.png" width="32"></Image>
+        <Image src="~/assets/boardHenderson.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15">
           <Span text="Sarah H" fontWeight="Bold"></Span>
           <Span text="enderson"></Span>
@@ -36,24 +36,24 @@
     </StackLayout>
   </GridLayout>
     
-  <GridLayout row="2" columns="*,*" rows="auto" verticalAlignment="center">
+  <GridLayout row="2" columns="auto,*" rows="auto" verticalAlignment="center">
     <Label col="1" text="At a party or business metting, each user turns on their location to find and add friends nearby. Your location automatically turns off after 5 minutes."
        verticalAlignment="center" paddingLeft="16" paddingRight="16" class="text" paddingTop="8" textWrap="true" fontSize="15"></Label>
-    <StackLayout col="0">
+    <StackLayout col="0" paddingRight="8">
       <StackLayout orientation="horizontal" horizontalAlignment="center">
         <Label text="Nearby" class="text" fontSize="15" fontWeight="Bold" paddingRight="8"></Label>
         <Image src="~/assets/boardGps.png" width="18"></Image>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardStevens.png" width="32"></Image>
+        <Image src="~/assets/boardStevens.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15" text="Larry Stevens"></Label>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardLane.png" width="32"></Image>
+        <Image src="~/assets/boardLane.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15" text="Emma Sharp"></Label>
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
-        <Image src="~/assets/boardPeters.png" width="32"></Image>
+        <Image src="~/assets/boardPeters.png" width="48"></Image>
         <Label paddingLeft="8" class="text" fontSize="15" text="Top Peters"></Label>
       </StackLayout>
     </StackLayout>
