@@ -1,0 +1,39 @@
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
+      <Label text="Permissions" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
+    <Label col="1" class="link" text="NEXT" fontSize="18" paddingRight="16"
+        verticalAlignment="center" horizontalAlignment="right" (tap)="onNext()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout backgroundColor="#ffffff">
+  <ScrollView>
+    <StackLayout padding="16">
+
+      <Label class="text" fontSize="28" fontWeight="Bold" textWrap="true" textAlignment="center"
+          text="Diatabase Permissions" paddingTop="16" paddingLeft="32" paddingRight="32" paddingBottom="16"></Label>
+
+      <Label class="text" fontSize="18" textWrap="true" 
+          text="By using Dikota, you give Diatum permission to access the following data associated with your Digital Identity and Diatabase for the app to function."></Label>
+
+      <Label class="text" fontSize="18" paddingLeft="32" paddingTop="16" fontWeight="Bold"
+          text="1. Digital Identity"></Label>
+      <Label class="text" fontSize="18" paddingLeft="32" paddingTop="4" fontWeight="Bold"
+          text="2. Contacts"></Label>
+      <Label class="text" fontSize="18" paddingLeft="32" paddingTop="4" paddingBottom="16" fontWeight="Bold"
+          text="2. Labels"></Label>
+
+      <Label class="text" fontSize="18" textWrap="true"
+          text="Because the purpose of Dikota is to manage your contacts, labels and identity, these permissions cannot be disabled while using Dikota."></Label>
+
+      <Label class="text" fontSize="18" textWrap="true" paddingTop="4"
+          text="Please note, Dikota will not collect data associated with these permissions."></Label>
+    
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

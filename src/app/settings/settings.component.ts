@@ -33,4 +33,10 @@ export class SettingsComponent implements OnInit {
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
     });
   }
+  
+  onPermissions() {
+    this.router.navigate(["/permissionp0"], { clearHistory: false, animated: true,
+        transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
+    });
+  }
 }
