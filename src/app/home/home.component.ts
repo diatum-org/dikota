@@ -59,8 +59,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private scrollVal: number[];
   private application: any;
   private orientation: any;
-  private allset: boolean = false;
-  private count: number = null;
+  private allset: boolean = true;
   private scrollFont: number = 12;
   private iOS: boolean;
   private searchSet: boolean = false;
@@ -180,6 +179,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     
     // observe filtered contacts
     this.sub.push(this.emigoService.filteredContacts.subscribe(c => {
+
+      if(c.length > 0) {
+        // timeout to avoid change-after-check error
+        setTimeout(() => {
+          this.allset = false;
+        }, 1);
+      }
 
       // load contact
       let stack = <StackLayout>this.contacts.nativeElement;

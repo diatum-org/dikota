@@ -12,10 +12,10 @@
 <GridLayout background="#FFFFFF">
   <ScrollView>
     <StackLayout marginTop="16" borderColor="#DCE8FA" borderTopWidth="1">
+      <Label class="text" text="Overview" fontWeight="Bold" fontSize="16" borderColor="#CDD8EA" borderBottomWidth="1"
+          padding="16" (tap)="onOverview()"></Label>
       <Label class="text" text="Privacy Controls" fontWeight="Bold" fontSize="16" borderColor="#CDD8EA" borderBottomWidth="1"
           padding="16" (tap)="onPrivacyControls()"></Label>
-      <Label class="text" text="Password" fontWeight="Bold" fontSize="16" borderColor="#CDD8EA" borderBottomWidth="1"
-          padding="16" (tap)="onPasswordUpdate()"></Label>
     </StackLayout>
   </ScrollView>
 </GridLayout>

@@ -29,15 +29,15 @@
 
   <ScrollView #scr col="0" colSpan="3" row="0" rowSpan="2" scrollBarIndicatorVisible="false" (scroll)="onScroll($event.scrollY)">
     <StackLayout paddingTop="16" paddingRight="24">
-      <Label *ngIf="count==0" class="text" text="You're all set!" paddingLeft="16" paddingTop="32" paddingBottom="32" fontSize="18" fontWeight="Bold"></Label>
-      <Label *ngIf="count==0" class="link" text="1. Take a tour" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onTour()"></Label>
-      <Label *ngIf="count==0" class="text" text="Learn more about using Dikota" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
-      <Label *ngIf="count==0" class="link" text="2. Finish completing your profile" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onProfile()"></Label>
-      <Label *ngIf="count==0" class="text" text="Add your name, a photo and contact details, and add your profile to the User Directory so people can find you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
-      <Label *ngIf="count==0" class="link" text="3. Create Labels" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onCreateEdit()"></Label>
-      <Label *ngIf="count==0" class="text" text="Labels determine what info your contacts can see about you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
-      <Label *ngIf="count==0" class="link" text="4. Find and connect with friends" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onSearch()"></Label>
-      <Label *ngIf="count==0" class="text" text="Search the directory or nearby" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="allset" class="text" text="You're all set!" paddingLeft="16" paddingTop="32" paddingBottom="32" fontSize="18" fontWeight="Bold"></Label>
+      <Label *ngIf="allset" class="link" text="1. Take a tour" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onTour()"></Label>
+      <Label *ngIf="allset" class="text" text="Learn more about using Dikota" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="allset" class="link" text="2. Finish completing your profile" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onProfile()"></Label>
+      <Label *ngIf="allset" class="text" text="Add your name, a photo and contact details, and add your profile to the User Directory so people can find you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="allset" class="link" text="3. Create Labels" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onCreateEdit()"></Label>
+      <Label *ngIf="allset" class="text" text="Labels determine what info your contacts can see about you" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
+      <Label *ngIf="allset" class="link" text="4. Find and connect with friends" fontWeight="Bold" fontSize="16" paddingLeft="16" textWrap="true" (tap)="onSearch()"></Label>
+      <Label *ngIf="allset" class="text" text="Search the directory or nearby" fontSize="16" paddingLeft="16" paddingBottom="32" textWrap="true"></Label>
       <StackLayout #res paddingBottom="32"></StackLayout>
     </StackLayout>
   </ScrollView>

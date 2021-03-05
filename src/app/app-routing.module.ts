@@ -5,6 +5,7 @@ import { Routes } from "@angular/router";
 import { RootComponent } from "./root/root.component";
 import { LoginComponent } from './login/login.component';
 import { AgreeComponent } from './agree/agree.component';
+import { OverviewComponent } from './overview/overview.component';
 import { CreateP0Component } from './createp0/createp0.component';
 import { CreateP1Component } from './createp1/createp1.component';
 import { CreateP2Component } from './createp2/createp2.component';
@@ -46,6 +47,7 @@ const routes: Routes = [
     { path: "", redirectTo: "/root", pathMatch: "full" },
     { path: "root", component: RootComponent },
     { path: "login", component: LoginComponent },
+    { path: "overview", component: OverviewComponent },
     { path: "agree/:username/:code", component: AgreeComponent },
     { path: "createp0", component: CreateP0Component },
     { path: "createp1", component: CreateP1Component },

@@ -22,20 +22,14 @@ export class SettingsComponent implements OnInit {
     this.router.back();
   }
 
-  onContactMethod() {
-    this.router.navigate(["/contactmethod"], { clearHistory: false, animated: true,
-        transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
-    });
-  }
-
   onPrivacyControls() {
     this.router.navigate(["/privacycontrols"], { clearHistory: false, animated: true,
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
     });
   }
 
-  onPasswordUpdate() {
-    this.router.navigate(["/passwordupdate"], { clearHistory: false, animated: true,
+  onOverview() {
+    this.router.navigate(["/overview"], { clearHistory: false, animated: true,
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
     });
   }

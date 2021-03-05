@@ -11,6 +11,7 @@ import { AppComponent } from "./app.component";
 import { RootComponent } from './root/root.component';
 import { LoginComponent } from './login/login.component';
 import { AgreeComponent } from './agree/agree.component';
+import { OverviewComponent } from './overview/overview.component';
 import { CreateP0Component } from './createp0/createp0.component';
 import { CreateP1Component } from './createp1/createp1.component';
 import { CreateP2Component } from './createp2/createp2.component';
@@ -85,6 +86,7 @@ import { EntryService } from './service/entry.service';
       RootComponent,
       LoginComponent,
       AgreeComponent,
+      OverviewComponent,
       CreateP0Component,
       CreateP1Component,
       CreateP2Component,
