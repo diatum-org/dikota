@@ -54,7 +54,7 @@
       </StackLayout>
       <StackLayout orientation="horizontal" paddingLeft="16" paddingTop="8">
         <Image src="~/assets/boardPeters.png" width="48"></Image>
-        <Label paddingLeft="8" class="text" fontSize="15" text="Top Peters"></Label>
+        <Label paddingLeft="8" class="text" fontSize="15" text="Tom Peters"></Label>
       </StackLayout>
     </StackLayout>
   </GridLayout>
