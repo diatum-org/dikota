@@ -39,8 +39,6 @@ import { AboutComponent } from './about/about.component';
 import { SettingsComponent } from './settings/settings.component';
 import { LabelViewComponent } from './labelview/labelview.component';
 import { OpenSourceNoticeComponent } from './opensourcenotice/opensourcenotice.component';
-import { PasswordUpdateComponent } from './passwordupdate/passwordupdate.component';
-import { PasswordResetComponent } from './passwordreset/passwordreset.component';
 import { ContactMethodComponent } from './contactmethod/contactmethod.component';
 import { PrivacyControlsComponent } from './privacycontrols/privacycontrols.component';
 import { SearchComponent } from './search/search.component';
@@ -113,8 +111,6 @@ import { EntryService } from './service/entry.service';
       SettingsComponent,
       LabelViewComponent,
       OpenSourceNoticeComponent,
-      PasswordUpdateComponent,
-      PasswordResetComponent,
       ContactMethodComponent,
       PrivacyControlsComponent,
       SearchComponent,

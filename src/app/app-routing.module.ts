@@ -33,8 +33,6 @@ import { AboutComponent } from './about/about.component';
 import { SettingsComponent } from './settings/settings.component';
 import { LabelViewComponent } from './labelview/labelview.component';
 import { OpenSourceNoticeComponent } from './opensourcenotice/opensourcenotice.component';
-import { PasswordUpdateComponent } from './passwordupdate/passwordupdate.component';
-import { PasswordResetComponent } from './passwordreset/passwordreset.component';
 import { ContactMethodComponent } from './contactmethod/contactmethod.component';
 import { PrivacyControlsComponent } from './privacycontrols/privacycontrols.component';
 import { SearchComponent } from './search/search.component';
@@ -75,8 +73,6 @@ const routes: Routes = [
     { path: "settings", component: SettingsComponent },
     { path: "labelview", component: LabelViewComponent },
     { path: "ossnotice", component: OpenSourceNoticeComponent },
-    { path: "passwordupdate", component: PasswordUpdateComponent },
-    { path: "passwordreset", component: PasswordResetComponent },
     { path: "contactmethod", component: ContactMethodComponent },
     { path: "privacycontrols", component: PrivacyControlsComponent },
     { path: "search", component: SearchComponent },
