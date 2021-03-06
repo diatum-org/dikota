@@ -111,6 +111,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.orientation = (args) => { this.onOrientation(); };
     this.iOS = (device.os == "iOS");
     this.emigoService.setEmigoSearchFilter(null);
+    this.emigoService.setEmigoLabelFilter(null);
     this.entries = new Map<string, ContactEntry>();
   }
 
