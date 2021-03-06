@@ -21,7 +21,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
   }
 
-  goBack() {
+  onBack() {
     this.router.back();
   }
 }

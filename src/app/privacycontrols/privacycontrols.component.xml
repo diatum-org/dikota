@@ -2,7 +2,7 @@
   <NavigationButton visibility="collapsed"></NavigationButton>
   <GridLayout width="95%" columns="3*,*">
     <StackLayout orientation="horizontal" horizontalAlignment="left">
-      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="onBack()"></Image>
       <Label text="Privacy Controls" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
           verticalAlignment="center"></Label>
     </StackLayout>

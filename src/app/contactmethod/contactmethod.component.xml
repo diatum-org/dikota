@@ -1,6 +1,6 @@
 <ActionBar backgroundColor="#cdd8ed">
   <NavigationButton visibility="collapsed"></NavigationButton>
-  <GridLayout width="95%" columns="3*,*">
+  <GridLayout width="95%" columns="*">
     <StackLayout orientation="horizontal" horizontalAlignment="left">
       <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
       <Label text="Diatum Communication" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
