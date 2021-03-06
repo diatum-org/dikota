@@ -2,11 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 
 @Component({
-    selector: "collectionp0",
+    selector: "collectionp2",
     moduleId: module.id,
-    templateUrl: "./collectionp0.component.xml"
+    templateUrl: "./collectionp2.component.xml"
 })
-export class CollectionP0Component implements OnInit {
+export class CollectionP2Component implements OnInit {
 
   constructor(private router: RouterExtensions) { 
   }
@@ -19,7 +19,7 @@ export class CollectionP0Component implements OnInit {
   }
 
   onNext() {
-    this.router.navigate(["/collectionp1"], { clearHistory: false,
-      transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
+    this.router.navigate(["/home"], { clearHistory: true,
+      transition: { name: "slideRight", duration: 300, curve: "easeIn" }});
   }
 }

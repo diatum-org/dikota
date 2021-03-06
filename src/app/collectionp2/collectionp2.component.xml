@@ -1,0 +1,25 @@
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
+      <Label text="User Directory Profile" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
+    <Label col="1" class="link" text="FINISH" fontSize="18" paddingRight="16"
+        verticalAlignment="center" horizontalAlignment="right" (tap)="onNext()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout backgroundColor="#ffffff">
+  <ScrollView>
+    <StackLayout padding="16">
+
+      <Label class="text" fontSize="26" textAlignment="center" paddingTop="8" fontWeight="Bold" text="User Directory Profile"></Label>
+      <Label class="text" fontSize="20" textAlignment="center" padding="4" paddingBottom="24" text="Identifying Data Collection"></Label>
+
+      <Label class="text" fontSize="18" textWrap="true" text="For users who opt to be included in the User Directory. Diatum stores a digital copy of your profile image, name, username, location and description (or whichever of these you choose to include) in a separate Diatum registry to enable this service. You may choose to enable/disable this service at any time under the Privacy Controls."></Label>
+      <Label class="text" fontSize="18" paddingTop="16" textWrap="true" text="Diatum does not utilize this collected data for any purpose other than to provide the User Directory service."></Label>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

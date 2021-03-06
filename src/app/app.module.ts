@@ -18,6 +18,8 @@ import { PermissionP2Component } from './permissionp2/permissionp2.component';
 import { PermissionP3Component } from './permissionp3/permissionp3.component';
 import { PermissionP4Component } from './permissionp4/permissionp4.component';
 import { CollectionP0Component } from './collectionp0/collectionp0.component';
+import { CollectionP1Component } from './collectionp1/collectionp1.component';
+import { CollectionP2Component } from './collectionp2/collectionp2.component';
 import { CreateP0Component } from './createp0/createp0.component';
 import { CreateP1Component } from './createp1/createp1.component';
 import { CreateP2Component } from './createp2/createp2.component';
@@ -99,6 +101,8 @@ import { EntryService } from './service/entry.service';
       PermissionP3Component,
       PermissionP4Component,
       CollectionP0Component,
+      CollectionP1Component,
+      CollectionP2Component,
       CreateP0Component,
       CreateP1Component,
       CreateP2Component,
