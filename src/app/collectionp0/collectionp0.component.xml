@@ -1,0 +1,40 @@
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
+      <Label text="Data Collection" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
+    <Label col="1" class="link" text="NEXT" fontSize="18" paddingRight="16"
+        verticalAlignment="center" horizontalAlignment="right" (tap)="onNext()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout backgroundColor="#ffffff">
+  <ScrollView>
+    <StackLayout padding="16">
+
+      <Label fontSize="18" textWrap="true" paddingTop="16">
+        <Span class="text" text="Because we're on a mission to empower your privacy rights, we've included educational information along with our disclosure. A full and complete description can be found on our "></Span>
+        <Span class="link" text="Data Privacy"></Span>
+        <Span class="text" text=" page on our website."></Span>
+      </Label>
+ 
+      <Label class="text" fontSize="18" fontWeight="Bold" paddingTop="16" text="Data Collection"></Label>
+
+      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="'Collected Data' is your data that is transferred off your phone or device to another location that allows the company providing the app, or third-parties, to access or utilize it."></Label>
+
+      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="These uses can be to provide a service, like Dikota's find nearby users feature, to deliver targed ads or sold to third parties."></Label>   
+ 
+      <Label class="text" fontSize="18" fontWeight="Bold" paddingTop="16" text="Identifying and Non-Identifying Data"></Label>
+
+      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="Collected data can be linked to your digital identity as 'Identifying Data' or anonymized as 'Non-Identifying'."></Label>
+   
+      <Label class="text" fontSize="18" fontWeight="Bold" paddingTop="16" text="Tracking"></Label>
+
+      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="Tracking refres to the ability to track you and your data across apps that are owned by other companies using device-based or other digital identifiers."></Label>
+
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

@@ -18,6 +18,8 @@
           borderBottomWidth="1" padding="16" (tap)="onPrivacyControls()"></Label>
       <Label class="text" text="Permissions" fontWeight="Bold" fontSize="16" borderColor="#CDD8EA" 
           borderBottomWidth="1" padding="16" (tap)="onPermissions()"></Label>
+      <Label class="text" text="Data Collection" fontWeight="Bold" fontSize="16" borderColor="#CDD8EA" 
+          borderBottomWidth="1" padding="16" (tap)="onCollection()"></Label>
     </StackLayout>
   </ScrollView>
 </GridLayout>

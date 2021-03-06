@@ -39,4 +39,10 @@ export class SettingsComponent implements OnInit {
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
     });
   }
+  
+  onCollection() {
+    this.router.navigate(["/collectionp0"], { clearHistory: false, animated: true,
+        transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
+    });
+  }
 }
