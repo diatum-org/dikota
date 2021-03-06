@@ -20,15 +20,6 @@ import { PermissionP4Component } from './permissionp4/permissionp4.component';
 import { CollectionP0Component } from './collectionp0/collectionp0.component';
 import { CollectionP1Component } from './collectionp1/collectionp1.component';
 import { CollectionP2Component } from './collectionp2/collectionp2.component';
-import { CreateP0Component } from './createp0/createp0.component';
-import { CreateP1Component } from './createp1/createp1.component';
-import { CreateP2Component } from './createp2/createp2.component';
-import { CreateP3Component } from './createp3/createp3.component';
-import { CreateP4Component } from './createp4/createp4.component';
-import { CreateP5Component } from './createp5/createp5.component';
-import { CreateP6Component } from './createp6/createp6.component';
-import { CreateP7Component } from './createp7/createp7.component';
-import { CreateP8Component } from './createp8/createp8.component';
 import { HomeComponent } from './home/home.component';
 import { BoardingP0Component } from './boardingp0/boardingp0.component';
 import { BoardingP1Component } from './boardingp1/boardingp1.component';
@@ -103,15 +94,6 @@ import { EntryService } from './service/entry.service';
       CollectionP0Component,
       CollectionP1Component,
       CollectionP2Component,
-      CreateP0Component,
-      CreateP1Component,
-      CreateP2Component,
-      CreateP3Component,
-      CreateP4Component,
-      CreateP5Component,
-      CreateP6Component,
-      CreateP7Component,
-      CreateP8Component,
       HomeComponent,
       BoardingP0Component,
       BoardingP1Component,

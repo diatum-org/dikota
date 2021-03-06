@@ -14,15 +14,6 @@ import { PermissionP4Component } from './permissionp4/permissionp4.component';
 import { CollectionP0Component } from './collectionp0/collectionp0.component';
 import { CollectionP1Component } from './collectionp1/collectionp1.component';
 import { CollectionP2Component } from './collectionp2/collectionp2.component';
-import { CreateP0Component } from './createp0/createp0.component';
-import { CreateP1Component } from './createp1/createp1.component';
-import { CreateP2Component } from './createp2/createp2.component';
-import { CreateP3Component } from './createp3/createp3.component';
-import { CreateP4Component } from './createp4/createp4.component';
-import { CreateP5Component } from './createp5/createp5.component';
-import { CreateP6Component } from './createp6/createp6.component';
-import { CreateP7Component } from './createp7/createp7.component';
-import { CreateP8Component } from './createp8/createp8.component';
 import { HomeComponent } from './home/home.component';
 import { BoardingP0Component } from "./boardingp0/boardingp0.component";
 import { BoardingP1Component } from "./boardingp1/boardingp1.component";
@@ -65,15 +56,6 @@ const routes: Routes = [
     { path: "collectionp1", component: CollectionP1Component },
     { path: "collectionp2", component: CollectionP2Component },
     { path: "agree/:username/:code", component: AgreeComponent },
-    { path: "createp0", component: CreateP0Component },
-    { path: "createp1", component: CreateP1Component },
-    { path: "createp2", component: CreateP2Component },
-    { path: "createp3", component: CreateP3Component },
-    { path: "createp4", component: CreateP4Component },
-    { path: "createp5", component: CreateP5Component },
-    { path: "createp6", component: CreateP6Component },
-    { path: "createp7", component: CreateP7Component },
-    { path: "createp8", component: CreateP8Component },
     { path: "home", component: HomeComponent },
     { path: "boardingp0", component: BoardingP0Component },
     { path: "boardingp1", component: BoardingP1Component },
