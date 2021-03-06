@@ -73,7 +73,7 @@ const routes: Routes = [
     { path: "settings", component: SettingsComponent },
     { path: "labelview", component: LabelViewComponent },
     { path: "ossnotice", component: OpenSourceNoticeComponent },
-    { path: "contactmethod", component: ContactMethodComponent },
+    { path: "contact", component: ContactMethodComponent },
     { path: "privacycontrols", component: PrivacyControlsComponent },
     { path: "search", component: SearchComponent },
     { path: "contactprofile/:emigo/:registry/:available/:pending", 

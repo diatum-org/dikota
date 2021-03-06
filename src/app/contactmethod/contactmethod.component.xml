@@ -1,55 +1,24 @@
-<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="Contact Method">
-  <NavigationButton></NavigationButton>
-   <ActionItem *ngIf="saveFlag" ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onSave()"></ActionItem>
-</ActionBar>
-<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
-  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
-    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
-    <Label col="1" text="Contact Method" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
-        paddingLeft="8"></Label>
-    <Label *ngIf="saveFlag" col="2" text="SAVE" fontWeight="Bold" fontSize="12" horizontalAlignment="right" 
-        verticalAlignment="center" translateX="-16" (tap)="onSave()"></Label>
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="goBack()"></Image>
+      <Label text="Diatum Communication" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
   </GridLayout>
 </ActionBar>
 
-<GridLayout background="#FFFFFF">
-  <StackLayout paddingLeft="16" paddingRight="16" paddingTop="16">
+<GridLayout backgroundColor="#ffffff">
+  <ScrollView>
+    <StackLayout padding="16">
 
-    <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" 
-        height="32"></ActivityIndicator>
-    
-    <StackLayout height="32">
-      <Label *ngIf="!availableFlag" color="#ED5a56" fontSize="12" text="(not available)" 
-          horizontalAlignment="center"></Label>
+      <Label class="text" fontSize="18" textWrap="true" paddingTop="16" text="We'd love to keep in touch with you about our mission and progress. Please subscribe on our website if you'd like to hear from us occasionally (no spam we promise)."></Label>
+
+      <Label class="text" fontSize="18" textWrap="true" paddingTop="16" text="Your email address will not be associated with your Digital Identity by Diatum, and is collected with a third party customer service provider to facilitate communication."></Label>
+   
+      <Label class="link" fontWeight="Bold" paddingTop="32" fontSize="18" textAlignment="center" text="Diatum Communication" (tap)="onCommunication()"></Label>
+ 
     </StackLayout>
-
-    <GridLayout rows="auto" paddingBottom="16">
-      <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" [hint]="hint" 
-          fontSize="16" [text]="contact" (textChange)="updateContact($event.value)" autocapitalizationType="none" 
-          borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
-      <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearContact()" width="24" height="24"></Image>
-    </GridLayout>
-
-    <GridLayout columns="*,*">
-      <GridLayout col="0" height="48" borderRadius="8" borderColor="#888888" borderWidth="1"
-          (tap)="onMethod($event)" verticalAlignment="top">
-        <Label class="text" [text]="method" fontSize="16" verticalAlignment="center" paddingLeft="16"></Label>
-        <Image src="~/assets/dcarrot.png" horizontalAlignment="right" verticalAlignment="center" width="24" 
-            height="24"></Image>
-      </GridLayout>
-
-      <StackLayout col="1" verticalAlignment="top" paddingLeft="32"> 
-        <StackLayout orientation="horizontal">
-          <Label class="text" fontSize="16" text="Confirmed"></Label>
-          <Image *ngIf="confirmed" src="~/assets/dcheck.png" width="24" height="24"></Image>
-          <Image *ngIf="!confirmed" src="~/assets/unchecked.png" width="24" height="24"></Image>
-        </StackLayout>
-        <StackLayout *ngIf="resendFlag" orientation="horizontal">
-          <Label class="link" fontSize="12" text="Resend" (tap)="onResend()"></Label>
-          <Label *ngIf="resend" class="text" fontSize="12" text="resending" paddingLeft="16"></Label>
-        </StackLayout>
-      </StackLayout>
-    </GridLayout>
-
-  </StackLayout>
+  </ScrollView>
 </GridLayout>

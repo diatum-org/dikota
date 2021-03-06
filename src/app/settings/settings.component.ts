@@ -28,6 +28,12 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  onContact() {
+    this.router.navigate(["/contact"], { clearHistory: false, animated: true,
+        transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
+    });
+  }
+ 
   onOverview() {
     this.router.navigate(["/overview"], { clearHistory: false, animated: true,
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
