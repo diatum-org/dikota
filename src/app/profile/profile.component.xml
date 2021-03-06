@@ -1,11 +1,11 @@
-<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" title="My Profile">
-  <NavigationButton></NavigationButton>
-</ActionBar>
-<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
-  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
-    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
-    <Label col="1" text="My Profile" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
-        paddingLeft="8"></Label>
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="onBack()"></Image>
+      <Label text="My Profile" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
   </GridLayout>
 </ActionBar>
 
