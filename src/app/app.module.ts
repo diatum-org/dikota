@@ -14,6 +14,9 @@ import { AgreeComponent } from './agree/agree.component';
 import { OverviewComponent } from './overview/overview.component';
 import { PermissionP0Component } from './permissionp0/permissionp0.component';
 import { PermissionP1Component } from './permissionp1/permissionp1.component';
+import { PermissionP2Component } from './permissionp2/permissionp2.component';
+import { PermissionP3Component } from './permissionp3/permissionp3.component';
+import { PermissionP4Component } from './permissionp4/permissionp4.component';
 import { CreateP0Component } from './createp0/createp0.component';
 import { CreateP1Component } from './createp1/createp1.component';
 import { CreateP2Component } from './createp2/createp2.component';
@@ -91,6 +94,9 @@ import { EntryService } from './service/entry.service';
       OverviewComponent,
       PermissionP0Component,
       PermissionP1Component,
+      PermissionP2Component,
+      PermissionP3Component,
+      PermissionP4Component,
       CreateP0Component,
       CreateP1Component,
       CreateP2Component,

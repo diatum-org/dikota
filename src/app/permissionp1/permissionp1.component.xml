@@ -16,7 +16,7 @@
     <StackLayout padding="16">
 
       <Label class="text" fontSize="28" fontWeight="Bold" textWrap="true" textAlignment="center"
-          text="Diatabase Permissions" paddingTop="16" paddingLeft="32" paddingRight="32" paddingBottom="16"></Label>
+          text="Diatabase Permissions" padding="32"></Label>
 
       <Label class="text" fontSize="18" textWrap="true" 
           text="By using Dikota, you give Diatum permission to access the following data associated with your Digital Identity and Diatabase for the app to function."></Label>

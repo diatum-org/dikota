@@ -8,6 +8,9 @@ import { AgreeComponent } from './agree/agree.component';
 import { OverviewComponent } from './overview/overview.component';
 import { PermissionP0Component } from './permissionp0/permissionp0.component';
 import { PermissionP1Component } from './permissionp1/permissionp1.component';
+import { PermissionP2Component } from './permissionp2/permissionp2.component';
+import { PermissionP3Component } from './permissionp3/permissionp3.component';
+import { PermissionP4Component } from './permissionp4/permissionp4.component';
 import { CreateP0Component } from './createp0/createp0.component';
 import { CreateP1Component } from './createp1/createp1.component';
 import { CreateP2Component } from './createp2/createp2.component';
@@ -52,6 +55,9 @@ const routes: Routes = [
     { path: "overview", component: OverviewComponent },
     { path: "permissionp0", component: PermissionP0Component },
     { path: "permissionp1", component: PermissionP1Component },
+    { path: "permissionp2", component: PermissionP2Component },
+    { path: "permissionp3", component: PermissionP3Component },
+    { path: "permissionp4", component: PermissionP4Component },
     { path: "agree/:username/:code", component: AgreeComponent },
     { path: "createp0", component: CreateP0Component },
     { path: "createp1", component: CreateP1Component },

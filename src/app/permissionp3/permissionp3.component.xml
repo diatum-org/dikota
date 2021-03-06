@@ -1,0 +1,78 @@
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" (tap)="goBack()"></Image>
+      <Label text="Device Permissions" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
+    <Label col="1" class="link" text="NEXT" fontSize="18" paddingRight="16"
+        verticalAlignment="center" horizontalAlignment="right" (tap)="onNext()"></Label>
+  </GridLayout>
+</ActionBar>
+
+<GridLayout backgroundColor="#ffffff">
+  <ScrollView>
+    <StackLayout padding="16">
+
+      <Label class="text" fontWeight="Bold" text="Photos, Media & Files Permission" 
+        textWrap="true" textAlignment="center" fontSize="28" padding="32"></Label>
+
+      <Label class="text" textWrap="true" fontSize="16" text="When you use an image for your profile, Dikota needs permission to access your photo gallery on your device."></Label>
+
+      <Label class="text" text="A message will appear to confirm the permission."
+          textWrap="true" paddingTop="8" paddingBottom="16"></Label>
+
+      <GridLayout *ngIf="block[0]" columns="auto,*" rows="auto,auto" (tap)="block[0]=false" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="-" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Allow' permits"
+            verticalAlignment="center" paddingTop="4"></Label>
+        <Label row="1" col="2" class="text" fontSize="16" text="Gives Dikota access to a photo or image for your public profile from your device gallery. The image is stored in your Diatabase and in the User Directory if your choose." textWrap="true"></Label>
+      </GridLayout>
+      <GridLayout *ngIf="!block[0]" columns="auto,*" (tap)="block[0]=true" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="+" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Allow' permits"
+            verticalAlignment="center" paddingTop="4"></Label>
+      </GridLayout>
+
+      <GridLayout *ngIf="block[1]" columns="auto,*" rows="auto,auto" (tap)="block[1]=false" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="-" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Allow' does not permit"
+            verticalAlignment="center" paddingTop="4"></Label>
+        <Label row="1" col="1" class="text" fontSize="16" textWrap="true" paddingBottom="4"
+            text="Does not permit Dikota to access your photos, media or files at anny other time than the image selection process, or to record or store this data anywhere other than your Diatabase. A copy of the image is stored with Dikota if you choose to be listed in the User Directory."></Label>
+      </GridLayout>
+      <GridLayout *ngIf="!block[1]" columns="auto,*" (tap)="block[1]=true" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="+" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Allow' does not permit"
+            verticalAlignment="center" paddingTop="4"></Label>
+      </GridLayout>
+
+      <GridLayout *ngIf="block[2]" columns="auto,*" rows="auto,auto" (tap)="block[2]=false" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="-" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Deny' means for you"
+            verticalAlignment="center" paddingTop="4"></Label>
+        <Label row="1" col="1" class="text" fontSize="16" textWrap="true" paddingBottom="4"
+            text="Deny this permission and the app will still function, but Dikota will not have the capability to retrieve images or photos to use for your profile from your device."></Label>
+      </GridLayout>
+      <GridLayout *ngIf="!block[2]" columns="auto,*" (tap)="block[2]=true" backgroundColor="#cdd8ed"
+          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">
+        <Label col="0" color="#ffffff" fontSize="32" text="+" textAlignment="center" width="48"
+            verticalAlignment="center"></Label>
+        <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Deny' means for you"
+            verticalAlignment="center" paddingTop="4"></Label>
+      </GridLayout>
+
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

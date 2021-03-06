@@ -19,6 +19,7 @@ export class PermissionP0Component implements OnInit {
   }
 
   onNext() {
-    this.router.navigate(["/permissionp1"], { clearHistory: false });
+    this.router.navigate(["/permissionp1"], { clearHistory: true,
+      transition: { name: "slideLeft", duration: 300, curve: "easeIn" }});
   }
 }
