@@ -1,20 +1,7 @@
 <GridLayout backgroundColor="#FFFFFF" rows="*,auto,*,auto,*,auto,*,auto,*,auto,*,auto">
     
-  <Image row="1" height="64" src="~/assets/logo.png" margin="64"
+  <Image row="1" height="64" src="~/assets/logo.png" 
     verticalAlignment="center"></Image>
-
-  <GridLayout row="3" rows="auto" marginLeft="32" marginRight="32">
-    <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
-        autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
-        (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
-        (tap)="onLoginFocus()"></TextField>
-  </GridLayout>
-  <GridLayout row="5" rows="auto" marginLeft="32" marginRight="32">
-    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
-        fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
-        autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
-        (tap)="onPassFocus()"></TextField>
-  </GridLayout>
 
   <Label row="7" fontSize="18" textAlignment="center" [backgroundColor]="getColor()" color="#ffffff"
         (tap)="onAttach()" paddingLeft="32" paddingRight="32" paddingTop="8" paddingBottom="8" 
@@ -29,6 +16,19 @@
       verticalAlignment="bottom" horizontalAlignment="center"></Label>
 
   <GridLayout rowSpan="12" *ngIf="loginFocus||passFocus" (tap)="onDismiss()"></GridLayout>
+
+  <GridLayout row="3" rows="auto" marginLeft="32" marginRight="32">
+    <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
+        autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
+        (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
+        (tap)="onLoginFocus()"></TextField>
+  </GridLayout>
+  <GridLayout row="5" rows="auto" marginLeft="32" marginRight="32">
+    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
+        fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
+        autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
+        (tap)="onPassFocus()"></TextField>
+  </GridLayout>
 
 </GridLayout>
 
