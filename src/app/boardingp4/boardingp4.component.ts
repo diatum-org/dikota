@@ -35,4 +35,9 @@ export class BoardingP4Component implements OnInit {
         transition: { name: "slideLeft", duration: 300, curve: "easeIn" }
     });
   }
+
+  onPortal() {
+    utils.openUrl("https://portal.diatum.net/app/#/account");
+  }
+
 }

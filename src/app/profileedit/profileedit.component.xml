@@ -6,8 +6,8 @@
       <Label text="Edit Public Info" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
           verticalAlignment="center"></Label>
     </StackLayout>
-    <Label *ngIf="isSavable()" col="1" text="SAVE" fontWeight="Bold" fontSize="12" horizontalAlignment="right" 
-        verticalAlignment="center" translateX="-16" (tap)="onSave()"></Label>
+    <Label *ngIf="isSavable()" col="1" text="SAVE" fontWeight="Bold" fontSize="18" horizontalAlignment="right" 
+        verticalAlignment="center" (tap)="onSave()"></Label>
   </GridLayout>
 </ActionBar>
 

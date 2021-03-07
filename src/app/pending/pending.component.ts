@@ -110,7 +110,9 @@ export class PendingComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.ready = true;
+    setTimeout(() => { //timeout to avoid change after check error
+      this.ready = true;
+    }, 1);
 
   }
 

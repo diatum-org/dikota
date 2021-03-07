@@ -2,9 +2,10 @@
   <ScrollView row="0" (swipe)="onSwipe($event)">
     <StackLayout paddingLeft="16" paddingRight="16">
       <Label text="What else is important to know?" class="text" paddingBottom="16" textWrap="true" fontSize="18" fontWeight="Bold"></Label>
-      <Label class="text" fontSize="16" textWrap="true" paddingTop="16">
+      <Label class="text" fontSize="16" textWrap="true" paddingTop="16" (tap)="onPortal()">
         <Span text="Username: " fontWeight="Bold"></Span>
-        <Span text="Your username helps people find you and will work similar to an email address in the future. Other users can search for and see it, so choose wisely. You can change it at any time." class="text"></Span>
+        <Span text="Your username helps people find you and will work similar to an email address in the future. Other users can search for and see it, so choose wisely. You can change it at any time in your " class="text"></Span>
+        <Span text="Diatabase Portal." class="link"></Span>
       </Label>
       <Label class="text" fontSize="16" textWrap="true" paddingTop="16">
         <Span text="Changing your Profile Information: " fontWeight="Bold"></Span>
