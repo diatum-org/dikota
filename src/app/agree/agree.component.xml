@@ -13,18 +13,16 @@
     <Label class="text" text="I agreee to the Dikota Terms of Service and Privacy Policy."
         fontSize="18" fontWeight="Bold" textWrap="true" paddingBottom="64" textAlignment="center"></Label>
 
-    <GridLayout rows="64" columns="*,*">
-      <GridLayout col="0" rows="auto" columns="96" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
-          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" backgroundColor="#eeeeee"
-           (tap)="onCancel()" horizontalAlignment="center" verticalAlignment="center">
-        <Label class="text" text="Cancel" fontSize="18" fontWeight="Bold" textAlignment="center"></Label>
-      </GridLayout>
+    <GridLayout rows="auto" columns="*,*">
+      <Label col="0" class="text" text="Cancel" fontSize="18" fontWeight="Bold" textAlignment="center" 
+          horizontalAlignment="center" verticalAlignment="center" (tap)="onCancel()" width="128"
+          paddingTop="8" paddingBottom="8" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
+          backgroundColor="#eeeeee"></Label>
 
-      <GridLayout col="1" rows="auto" columns="96" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
-          paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" backgroundColor="#eeeeee"
-           (tap)="onAgree()" horizontalAlignment="center" verticalAlignment="center">
-        <Label class="link" text="I Agree" fontSize="18" fontWeight="Bold" textAlignment="center"></Label>
-      </GridLayout>
+      <Label col="0" class="link" text="I Agree" fontSize="18" fontWeight="Bold" textAlignment="center" 
+          horizontalAlignment="center" verticalAlignment="center" (tap)="onAgree()" width="128"
+          paddingTop="8" paddingBottom="8" borderWidth="1" borderRadius="4" borderColor="#dddddd" 
+          backgroundColor="#eeeeee"></Label>
 
     </GridLayout>
 
