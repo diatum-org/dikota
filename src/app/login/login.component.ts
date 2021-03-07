@@ -77,6 +77,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     return "#447390";
   }
 
+  showControls(): boolean {
+    if(isIOS) {
+      return true;
+    }
+    if(this.loginFocus || this.passFocus) {
+      return false;
+    }
+    return true;
+  }
+
   onDismiss() {
     if(this.loginFocus) {
       let view = <TextField>this.loginRef.nativeElement;
