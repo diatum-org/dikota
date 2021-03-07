@@ -1,41 +1,36 @@
-<GridLayout backgroundColor="#FFFFFF">
-  <GridLayout rows="*,*,*,*" paddingRight="32" paddingLeft="32">
-
-    <Image row="0" height="64" src="~/assets/logo.png"
+<GridLayout backgroundColor="#FFFFFF" (tap)="onDismiss()">
+  <StackLayout verticalAlignment="top" paddingTop="32"> 
+    
+    <Image row="0" height="64" src="~/assets/logo.png" margin="64"
       verticalAlignment="center"></Image>
 
-    <GridLayout *ngIf="loginFocus||passFocus" rowSpan="4" (tap)="onDismiss()"></GridLayout>
-
-    <StackLayout row="1" verticalAlignment="center">
-      <GridLayout rows="auto" padding="16">
-        <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
-            autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
-            (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
-            (tap)="onLoginFocus()"></TextField>
-      </GridLayout>
-      <GridLayout rows="auto" padding="16">
-        <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
-            fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
-            autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
-            (tap)="onPassFocus()"></TextField>
-      </GridLayout>
-    </StackLayout>
-
-    <GridLayout row="2" rows="auto" columns="*,auto,*" verticalAlignment="center">
-      <Label col="1" fontSize="18" textAlignment="center" [backgroundColor]="getColor()" color="#ffffff" (tap)="onAttach()"
-          paddingLeft="32" paddingRight="32" paddingTop="8" paddingBottom="8" text="Attach App" borderRadius="8"></Label>
+    <GridLayout rows="auto" padding="16" padding="16" marginLeft="32" marginRight="32">
+      <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
+          autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
+          (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
+          (tap)="onLoginFocus()"></TextField>
     </GridLayout>
-
-    <GridLayout row="3">
-      <Label fontSize="16" textAlignment="center" textWrap="true" height="64"
-          verticalAlignment="center" (tap)="onPortal()">
-        <Span class="text" text="New or logged-out users can create an attachment code in your"></Span>
-        <Span class="link" text=" Diatabase Portal. "></Span>
-      </Label>
-      <Label class="text-light" [text]="version" fontSize="12" paddingBottom="16"
-          verticalAlignment="bottom" horizontalAlignment="center"></Label>
+    <GridLayout rows="auto" padding="16" marginLeft="32" marginRight="32">
+      <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
+          fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
+          autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
+          (tap)="onPassFocus()"></TextField>
     </GridLayout>
+  </StackLayout>
 
-  </GridLayout>
+  <StackLayout verticalAlignment="bottom">
+    <Label fontSize="18" textAlignment="center" [backgroundColor]="getColor()" color="#ffffff" (tap)="onAttach()"
+          paddingLeft="32" paddingRight="32" paddingTop="8" paddingBottom="8" text="Attach App" borderRadius="8"
+          horizontalAlignment="center" marginBottom="64"></Label>
+  
+    <Label fontSize="16" textAlignment="center" textWrap="true" margin="32"
+        verticalAlignment="center" (tap)="onPortal()">
+      <Span class="text" text="New or logged-out users can create an attachment code in your"></Span>
+      <Span class="link" text=" Diatabase Portal. "></Span>
+    </Label>
+    <Label class="text-light" [text]="version" fontSize="12" paddingBottom="16"
+        verticalAlignment="bottom" horizontalAlignment="center"></Label>
+  </StackLayout>
+
 </GridLayout>
 

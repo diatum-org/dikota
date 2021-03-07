@@ -33,6 +33,7 @@ export class SavedComponent implements OnInit, OnDestroy {
   @ViewChild("res", {static: false}) saved: ElementRef;
   private iOS: boolean;
   private grids: Map<string, ContactEntry>;
+  private empty: boolean;
 
   constructor(private router: RouterExtensions,
       private bitmapService: BitmapService,
@@ -50,6 +51,12 @@ export class SavedComponent implements OnInit, OnDestroy {
 
     // observe list of saved emigos
     this.sub.push(this.entryService.savedContacts.subscribe(async c => {
+
+      if(c.length == 0) {
+        setTimeout(() => {
+          this.empty = true;
+        }, 1);
+      }
 
       // load contacts
       let stack = <StackLayout>this.saved.nativeElement;

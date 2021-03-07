@@ -45,6 +45,7 @@ export class PendingComponent implements OnInit, OnDestroy {
   @ViewChild("pen", {static: false}) pendingStack: ElementRef;
   private iOS: boolean;
 
+  private ready: boolean = false;
   private requested: EmigoContact[] = [];
   private received: EmigoContact[] = [];
   private connected: EmigoContact[] = [];
@@ -109,6 +110,8 @@ export class PendingComponent implements OnInit, OnDestroy {
       }
     }));
 
+    this.ready = true;
+
   }
 
   ngOnDestroy(): void {
@@ -122,6 +125,25 @@ export class PendingComponent implements OnInit, OnDestroy {
     (<StackLayout>this.receivedStack.nativeElement).removeChildren();
     (<StackLayout>this.requestedStack.nativeElement).removeChildren();
     (<StackLayout>this.pendingStack.nativeElement).removeChildren();
+  }
+
+  private isEmpty(): boolean {
+    if(!this.ready) {
+      return false;
+    }
+    if((<StackLayout>this.connectedStack.nativeElement).getChildrenCount() != 0) {
+      return false;
+    }
+    if((<StackLayout>this.receivedStack.nativeElement).getChildrenCount() != 0) {
+      return false;
+    }
+    if((<StackLayout>this.requestedStack.nativeElement).getChildrenCount() != 0) {
+      return false;
+    }
+    if((<StackLayout>this.pendingStack.nativeElement).getChildrenCount() != 0) {
+      return false;
+    }
+    return true;
   }
 
   public async setNotify() {
