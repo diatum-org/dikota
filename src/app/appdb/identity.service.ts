@@ -58,6 +58,10 @@ export class IdentityService {
   }
 
   public setLocation(url: string, token: string, data: string): Promise<EmigoMessage> {
+    if(data == null) {
+      return this.httpClient.put<EmigoMessage>(url + "/identity/location?token=" + token, 
+          null, { headers: this.headers, observe: 'body' }).toPromise();
+    }
     return this.httpClient.put<EmigoMessage>(url + "/identity/location?token=" + token, 
         data, { headers: this.headers, observe: 'body' }).toPromise();
   }

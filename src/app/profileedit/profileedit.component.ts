@@ -291,6 +291,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
       this.emigoService.setLocation(this.location).then(() => { 
         this.onSave();
       }).catch(err => {
+        console.log(err);
         console.log("EmigoService.setLocation failed");
         dialogs.alert({ message: "failed to save location", okButtonText: "ok" });
       });

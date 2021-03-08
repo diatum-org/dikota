@@ -1,17 +1,13 @@
-<ActionBar *ngIf="iOS" backgroundColor="#CDD8ED" class="text" [title]="name">
-   <NavigationButton *ngIf="!this.applySave"></NavigationButton>
-   <NavigationButton *ngIf="this.applySave" text="Back" visibility="collapsed"></NavigationButton>
-   <ActionItem *ngIf="this.applySave" ios.systemIcon="1" ios.position="left" width="48" height="48" (tap)="onBack()"></ActionItem>
-   <ActionItem *ngIf="applyText=='DELETE'" ios.systemIcon="16" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
-   <ActionItem *ngIf="applyText=='SAVE'" ios.systemIcon="3" ios.position="right" width="48" height="48" (tap)="onApply()"></ActionItem>
-</ActionBar>
-<ActionBar *ngIf="!iOS" backgroundColor="#CDD8ED" class="text">
-  <GridLayout columns="48,*,48" backgroundColor="#CDD8ED">
-    <Image col="0" src="~/assets/iarrow.png" width="48" height="48" translateX="-16" (tap)="onBack()"></Image>
-    <Label col="1" [text]="name" fontWeight="Bold" fontSize="18" horizontalAlignment="left" verticalAlignment="center"
-        paddingLeft="8"></Label>
-    <Label col="2" [text]="applyText" fontWeight="Bold" fontSize="12" horizontalAlignment="right" verticalAlignment="center"
-        translateX="-16" (tap)="onApply()"></Label>
+<ActionBar backgroundColor="#cdd8ed">
+  <NavigationButton visibility="collapsed"></NavigationButton>
+  <GridLayout width="95%" columns="3*,*">
+    <StackLayout orientation="horizontal" horizontalAlignment="left">
+      <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="onBack()"></Image>
+      <Label [text]="name" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+          verticalAlignment="center"></Label>
+    </StackLayout>
+    <Label col="1" class="text" [text]="applyText" fontSize="18" horizontalAlignment="right"
+        verticalAlignment="center" translateX="-16" (tap)="onApply()"></Label>
   </GridLayout>
 </ActionBar>
 

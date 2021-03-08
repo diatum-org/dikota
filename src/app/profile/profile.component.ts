@@ -73,8 +73,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if(this.imgObject != null) {
         this.imgObject.imageSource = this.imageSrc;
       }
-      if(i.name == null && i.handle == null && i.location == null && i.description == null &&
-          i.logo == null) {
+      if(i.name == null && i.location == null && i.description == null && i.logo == null) {
         this.showHint = true;
       }
       else {

@@ -3,7 +3,7 @@
   <GridLayout width="95%" columns="3*,*">
     <StackLayout orientation="horizontal" horizontalAlignment="left">
       <Image width="40" height="40" src="~/assets/back.png" stretch="aspectFit" (tap)="onBack()"></Image>
-      <Label text="My Profile" class="text" fontWeight="Bold" fontSize="18" paddingLeft="32"
+      <Label text="My Profile" class="text" fontSize="18" paddingLeft="32" fontWeight="Bold" 
           verticalAlignment="center"></Label>
     </StackLayout>
   </GridLayout>
