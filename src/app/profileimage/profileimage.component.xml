@@ -7,7 +7,7 @@
           verticalAlignment="center"></Label>
     </StackLayout>
     <Label col="1" class="text" [text]="applyText" fontSize="18" horizontalAlignment="right" 
-        verticalAlignment="center" (tap)="onApply()"></Label>
+        verticalAlignment="center" (tap)="onApply()" translateX="-16"></Label>
   </GridLayout>
 </ActionBar>
 
