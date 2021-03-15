@@ -267,7 +267,7 @@ export class ViewService {
   }
 
   private viewGetSubjectTags(url: string, token: string, subjectId: string, schema: string, agent: string): Promise<SubjectTag> {
-    return this.httpClient.get<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags?schema=" + schema + "&token=" + token + "&agent=" + agent,
+    return this.httpClient.get<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags?schema=" + schema + "&descending=false&token=" + token + "&agent=" + agent,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -344,7 +344,7 @@ export class ViewService {
   }
 
   private viewAddSubjectTags(url: string, token: string, subjectId: string, schema: string, data: string, agent: string): Promise<SubjectTag> {
-    return this.httpClient.post<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags?schema=" + schema + "&token=" + token + "&agent=" + agent,
+    return this.httpClient.post<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags?schema=" + schema + "&descending=false&token=" + token + "&agent=" + agent,
         data, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -421,7 +421,7 @@ export class ViewService {
   }
 
   private viewRemoveSubjectTags(url: string, token: string, subjectId: string, tagId: string, schema: string, agent: string): Promise<SubjectTag> {
-    return this.httpClient.delete<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags/" + tagId + "?schema=" + schema + "&token=" + token + "&agent=" + agent,
+    return this.httpClient.delete<SubjectTag>(url + "/view/subjects/" + subjectId + "/tags/" + tagId + "?schema=" + schema + "&descending=false&token=" + token + "&agent=" + agent,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 

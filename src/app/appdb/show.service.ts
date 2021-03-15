@@ -88,17 +88,17 @@ export class ShowService {
   }
 
   public getSubjectTags(url: string, token: string, subjectId: string, schema: string): Promise<SubjectTag> {
-    return this.httpClient.get<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags?schema=" + schema + "&token=" + token,
+    return this.httpClient.get<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags?schema=" + schema + "&descending=false&token=" + token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public addSubjectTag(url: string, token: string, subjectId: string, schema: string, data: string): Promise<SubjectTag> {
-    return this.httpClient.post<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags?schema=" + schema + "&token=" + token,
+    return this.httpClient.post<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags?schema=" + schema + "&descending=false&token=" + token,
         data, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public removeSubjectTag(url: string, token: string, subjectId: string, tagId: string, schema: string): Promise<SubjectTag> {
-    return this.httpClient.delete<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags/" + tagId + "?schema=" + schema + "&token=" + token,
+    return this.httpClient.delete<SubjectTag>(url + "/show/subjects/" + subjectId + "/tags/" + tagId + "?schema=" + schema + "&descending=false&token=" + token,
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
