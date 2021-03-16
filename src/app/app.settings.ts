@@ -7,4 +7,5 @@ export class AppSettings {
   public static AMIGO=Environment.AMIGO;
   public static DB=Environment.DB;
   public static ENV=Environment.ENV;
+  public static PORTAL=Environment.PORTAL;
 }

@@ -101,7 +101,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onPortal() {
-    utils.openUrl("https://portal.diatum.net/app/#/account");
+    utils.openUrl(AppSettings.PORTAL);
   }
 
   onAttach() {
