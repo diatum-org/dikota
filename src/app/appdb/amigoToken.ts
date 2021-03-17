@@ -9,24 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { AmigoMessage } from './amigoMessage';
 
-export interface SubjectAsset { 
-    assetId: string;
-    originalId?: string;
-    transform?: string;
-    state?: SubjectAsset.StateEnum;
-    size?: number;
-    hash?: string;
-    created?: number;
-}
-export namespace SubjectAsset {
-    export type StateEnum = 'uploading' | 'pending' | 'processing' | 'ready' | 'failed' | 'deleted';
-    export const StateEnum = {
-        Uploading: 'uploading' as StateEnum,
-        Pending: 'pending' as StateEnum,
-        Processing: 'processing' as StateEnum,
-        Ready: 'ready' as StateEnum,
-        Failed: 'failed' as StateEnum,
-        Deleted: 'deleted' as StateEnum
-    };
+export interface AmigoToken { 
+    amigoId: string;
+    amigo: AmigoMessage;
+    signature: string;
+    token: string;
 }

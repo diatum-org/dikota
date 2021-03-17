@@ -7,7 +7,7 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import * as application from "tns-core-modules/application";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { Profile } from '../model/profile';
 
 import { DikotaService } from '../service/dikota.service';
@@ -40,7 +40,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
   private active: boolean = false;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private dikotaService: DikotaService) {
     this.iOS = (device.os == "iOS");
   }
@@ -66,7 +66,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
       application.android.on(application.AndroidApplication.activityBackPressedEvent, this.discard);
     }
 
-    this.emigoService.getAppProperty("dikota_profile").then(p => {
+    this.amigoService.getAppProperty("dikota_profile").then(p => {
       if(p == null) {
         this.profile = { };
       }
@@ -74,10 +74,10 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
         this.profile = p;
       }
     }).catch(err => {
-      console.log("EmigoService.getAppProperty failed");
+      console.log("AmigoService.getAppProperty failed");
     });
 
-    this.sub.push(this.emigoService.identity.subscribe(i => {
+    this.sub.push(this.amigoService.identity.subscribe(i => {
       if(this.nameSet == false) {
         this.name = i.name;
       }
@@ -209,7 +209,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
             this.alpha = true;
           }
           else {
-            this.emigoService.checkHandle(this.handle).then(f => {
+            this.amigoService.checkHandle(this.handle).then(f => {
               this.ready = true;
               if(f || this.handle == null) {
                 this.handleColor = "#DDDDDD";
@@ -220,7 +220,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
                 this.available = false;
               }
             }).catch(err => {
-              console.log("EmigoService.checkHandle failed");
+              console.log("AmigoService.checkHandle failed");
               this.handleColor = "#DDDDDD";
               this.available = true;
             });
@@ -268,41 +268,41 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
   public onSave() {
     if(this.nameSet) {
       this.nameSet = false;
-      this.emigoService.setName(this.name).then(() => {
+      this.amigoService.setName(this.name).then(() => {
         this.onSave();
       }).catch(err => {
-        console.log("EmigoService.setName failed");
+        console.log("AmigoService.setName failed");
         dialogs.alert({ message: "failed to save name", okButtonText: "ok" });
       });
       return;
     }
     if(this.handleSet) {
       this.handleSet = false;
-      this.emigoService.setHandle(this.handle).then(() => {
+      this.amigoService.setHandle(this.handle).then(() => {
         this.onSave();
       }).catch(err => {
-        console.log("EmigoService.setHandle failed");
+        console.log("AmigoService.setHandle failed");
         dialogs.alert({ message: "failed to save handle", okButtonText: "ok" });
       });
       return;
     }
     if(this.locationSet) {
       this.locationSet = false;
-      this.emigoService.setLocation(this.location).then(() => { 
+      this.amigoService.setLocation(this.location).then(() => { 
         this.onSave();
       }).catch(err => {
         console.log(err);
-        console.log("EmigoService.setLocation failed");
+        console.log("AmigoService.setLocation failed");
         dialogs.alert({ message: "failed to save location", okButtonText: "ok" });
       });
       return;
     }
     if(this.descriptionSet) {
       this.descriptionSet = false;
-      this.emigoService.setDescription(this.description).then(() => {
+      this.amigoService.setDescription(this.description).then(() => {
         this.onSave();
       }).catch(err => {
-        console.log("EmigoService.setDescription failed");
+        console.log("AmigoService.setDescription failed");
         dialogs.alert({ message: "failed to save description", okButtonText: "ok" });
       });
       return;
@@ -352,8 +352,8 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
 
   private setProfile(p: Profile): void {
     this.profile = p;
-    this.emigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
-      console.log("EmigoService.setAppProperty failed");
+    this.amigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
+      console.log("AmigoService.setAppProperty failed");
     });
   }
 }

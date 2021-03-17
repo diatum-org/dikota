@@ -1,12 +1,12 @@
-import { Emigo } from './appdb/emigo';
+import { Amigo } from './appdb/amigo';
 
-export class EmigoUtil {
+export class AmigoUtil {
 
-  public static getSearchableEmigo(e: Emigo): string {
+  public static getSearchableAmigo(e: Amigo): string {
 
     let searchable = "";
     
-    // emigo searchable on name, location, handle and description
+    // amigo searchable on name, location, handle and description
     if(e != null) {
       if(e.name != null) {
         searchable += e.name.toLowerCase() + " ";

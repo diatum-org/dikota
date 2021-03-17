@@ -1,6 +1,6 @@
 
 export interface Contact { 
-    emigoId: string;
+    amigoId: string;
     name?: string;
     description?: string;
     logo?: string;

@@ -46,7 +46,7 @@ import { ContactProfileComponent } from './contactprofile/contactprofile.compone
 import { SavedComponent } from './saved/saved.component';
 import { PendingComponent } from './pending/pending.component';
 
-import { EmigoService } from './appdb/emigo.service';
+import { AmigoService } from './appdb/amigo.service';
 import { StoreService } from './appdb/store.service';
 import { RegistryService } from './appdb/registry.service';
 import { AccessService } from './appdb/access.service';
@@ -119,7 +119,7 @@ import { EntryService } from './service/entry.service';
       PendingComponent,
     ],
     providers: [
-      EmigoService,
+      AmigoService,
       StoreService,
       RegistryService,
       AccessService,

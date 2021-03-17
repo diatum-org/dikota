@@ -3,15 +3,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ImageSource } from "tns-core-modules/image-source";
 
 import { BitmapService } from './bitmap.service';
-import { EmigoService } from '../appdb/emigo.service';
-import { EmigoContact } from '../appdb/emigoContact';
+import { AmigoService } from '../appdb/amigo.service';
+import { AmigoContact } from '../appdb/amigoContact';
 import { PendingContact } from '../appdb/pendingContact';
-import { Emigo } from '../appdb/emigo';
+import { Amigo } from '../appdb/amigo';
 import { Attribute } from '../appdb/attribute';
 import { AttributeUtil } from '../attributeUtil';
-import { PendingEmigo } from '../appdb/pendingEmigo';
+import { PendingAmigo } from '../appdb/pendingAmigo';
 
-import { getEmigoObject } from '../appdb/emigo.util';
+import { getAmigoObject } from '../appdb/amigo.util';
 
 export class IdentityData {
   revision: number;
@@ -30,7 +30,7 @@ export class ShareData {
 }
 
 export class PendingData {
-  emigoId: string;
+  amigoId: string;
   revision: number;
   name: string;
   handle: string;
@@ -43,81 +43,81 @@ export class EntryService {
 
   private icons: Map<string, any>; 
   private avatarSrc: ImageSource;
-  private all: EmigoContact[] = [];
-  private connected: EmigoContact[] = [];
-  private requested: EmigoContact[] = [];
-  private received: EmigoContact[] = [];
-  private saved: EmigoContact[] = [];
+  private all: AmigoContact[] = [];
+  private connected: AmigoContact[] = [];
+  private requested: AmigoContact[] = [];
+  private received: AmigoContact[] = [];
+  private saved: AmigoContact[] = [];
   private pending: PendingContact[] = [];
   private revision: number = null;
   private notified: number = null;
 
-  private connectedEmigos: BehaviorSubject<EmigoContact[]>;
-  private requestedEmigos: BehaviorSubject<EmigoContact[]>;
-  private receivedEmigos: BehaviorSubject<EmigoContact[]>;
-  private savedEmigos: BehaviorSubject<EmigoContact[]>;
-  private pendingEmigos: BehaviorSubject<PendingContact[]>;
+  private connectedAmigos: BehaviorSubject<AmigoContact[]>;
+  private requestedAmigos: BehaviorSubject<AmigoContact[]>;
+  private receivedAmigos: BehaviorSubject<AmigoContact[]>;
+  private savedAmigos: BehaviorSubject<AmigoContact[]>;
+  private pendingAmigos: BehaviorSubject<PendingContact[]>;
 
   private notifyRevision: BehaviorSubject<boolean>;
 
   constructor(private bitmapService: BitmapService,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
 
     this.avatarSrc = ImageSource.fromFileSync("~/assets/savatar.png");
     this.icons = new Map<string, any>();
 
-    this.connectedEmigos = new BehaviorSubject<EmigoContact[]>([]);
-    this.requestedEmigos = new BehaviorSubject<EmigoContact[]>([]);
-    this.receivedEmigos = new BehaviorSubject<EmigoContact[]>([]);
-    this.savedEmigos = new BehaviorSubject<EmigoContact[]>([]);
-    this.pendingEmigos = new BehaviorSubject<PendingContact[]>([]);
+    this.connectedAmigos = new BehaviorSubject<AmigoContact[]>([]);
+    this.requestedAmigos = new BehaviorSubject<AmigoContact[]>([]);
+    this.receivedAmigos = new BehaviorSubject<AmigoContact[]>([]);
+    this.savedAmigos = new BehaviorSubject<AmigoContact[]>([]);
+    this.pendingAmigos = new BehaviorSubject<PendingContact[]>([]);
     this.notifyRevision = new BehaviorSubject<boolean>(false);
 
     // observe all saved contacts
-    this.emigoService.allContacts.subscribe(async e => {
+    this.amigoService.allContacts.subscribe(async e => {
       this.all = e;
       for(let i = 0; i < e.length; i++) {
         await this.setIdentityData(e[i]);
         await this.setAttributeData(e[i]);
       }
-      this.connectedEmigos.next(this.connected);
-      this.requestedEmigos.next(this.requested);
-      this.receivedEmigos.next(this.received);
-      this.savedEmigos.next(this.saved);
+      this.connectedAmigos.next(this.connected);
+      this.requestedAmigos.next(this.requested);
+      this.receivedAmigos.next(this.received);
+      this.savedAmigos.next(this.saved);
     });
 
-    this.emigoService.connectedContacts.subscribe(c => {
+    this.amigoService.connectedContacts.subscribe(c => {
       this.connected = c;
-      this.connectedEmigos.next(this.connected);
+      this.connectedAmigos.next(this.connected);
       this.setNotifyRevision();
     });
-    this.emigoService.requestedContacts.subscribe(c => {
+    this.amigoService.requestedContacts.subscribe(c => {
       this.requested = c;
-      this.requestedEmigos.next(this.requested);
+      this.requestedAmigos.next(this.requested);
     });
-    this.emigoService.receivedContacts.subscribe(c => {
+    this.amigoService.receivedContacts.subscribe(c => {
       this.received = c;
-      this.receivedEmigos.next(this.received);
+      this.receivedAmigos.next(this.received);
       this.setNotifyRevision();
     });
-    this.emigoService.savedContacts.subscribe(c => {
+    this.amigoService.savedContacts.subscribe(c => {
       this.saved = c;
-      this.savedEmigos.next(this.saved);
+      this.savedAmigos.next(this.saved);
     });
 
-    this.emigoService.pendingContacts.subscribe(async c => {
+    this.amigoService.pendingContacts.subscribe(async c => {
       this.pending = c;
       for(let i = 0; i < c.length; i++) {
         await this.setPendingData(c[i]);
       }      
-      this.pendingEmigos.next(this.pending);
+      this.pendingAmigos.next(this.pending);
       this.setNotifyRevision();
     });
   }
 
   public async init() {
     // retrieve notified revision
-    this.notified = await this.emigoService.getAppProperty("notified_revision");
+    this.notified = await this.amigoService.getAppProperty("notified_revision");
     this.setNotified();
   }
 
@@ -132,11 +132,11 @@ export class EntryService {
     this.all = [];
     this.icons.clear();
 
-    this.connectedEmigos.next([]);
-    this.requestedEmigos.next([]);
-    this.receivedEmigos.next([]);
-    this.savedEmigos.next([]);
-    this.pendingEmigos.next([]);
+    this.connectedAmigos.next([]);
+    this.requestedAmigos.next([]);
+    this.receivedAmigos.next([]);
+    this.savedAmigos.next([]);
+    this.pendingAmigos.next([]);
     this.notifyRevision.next(false);
   }
 
@@ -145,29 +145,29 @@ export class EntryService {
   }
 
   get connectedContacts() {
-    return this.connectedEmigos.asObservable();
+    return this.connectedAmigos.asObservable();
   }
 
   get requestedContacts() {
-    return this.requestedEmigos.asObservable();
+    return this.requestedAmigos.asObservable();
   }
 
   get receivedContacts() {
-    return this.receivedEmigos.asObservable();
+    return this.receivedAmigos.asObservable();
   }
 
   get savedContacts() {
-    return this.savedEmigos.asObservable();
+    return this.savedAmigos.asObservable();
   }
 
   get pendingContacts() {
-    return this.pendingEmigos.asObservable();
+    return this.pendingAmigos.asObservable();
   }
 
   public async setNotified() {
   
     this.notified = this.revision;
-    await this.emigoService.setAppProperty("notified_revision", this.notified);
+    await this.amigoService.setAppProperty("notified_revision", this.notified);
     this.notify();
   }
 
@@ -191,7 +191,7 @@ export class EntryService {
   private setNotifyRevision() {
     let r: number = null;
     for(let i = 0; i < this.received.length; i++) {
-      let c: EmigoContact = this.received[i];
+      let c: AmigoContact = this.received[i];
       if(c.shareData == null || c.shareData.notified != c.shareRevision) {
         if(r == null || c.shareRevision > r) {
           r = c.shareRevision;
@@ -199,7 +199,7 @@ export class EntryService {
       }
     }
     for(let i = 0; i < this.connected.length; i++) {
-      let c: EmigoContact = this.connected[i];
+      let c: AmigoContact = this.connected[i];
       if(c.shareData == null || c.shareData.notified != c.shareRevision) {
         if(r == null || c.shareRevision > r) {
           r = c.shareRevision;
@@ -239,32 +239,32 @@ export class EntryService {
     }
   }
 
-  private async setIdentityData(e: EmigoContact) {
+  private async setIdentityData(e: AmigoContact) {
 
     // check if identity data should be cleared
     if(e.identityRevision == null && e.identityData != null) {
-      await this.emigoService.setContactIdentityData(e.emigoId, null);
+      await this.amigoService.setContactIdentityData(e.amigoId, null);
     }
 
     // check if identity data should be set
     if(e.identityRevision != null && (e.identityData == null || e.identityData.revision != e.identityRevision)) {
-      let emigo: Emigo = await this.emigoService.getContactIdentity(e.emigoId);
-      if(emigo != null) {
-        let icon: string = await this.bitmapService.convert(emigo.logo);
+      let amigo: Amigo = await this.amigoService.getContactIdentity(e.amigoId);
+      if(amigo != null) {
+        let icon: string = await this.bitmapService.convert(amigo.logo);
         e.identityData = { revision: e.identityRevision, icon: icon };
-        await this.emigoService.setContactIdentityData(e.emigoId, e.identityData); 
+        await this.amigoService.setContactIdentityData(e.amigoId, e.identityData); 
       }
     }
 
     // load icon if not set yet
-    await this.setIcon(e.emigoId, e.identityData);
+    await this.setIcon(e.amigoId, e.identityData);
   }
 
-  private async setAttributeData(e: EmigoContact) {
+  private async setAttributeData(e: AmigoContact) {
 
     // check if attribute data should be cleared
     if(e.attributeRevision == null && e.attributeData != null) {
-      await this.emigoService.setContactProfileData(e.emigoId, null);
+      await this.amigoService.setContactProfileData(e.amigoId, null);
     }
 
     // check if attribute data should be set
@@ -272,7 +272,7 @@ export class EntryService {
       let phone: any[] = [];
       let text: any[] = [];
       let email: any[] = [];
-      let attr: Attribute[] = await this.emigoService.getContactProfile(e.emigoId);
+      let attr: Attribute[] = await this.amigoService.getContactProfile(e.amigoId);
       for(let i = 0; i < attr.length; i++) {
         if(attr[i].schema == AttributeUtil.PHONE) {
           let p = JSON.parse(attr[i].data);
@@ -315,7 +315,7 @@ export class EntryService {
         }
       }
       e.attributeData = { revision: e.attributeRevision, phone: phone, text: text, email: email };
-      await this.emigoService.setContactProfileData(e.emigoId, e.attributeData);
+      await this.amigoService.setContactProfileData(e.amigoId, e.attributeData);
     }
   }
 
@@ -324,38 +324,38 @@ export class EntryService {
     // check if pending data should be cleared
     if(e.revision == null && e.pendingData != null) {
       e.pendingData = null;
-      await this.emigoService.setPendingEmigoData(e.shareId, null);
+      await this.amigoService.setPendingAmigoData(e.shareId, null);
     }
 
     // store updated pending data
     if(e.revision != null && (e.pendingData == null || e.pendingData.revision != e.revision)) {
-      let pending: PendingEmigo = await this.emigoService.getPending(e.shareId);
-      let emigo: Emigo = getEmigoObject(pending.message);
+      let pending: PendingAmigo = await this.amigoService.getPending(e.shareId);
+      let amigo: Amigo = getAmigoObject(pending.message);
       e.pendingData = {
-        emigoId: emigo.emigoId,
+        amigoId: amigo.amigoId,
         revision: e.revision,
-        name: emigo.name,
-        handle: emigo.handle,
-        registry: emigo.registry,
-        icon: await this.bitmapService.convert(emigo.logo),
+        name: amigo.name,
+        handle: amigo.handle,
+        registry: amigo.registry,
+        icon: await this.bitmapService.convert(amigo.logo),
       };
-      await this.emigoService.setPendingEmigoData(e.shareId, e.pendingData);
+      await this.amigoService.setPendingAmigoData(e.shareId, e.pendingData);
     }
 
     // load icon if not set yet
     await this.setIcon(e.shareId, e.pendingData);
   }
 
-  public notifyContact(emigoId: string) {
+  public notifyContact(amigoId: string) {
     for(let i = 0; i < this.all.length; i++) {
-      if(this.all[i].emigoId == emigoId) {
-        let e: EmigoContact = this.all[i];
+      if(this.all[i].amigoId == amigoId) {
+        let e: AmigoContact = this.all[i];
         e.shareData = { notified: e.shareRevision };
-        this.emigoService.setContactShareData(e.shareId, e.shareData);
-        this.connectedEmigos.next(this.connected);
-        this.requestedEmigos.next(this.requested);
-        this.receivedEmigos.next(this.received);
-        this.savedEmigos.next(this.saved);
+        this.amigoService.setContactShareData(e.shareId, e.shareData);
+        this.connectedAmigos.next(this.connected);
+        this.requestedAmigos.next(this.requested);
+        this.receivedAmigos.next(this.received);
+        this.savedAmigos.next(this.saved);
       }
     }
   }
@@ -365,8 +365,8 @@ export class EntryService {
       if(this.pending[i].shareId == shareId) {
         let e: PendingContact = this.pending[i];
         e.pendingData.notified = e.revision; 
-        this.emigoService.setPendingEmigoData(e.shareId, e.pendingData);
-        this.pendingEmigos.next(this.pending);
+        this.amigoService.setPendingAmigoData(e.shareId, e.pendingData);
+        this.pendingAmigos.next(this.pending);
       }
     }
   }

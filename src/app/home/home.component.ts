@@ -24,8 +24,8 @@ import { ContactEntry, ContactLayoutType } from '../contactEntry';
 import { AttributeUtil } from '../attributeUtil';
 import { DikotaService } from '../service/dikota.service';
 import { EntryService } from '../service/entry.service';
-import { EmigoService } from '../appdb/emigo.service';
-import { Emigo } from '../appdb/emigo';
+import { AmigoService } from '../appdb/amigo.service';
+import { Amigo } from '../appdb/amigo';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -77,7 +77,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       private zone: NgZone,
       private entryService: EntryService,
       private dikotaService: DikotaService,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.scrollVal = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
     this.scrollIdx = new Map<string, number>();
     this.scrollIdx.set('A', 0);
@@ -110,8 +110,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
     this.iOS = (device.os == "iOS");
-    this.emigoService.setEmigoSearchFilter(null);
-    this.emigoService.setEmigoLabelFilter(null);
+    this.amigoService.setAmigoSearchFilter(null);
+    this.amigoService.setAmigoLabelFilter(null);
     this.entries = new Map<string, ContactEntry>();
   }
 
@@ -121,12 +121,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.avatarSrc = ImageSource.fromFileSync("~/assets/savatar.png");
 
     // observe labels
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     })); 
 
     // observe identity
-    this.sub.push(this.emigoService.identity.subscribe(i => {
+    this.sub.push(this.amigoService.identity.subscribe(i => {
       
       // extract name
       if(i == null || i.name == null) {
@@ -152,22 +152,22 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // update dikota profile
     this.dikotaService.getProfileRevision().then(n => {
-      this.emigoService.getAppProperty("dikota_revision").then(r => {
+      this.amigoService.getAppProperty("dikota_revision").then(r => {
         if(r == null || r.num != n) {
           this.dikotaService.getProfile().then(p => {
-            this.emigoService.setAppProperty("dikota_revision", { num: n }).then(() => {
-              this.emigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
-                console.log("EmigoService.setAppProperty failed");
+            this.amigoService.setAppProperty("dikota_revision", { num: n }).then(() => {
+              this.amigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
+                console.log("AmigoService.setAppProperty failed");
               });
             }).catch(err => {
-              console.log("EmigoService.setAppProperty failed");
+              console.log("AmigoService.setAppProperty failed");
             });
           }).catch(err => {
             console.log("DikotaService.getProfile failed");
           });
         }
       }).catch(err => {
-        console.log("EmigoService.getAppProperty failed");
+        console.log("AmigoService.getAppProperty failed");
       });
     }).catch(err => {
       console.log("DikotaService.getProfileRevision failed");
@@ -179,7 +179,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngAfterViewInit(): void {
     
     // observe filtered contacts
-    this.sub.push(this.emigoService.filteredContacts.subscribe(c => {
+    this.sub.push(this.amigoService.filteredContacts.subscribe(c => {
 
       if(c.length > 0) {
         // timeout to avoid change-after-check error
@@ -192,10 +192,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       let stack = <StackLayout>this.contacts.nativeElement;
       stack.removeChildren();
       for(let i = 0; i < c.length; i++) {
-        let e: ContactEntry = this.entries.get(c[i].emigoId);
+        let e: ContactEntry = this.entries.get(c[i].amigoId);
         if(e == null) {
-          e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
-          this.entries.set(c[i].emigoId, e);
+          e = new ContactEntry(this.amigoService, this.entryService, this.router, this.zone);
+          this.entries.set(c[i].amigoId, e);
         }
         e.setContact(c[i], ContactLayoutType.Controls);
         stack.addChild(e.getLayout());
@@ -243,16 +243,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private onSearchUpdate(s: string) {
     if(s == null) {
-      this.emigoService.setEmigoSearchFilter(null);
+      this.amigoService.setAmigoSearchFilter(null);
       this.search = null;
     }
     else if(s.length == 0) {
-      this.emigoService.setEmigoSearchFilter(null);
+      this.amigoService.setAmigoSearchFilter(null);
       this.search = null;
       this.searchSet = false;
     }
     else {
-      this.emigoService.setEmigoSearchFilter(s);
+      this.amigoService.setAmigoSearchFilter(s);
       this.search = s;
     }  
   }
@@ -485,13 +485,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   public onLabel(label: string): void {
     this.labelId = label;
     if(label == null) {
-      this.emigoService.setEmigoLabelFilter(null);
+      this.amigoService.setAmigoLabelFilter(null);
     }
     else if(label == "") {
-      this.emigoService.setEmigoLabelFilter("");
+      this.amigoService.setAmigoLabelFilter("");
     }
     else {
-      this.emigoService.setEmigoLabelFilter(label);
+      this.amigoService.setAmigoLabelFilter(label);
     }
   }
 
@@ -583,14 +583,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   public onLogout() {
     dialogs.confirm({ message: "Log out of Dikota?", okButtonText: "Log Out", cancelButtonText: "Cancel" }).then(flag => {
       if(flag) {
-        this.emigoService.clearEmigo();
+        this.amigoService.clearAmigo();
         this.entryService.clear();
         this.dikotaService.clearToken();
-        this.emigoService.clearAppContext().then(() => {
+        this.amigoService.clearAppContext().then(() => {
           this.router.navigate(["/root"], { clearHistory: true });
         }).catch(err => {
-          console.log("EmigoService.clearAppContext failed");
-          dialogs.alert({ message: "internal error [EmigoService.clearAppContext]", okButtonText: "ok" });
+          console.log("AmigoService.clearAppContext failed");
+          dialogs.alert({ message: "internal error [AmigoService.clearAppContext]", okButtonText: "ok" });
         });
       }
     });

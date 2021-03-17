@@ -13,12 +13,12 @@ import * as utils from "tns-core-modules/utils/utils";
 import { EventData } from 'tns-core-modules/data/observable';
 import { Menu } from "nativescript-menu";
 
-import { Emigo } from './appdb/emigo';
+import { Amigo } from './appdb/amigo';
 import { Attribute } from './appdb/attribute';
 import { AttributeUtil } from './attributeUtil';
 import { EntryService } from './service/entry.service';
-import { EmigoContact } from './appdb/emigoContact';
-import { EmigoService } from './appdb/emigo.service';
+import { AmigoContact } from './appdb/amigoContact';
+import { AmigoService } from './appdb/amigo.service';
 
 export enum ContactLayoutType {
   Basic,
@@ -30,25 +30,25 @@ export class ContactEntry {
 
   private maskSrc: ImageSource = null;
   private grid: GridLayout = null;
-  private emigoService: EmigoService;
+  private amigoService: AmigoService;
   private entryService: EntryService;
   private router: RouterExtensions;
   private zone: NgZone;
 
-  private emigoSet: boolean = false;
+  private amigoSet: boolean = false;
   private identityRevision: number = null;
   private attributeRevision: number = null;
-  private emigoId: string = null;
+  private amigoId: string = null;
   private registry: string = null;
   private mode: ContactLayoutType = null;
 
-  constructor(emigoService: EmigoService, 
+  constructor(amigoService: AmigoService, 
         entryService: EntryService, 
         router: RouterExtensions, 
         zone: NgZone) {
 
     this.maskSrc = ImageSource.fromFileSync("~/assets/mask.png");
-    this.emigoService = emigoService;
+    this.amigoService = amigoService;
     this.entryService = entryService;
     this.router = router;  
     this.zone = zone;  
@@ -67,10 +67,10 @@ export class ContactEntry {
     return this.grid;
   }
 
-  public async setContact(e: EmigoContact, mode: ContactLayoutType) {
+  public async setContact(e: AmigoContact, mode: ContactLayoutType) {
 
     // reset on contact change
-    if(!this.emigoSet || this.mode != mode ||
+    if(!this.amigoSet || this.mode != mode ||
         (this.identityRevision == null && e.identityData != null) ||
         (this.identityRevision != null && e.identityData == null) ||
         (this.identityRevision != null && e.identityData != null && 
@@ -110,7 +110,7 @@ export class ContactEntry {
       let icon: Image = new Image();
       icon.width = 48;
       icon.height = 48;
-      icon.src = this.entryService.getIcon(e.emigoId);
+      icon.src = this.entryService.getIcon(e.amigoId);
 
       // place icon
       this.grid.addChildAtCell(icon, 0, 0);
@@ -183,7 +183,7 @@ export class ContactEntry {
         this.grid.addChildAtCell(ctrl, 0, 1);
 
         this.grid.on(GestureTypes.swipe, () => {
-          this.entryService.notifyContact(e.emigoId);
+          this.entryService.notifyContact(e.amigoId);
         });
       }
       else {
@@ -262,19 +262,19 @@ export class ContactEntry {
 
       // store params
       this.mode = mode;
-      this.emigoSet = true;
+      this.amigoSet = true;
       this.identityRevision = e.identityData.revision;
       this.attributeRevision = e.attributeData.revision;
-      this.emigoId = e.emigoId;
+      this.amigoId = e.amigoId;
       this.registry = e.registry;
     }
   }
 
-  private async selectContact(e: EmigoContact) {
+  private async selectContact(e: AmigoContact) {
     this.zone.run(async () => {
-      if(this.emigoSet) {
-        await this.emigoService.setContact(e.emigoId);
-        this.router.navigate(["/contactprofile", this.emigoId, this.registry, true, false],
+      if(this.amigoSet) {
+        await this.amigoService.setContact(e.amigoId);
+        this.router.navigate(["/contactprofile", this.amigoId, this.registry, true, false],
           { clearHistory: false, animated: true, transition:
           { name: "slideLeft", duration: 300, curve: "easeIn" }});
       }

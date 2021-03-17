@@ -76,7 +76,7 @@ const routes: Routes = [
     { path: "contact", component: ContactMethodComponent },
     { path: "privacycontrols", component: PrivacyControlsComponent },
     { path: "search", component: SearchComponent },
-    { path: "contactprofile/:emigo/:registry/:available/:pending", 
+    { path: "contactprofile/:amigo/:registry/:available/:pending", 
         component: ContactProfileComponent },
     { path: "saved", component: SavedComponent },
     { path: "pending", component: PendingComponent },

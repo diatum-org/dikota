@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { RouterExtensions } from "nativescript-angular/router";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -18,12 +18,12 @@ export class LabelsComponent implements OnInit, OnDestroy {
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.iOS = (device.os == "iOS");
   }
 
   ngOnInit(): void {
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
   }

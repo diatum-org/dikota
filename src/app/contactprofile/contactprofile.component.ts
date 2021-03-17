@@ -18,16 +18,16 @@ import { ContactView } from '../model/contactView';
 
 import { Attribute } from '../appdb/attribute';
 import { LabelEntry } from '../appdb/labelEntry';
-import { getEmigoObject } from '../appdb/emigo.util';
+import { getAmigoObject } from '../appdb/amigo.util';
 import { RegistryService } from '../appdb/registry.service';
-import { EmigoService } from '../appdb/emigo.service';
-import { EmigoMessage } from '../appdb/emigoMessage';
-import { Emigo } from '../appdb/emigo';
+import { AmigoService } from '../appdb/amigo.service';
+import { AmigoMessage } from '../appdb/amigoMessage';
+import { Amigo } from '../appdb/amigo';
 import { ShareEntry } from '../appdb/shareEntry';
 import { AppSettings } from '../app.settings';
-import { EmigoEntry } from '../appdb/emigoEntry';
-import { EmigoView } from '../appdb/emigoView';
-import { EmigoContact } from '../appdb/emigoContact';
+import { AmigoEntry } from '../appdb/amigoEntry';
+import { AmigoView } from '../appdb/amigoView';
+import { AmigoContact } from '../appdb/amigoContact';
 
 @Component({
     selector: "contactprofile",
@@ -52,18 +52,18 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   private imageObj: any = null;
   private imageSrc: ImageSource = null;
 
-  private emigoMessage: EmigoMessage = null;
+  private amigoMessage: AmigoMessage = null;
 
-  private contact: EmigoContact = null;
+  private contact: AmigoContact = null;
   
-  private emigoId: string;
+  private amigoId: string;
   private registry: string;
   private available: boolean;
   private pending: boolean;  
   private shareId: string;
 
-  private emigo: Emigo = null;
-  private entry: EmigoEntry = null;
+  private amigo: Amigo = null;
+  private entry: AmigoEntry = null;
   private labelSet: Set<string> = null;
   private attr: any[] = [];
   
@@ -73,14 +73,14 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
       private registryService: RegistryService,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
 
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
     this.iOS = (device.os == "iOS");
   }
 
-  private setEmigoEntry(e: EmigoEntry) {
+  private setAmigoEntry(e: AmigoEntry) {
     this.entry = e;
     this.labelSet = new Set<string>();
     for(let i = 0; i < e.labels.length; i++) {
@@ -94,45 +94,45 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     this.application.on(this.application.orientationChangedEvent, this.orientation);
 
     // retrieve labels
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
 
     // retrieve contact
     this.route.params.forEach(p => {
 
-      this.emigoId = p.emigo;
+      this.amigoId = p.amigo;
       this.registry = p.registry;
       this.available = p.available == "true";
       this.pending = p.pending != "false";
       this.shareId = p.pending;
      
       // subscribe to selected contact 
-      this.sub.push(this.emigoService.selectedContact.subscribe(c => {
+      this.sub.push(this.amigoService.selectedContact.subscribe(c => {
         
         // case to load from store
         if(this.contact == null && c != null) {
 
           // load identity
-          this.emigoService.getContactIdentity(this.emigoId).then(e => {
+          this.amigoService.getContactIdentity(this.amigoId).then(e => {
             if(e != null) {
-              this.emigo = e;
-              this.setImage(this.emigo.logo);
+              this.amigo = e;
+              this.setImage(this.amigo.logo);
             }
           }).catch(err => {
             console.log(err);
           });
 
           // load notes
-          this.emigoService.getEmigo(this.emigoId).then(e => {
-            this.setEmigoEntry(e);
+          this.amigoService.getAmigo(this.amigoId).then(e => {
+            this.setAmigoEntry(e);
           }).catch(err => {
             console.log(err);
           });
 
           // load attributes
           this.attr = [];
-          this.emigoService.getContactProfile(p.emigo).then(a => {
+          this.amigoService.getContactProfile(p.amigo).then(a => {
             for(let i = 0; i < a.length; i++) {
               this.attr.push({ id: a[i].attributeId, schema: a[i].schema, obj: JSON.parse(a[i].data) });
             }
@@ -143,11 +143,11 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
         // check if has been loaded from registry
         if(c == null) {
-          if(this.emigo == null || this.emigoMessage == null) {
-            this.registryService.getMessage(this.registry, this.emigoId).then(m => {
-              this.emigoMessage = m;
-              this.emigo = getEmigoObject(m);
-              this.setImage(this.emigo.logo);
+          if(this.amigo == null || this.amigoMessage == null) {
+            this.registryService.getMessage(this.registry, this.amigoId).then(m => {
+              this.amigoMessage = m;
+              this.amigo = getAmigoObject(m);
+              this.setImage(this.amigo.logo);
             }).catch(err => {
               console.log(err);
             });
@@ -159,9 +159,9 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
           // check if identity should reload
           if(this.contact.identityRevision != c.identityRevision) {
-            this.emigoService.getContactIdentity(this.emigoId).then(e => {
-              this.emigo = e;
-              this.setImage(this.emigo.logo);
+            this.amigoService.getContactIdentity(this.amigoId).then(e => {
+              this.amigo = e;
+              this.setImage(this.amigo.logo);
             }).catch(err => {
               console.log(err);
             });
@@ -170,7 +170,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
           // check if attributes should reload
           if(this.contact.attributeRevision != c.attributeRevision) {
             this.attr = [];
-            this.emigoService.getContactProfile(p.emigo).then(a => {
+            this.amigoService.getContactProfile(p.amigo).then(a => {
               for(let i = 0; i < a.length; i++) {
                 this.attr.push({ id: a[i].attributeId, schema: a[i].schema, obj: JSON.parse(a[i].data) });
               }
@@ -216,7 +216,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
   public canSave(): boolean {
 
-    if(this.contact == null && this.emigoMessage != null) {
+    if(this.contact == null && this.amigoMessage != null) {
       if(this.pending == true || this.available == true) {
         return true;
       }
@@ -228,12 +228,12 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     
     if(this.busy == false) {
       this.busy = true;
-      this.emigoService.addEmigo(this.emigoMessage).then(i => {
+      this.amigoService.addAmigo(this.amigoMessage).then(i => {
         this.busy = false;
         this.pending = false;
       }).catch(err => {
         this.busy = false;
-        console.log("EmigoService.addEmigo failed");
+        console.log("AmigoService.addAmigo failed");
         dialogs.alert({ message: "failed to save contact", okButtonText: "ok" });
       });
     }
@@ -261,8 +261,8 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       if(this.contact.shareId == null) {
         // add and request
         this.busy = true;
-        this.emigoService.addConnection(this.emigoId).then(e => {
-          this.emigoService.openConnection(this.emigoId, e.shareId, this.contact.node).then(s => {
+        this.amigoService.addConnection(this.amigoId).then(e => {
+          this.amigoService.openConnection(this.amigoId, e.shareId, this.contact.node).then(s => {
             this.busy = false;
           }).catch(err => {
             this.busy = false;
@@ -278,7 +278,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       else {
         // request only
         this.busy = true;
-        this.emigoService.openConnection(this.emigoId, this.contact.shareId, this.contact.node).then(s => {
+        this.amigoService.openConnection(this.amigoId, this.contact.shareId, this.contact.node).then(s => {
           this.busy = false;
         }).catch(err => {
           this.busy = false;
@@ -291,7 +291,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
   public canAccept(): boolean {
   
-    if(this.contact == null && this.pending == true && this.emigoMessage != null) {
+    if(this.contact == null && this.pending == true && this.amigoMessage != null) {
       return true;
     }
     if(this.contact != null && this.contact.status == "received") {
@@ -305,10 +305,10 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     if(this.busy == false) {
 
       if(this.contact == null && this.pending == true) {
-        this.emigoService.addEmigo(this.emigoMessage).then(i => {
+        this.amigoService.addAmigo(this.amigoMessage).then(i => {
           this.pending = false;
-          this.emigoService.addConnection(this.emigoId).then(e => {
-            this.emigoService.openConnection(this.emigoId, e.shareId, this.emigo.node).then(s => {
+          this.amigoService.addConnection(this.amigoId).then(e => {
+            this.amigoService.openConnection(this.amigoId, e.shareId, this.amigo.node).then(s => {
               this.busy = false;
             }).catch(err => {
               this.busy = false;
@@ -330,8 +330,8 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       if(this.contact != null && this.contact.status == "received") {
         // add and request
         this.busy = true;
-        this.emigoService.addConnection(this.emigoId).then(e => {
-          this.emigoService.openConnection(this.emigoId, e.shareId, this.contact.node).then(s => {
+        this.amigoService.addConnection(this.amigoId).then(e => {
+          this.amigoService.openConnection(this.amigoId, e.shareId, this.contact.node).then(s => {
             this.busy = false;
           }).catch(err => {
             this.busy = false;
@@ -364,7 +364,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     if(this.busy == false) {
       if(this.contact == null && this.pending == true) {
         this.busy = true;
-        this.emigoService.clearEmigoRequest(this.shareId).then(() => {
+        this.amigoService.clearAmigoRequest(this.shareId).then(() => {
           this.pending = false;
           this.busy = false;
         }).catch(err => {
@@ -376,8 +376,8 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
       if(this.contact != null && this.contact.status == "received") {
         this.busy = true;
-        this.emigoService.closeConnection(this.emigoId, this.contact.shareId, this.contact.node).then(s => {
-          this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+        this.amigoService.closeConnection(this.amigoId, this.contact.shareId, this.contact.node).then(s => {
+          this.amigoService.removeConnection(this.amigoId, this.contact.shareId).then(() => {
             this.busy = false;
           }).catch(err => {
             this.busy = false;
@@ -386,7 +386,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
           });  
         }).catch(err => {
           console.log(err);
-          this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+          this.amigoService.removeConnection(this.amigoId, this.contact.shareId).then(() => {
             this.busy = false;
           }).catch(err => {
             this.busy = false;
@@ -410,7 +410,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
     if(this.contact != null && this.busy == false) {
       this.busy = true;
-      this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+      this.amigoService.removeConnection(this.amigoId, this.contact.shareId).then(() => {
         this.busy = false;
       }).catch(err => {
         this.busy = false;
@@ -455,10 +455,10 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
             okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
           if(flag) {
             this.busy = true;
-            this.emigoService.removeEmigo(this.emigoId).then(() => {
+            this.amigoService.removeAmigo(this.amigoId).then(() => {
               this.busy = false;
             }).catch(err => {
-              console.log("EmigoService.deleteEmigo failed");
+              console.log("AmigoService.deleteAmigo failed");
               dialogs.alert({ message: "failed to delete contact", okButtonText: "ok" });
             });
           }
@@ -469,8 +469,8 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
             okButtonText: "Yes, Disconnect", cancelButtonText: "No, Cancel" }).then(flag => {
           if(flag) {
             this.busy = true;
-            this.emigoService.closeConnection(this.emigoId, this.contact.shareId, this.contact.node).then(() => {
-              this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+            this.amigoService.closeConnection(this.amigoId, this.contact.shareId, this.contact.node).then(() => {
+              this.amigoService.removeConnection(this.amigoId, this.contact.shareId).then(() => {
                 this.busy = false;
               }).catch(err => {
                 this.busy = false;
@@ -479,7 +479,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
               });
             }).catch(err => {
               // remove connection even if frienndly close failed
-              this.emigoService.removeConnection(this.emigoId, this.contact.shareId).then(() => {
+              this.amigoService.removeConnection(this.amigoId, this.contact.shareId).then(() => {
                 this.busy = false;
               }).catch(err => {
                 this.busy = false;
@@ -491,7 +491,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
         });
       }
       if(action.id == 2) {
-        this.emigoService.refreshContact(this.contact.emigoId);
+        this.amigoService.refreshContact(this.contact.amigoId);
       }
     });
   }
@@ -538,9 +538,9 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     if(this.labelBusy != true && this.labelSet != null) {
       this.labelBusy = true;
       if(this.labelSet.has(l.labelId)) {
-        this.emigoService.clearEmigoLabel(this.emigoId, l.labelId).then(e => {
+        this.amigoService.clearAmigoLabel(this.amigoId, l.labelId).then(e => {
           this.labelBusy = false;
-          this.setEmigoEntry(e);
+          this.setAmigoEntry(e);
         }).catch(err => {
           this.labelBusy = false;
           console.log(err);
@@ -548,9 +548,9 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
         });
       }
       else {
-        this.emigoService.setEmigoLabel(this.emigoId, l.labelId).then(e => {
+        this.amigoService.setAmigoLabel(this.amigoId, l.labelId).then(e => {
           this.labelBusy = false;
-          this.setEmigoEntry(e);
+          this.setAmigoEntry(e);
         }).catch(err => {
           this.labelBusy = false;
           console.log(err);
@@ -577,7 +577,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       else {
         if(this.entry.notes != null) {
           this.busy = true;
-          this.emigoService.updateEmigoNotes(this.entry.emigoId, null).then(e => {
+          this.amigoService.updateAmigoNotes(this.entry.amigoId, null).then(e => {
             this.busy = false;
             this.entry = e;
           }).catch(err => {
@@ -618,7 +618,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
     if(this.contact != null && this.entry != null) {
       this.busy = true;
-      this.emigoService.updateEmigoNotes(this.entry.emigoId, this.notes).then(e => {
+      this.amigoService.updateAmigoNotes(this.entry.amigoId, this.notes).then(e => {
         this.busy = false;
         this.entry = e;
         this.notesSet = false;

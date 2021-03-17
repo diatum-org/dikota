@@ -15,11 +15,11 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { NgZone } from "@angular/core";
 
-import { getEmigoObject } from '../appdb/emigo.util';
-import { Emigo } from '../appdb/emigo';
-import { EmigoContact } from '../appdb/emigoContact';
+import { getAmigoObject } from '../appdb/amigo.util';
+import { Amigo } from '../appdb/amigo';
+import { AmigoContact } from '../appdb/amigoContact';
 import { PendingContact } from '../appdb/pendingContact';
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { ScaleService } from '../service/scale.service';
 import { EntryService } from '../service/entry.service';
 import { ContactEntry, ContactLayoutType } from '../contactEntry';
@@ -46,16 +46,16 @@ export class PendingComponent implements OnInit, OnDestroy {
   private iOS: boolean;
 
   private ready: boolean = false;
-  private requested: EmigoContact[] = [];
-  private received: EmigoContact[] = [];
-  private connected: EmigoContact[] = [];
+  private requested: AmigoContact[] = [];
+  private received: AmigoContact[] = [];
+  private connected: AmigoContact[] = [];
   private pending: PendingContact[] = [];
 
   private contactEntries: Map<string, ContactEntry>;
   private pendingEntries: Map<string, PendingEntry>;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private entryService: EntryService,
       private scaleService: ScaleService,
       private zone: NgZone) {
@@ -185,22 +185,22 @@ export class PendingComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async applySaved(stack: StackLayout, c: EmigoContact[]) { 
+  private async applySaved(stack: StackLayout, c: AmigoContact[]) { 
 
     // load saved contacts
     stack.removeChildren();
     for(let i = 0; i < c.length; i++) {
-      let e: ContactEntry = this.contactEntries.get(c[i].emigoId);
+      let e: ContactEntry = this.contactEntries.get(c[i].amigoId);
       if(e == null) {
-        e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
-        this.contactEntries.set(c[i].emigoId, e);
+        e = new ContactEntry(this.amigoService, this.entryService, this.router, this.zone);
+        this.contactEntries.set(c[i].amigoId, e);
       }
       e.setContact(c[i], ContactLayoutType.Basic);
       stack.addChild(e.getLayout());
     }
   }
 
-  private async notifySaved(stack: StackLayout, c: EmigoContact[]) {
+  private async notifySaved(stack: StackLayout, c: AmigoContact[]) {
 
     // load saved contacts
     stack.removeChildren();
@@ -208,10 +208,10 @@ export class PendingComponent implements OnInit, OnDestroy {
       let d: Date = new Date();
       if(c[i].updated != null && (d.getTime()/1000) < (c[i].updated + 2419200)) {
         if(c[i].shareData == null || c[i].shareData.notified != c[i].shareRevision) {
-          let e: ContactEntry = this.contactEntries.get(c[i].emigoId);
+          let e: ContactEntry = this.contactEntries.get(c[i].amigoId);
           if(e == null) {
-            e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
-            this.contactEntries.set(c[i].emigoId, e);
+            e = new ContactEntry(this.amigoService, this.entryService, this.router, this.zone);
+            this.contactEntries.set(c[i].amigoId, e);
           }
           e.setContact(c[i], ContactLayoutType.Updates);
           stack.addChild(e.getLayout());
@@ -227,7 +227,7 @@ export class PendingComponent implements OnInit, OnDestroy {
     for(let i = 0; i < c.length; i++) {
       let e: PendingEntry = this.pendingEntries.get(c[i].shareId);
       if(e == null) {
-        e = new PendingEntry(this.emigoService, this.entryService, this.router, this.zone);
+        e = new PendingEntry(this.amigoService, this.entryService, this.router, this.zone);
         this.pendingEntries.set(c[i].shareId, e);
       }
       e.setPending(c[i], PendingLayoutType.Basic);
@@ -245,7 +245,7 @@ export class PendingComponent implements OnInit, OnDestroy {
         if(c[i].pendingData == null || c[i].pendingData.notified != c[i].revision) {
           let e: PendingEntry = this.pendingEntries.get(c[i].shareId);
           if(e == null) {
-            e = new PendingEntry(this.emigoService, this.entryService, this.router, this.zone);
+            e = new PendingEntry(this.amigoService, this.entryService, this.router, this.zone);
             this.pendingEntries.set(c[i].shareId, e);
           }
           e.setPending(c[i], PendingLayoutType.Updates);

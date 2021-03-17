@@ -4,7 +4,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -24,7 +24,7 @@ export class LabelCreateComponent implements OnInit {
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService) { 
+      private amigoService: AmigoService) { 
     this.all = ['Acquaintance', 'Best Friend', 'Business', 'Client', 'Colleague', 
         'Family', 'Friend', 'New Friend', 'Classmate', 'Neighbor' ];
     this.suggested = this.all;
@@ -33,7 +33,7 @@ export class LabelCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = null;
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
       this.filterSuggested();
     }));
@@ -100,7 +100,7 @@ export class LabelCreateComponent implements OnInit {
   public onCreate(): void {
     if(this.name != null && this.name != "") {
       this.busy = true;
-      this.emigoService.addLabel(this.name).then(e => {
+      this.amigoService.addLabel(this.name).then(e => {
         this.name = null;
         this.color = "#888888";
         this.filterSuggested();

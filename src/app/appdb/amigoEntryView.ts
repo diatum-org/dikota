@@ -10,6 +10,8 @@
  * Do not edit the class manually.
  */
 
-export interface ShareToken { 
-    token?: string;
+export interface AmigoEntryView { 
+    amigoId: string;
+    notes: string;
+    labels: Array<string>;
 }

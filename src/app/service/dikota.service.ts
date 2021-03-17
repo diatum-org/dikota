@@ -4,17 +4,17 @@ import { HttpClient, HttpHeaders, HttpParams, HttpResponse, HttpEvent } from '@a
 import { HttpUrlEncodingCodec } from '@angular/common/http';
 import { Subscription } from 'rxjs'; 
 
-import { Emigo } from '../appdb/emigo';
+import { Amigo } from '../appdb/amigo';
 import { Result } from '../appdb/result';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 
 import { AppSettings } from '../app.settings';
 import { GpsLocation } from '../model/gpsLocation';
 import { SearchArea } from '../model/searchArea';
 import { Contact } from '../model/contact';
 import { Profile } from '../model/profile';
-import { EmigoLogin } from '../model/emigoLogin';
+import { AmigoLogin } from '../model/amigoLogin';
 
 @Injectable()
 export class DikotaService {
@@ -23,14 +23,14 @@ export class DikotaService {
   private headers: HttpHeaders;
   private syncInterval: any = null;
   private syncRevision: number = null;
-  private identity: Emigo = null;
+  private identity: Amigo = null;
   private sub: Subscription = null;
   private phoneUtil: any;
   private pnf: any;
   private readonly SEMI_SECRET: string = "92a41a31a209ce961e279e54592199be"
 
   constructor(private httpClient: HttpClient,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.headers = new HttpHeaders();
     this.headers = this.headers.set('Accept', 'application/json');
   
@@ -77,29 +77,29 @@ export class DikotaService {
     });
   }
 
-  public emigoIdLogin(emigoId: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?emigoId=" + emigoId +
+  public amigoIdLogin(amigoId: string, password: string): Promise<AmigoLogin> {
+    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?amigoId=" + amigoId +
         "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public emailLogin(email: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?email=" + email +
+  public emailLogin(email: string, password: string): Promise<AmigoLogin> {
+    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?email=" + email +
         "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
   }
  
-  public phoneLogin(phone: string, password: string): Promise<EmigoLogin> {
-    return this.httpClient.get<EmigoLogin>(AppSettings.AMIGO + "/accounts/token?phone=" + 
+  public phoneLogin(phone: string, password: string): Promise<AmigoLogin> {
+    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?phone=" + 
         phone.replace(/\+/g, "%2B") + "&password=" + password, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public attach(emigoId: string, node: string, code: string): Promise<EmigoLogin> {
+  public attach(amigoId: string, node: string, code: string): Promise<AmigoLogin> {
 
-    return this.httpClient.post<EmigoLogin>(AppSettings.AMIGO + "/accounts/attached?emigoId=" + emigoId 
+    return this.httpClient.post<AmigoLogin>(AppSettings.AMIGO + "/accounts/attached?amigoId=" + amigoId 
         + "&node=" + node + "&code=" + code, { headers: this.headers, observe: 'body' }).toPromise();
   }
 
-  public createAccount(phone: string, email: string, password: string): Promise<EmigoLogin> {
+  public createAccount(phone: string, email: string, password: string): Promise<AmigoLogin> {
     let e: string = "";
     if(email != null) {
       e = "&emailAddress=" + email;
@@ -115,7 +115,7 @@ export class DikotaService {
     var SHA256 = require('nativescript-toolbox/crypto-js/sha256');
     let auth = SHA256(this.SEMI_SECRET + ":" + t);
 
-    return this.httpClient.post<EmigoLogin>(AppSettings.AMIGO + "/accounts/created?password=" + password + e + p + "&timestamp=" + t + "&auth=" + auth, 
+    return this.httpClient.post<AmigoLogin>(AppSettings.AMIGO + "/accounts/created?password=" + password + e + p + "&timestamp=" + t + "&auth=" + auth, 
         { headers: this.headers, observe: 'body' }).toPromise();
   }
 
@@ -126,7 +126,7 @@ export class DikotaService {
     this.syncInterval = setInterval(() => {
       this.syncChanges();
     }, 1000);
-    this.sub = this.emigoService.identity.subscribe(i => {
+    this.sub = this.amigoService.identity.subscribe(i => {
       this.identity = i;
     });
   }
@@ -165,8 +165,8 @@ export class DikotaService {
 
   public setRegistry(registry: string, revision: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      // trigger emigo update
-      this.httpClient.put<Emigo>(AppSettings.AMIGO + "/accounts/registry?token=" + this.token + "&registry=" + registry + "&revision=" + revision,
+      // trigger amigo update
+      this.httpClient.put<Amigo>(AppSettings.AMIGO + "/accounts/registry?token=" + this.token + "&registry=" + registry + "&revision=" + revision,
           { headers: this.headers, observe: 'body' }).toPromise().then(e => {
         resolve();
       }).catch(err => {

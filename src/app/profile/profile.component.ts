@@ -16,7 +16,7 @@ import { Attribute } from '../appdb/attribute';
 import { LabelEntry } from '../appdb/labelEntry';
 import { AttributeView } from '../appdb/attributeView';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 
 @Component({
     selector: "profile",
@@ -46,7 +46,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild("rmu", {static: false}) menu: ElementRef;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
 
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
@@ -58,7 +58,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     // load default logo
     this.avatarSrc = ImageSource.fromFileSync("~/assets/avatar.png");
 
-    this.sub.push(this.emigoService.identity.subscribe(i => {
+    this.sub.push(this.amigoService.identity.subscribe(i => {
       this.name = i.name;
       this.handle = i.handle;
       this.registry = i.registry;
@@ -80,11 +80,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.showHint = false;
       }
     }));
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
 
-    this.sub.push(this.emigoService.attributes.subscribe(a => {
+    this.sub.push(this.amigoService.attributes.subscribe(a => {
       let attr: any[] = [];
       for(let i = 0; i < a.length; i++) {
 

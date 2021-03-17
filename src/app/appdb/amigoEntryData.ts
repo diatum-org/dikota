@@ -1,4 +1,4 @@
-export interface EmigoEntryData { 
+export interface AmigoEntryData { 
     enabled?: boolean;
     prompt?: boolean;
     accept?: boolean;

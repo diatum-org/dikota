@@ -13,12 +13,12 @@ import * as utils from "tns-core-modules/utils/utils";
 import { EventData } from 'tns-core-modules/data/observable';
 import { Menu } from "nativescript-menu";
 
-import { Emigo } from './appdb/emigo';
+import { Amigo } from './appdb/amigo';
 import { Attribute } from './appdb/attribute';
 import { AttributeUtil } from './attributeUtil';
 import { EntryService, IdentityData, ProfileData, PendingData } from './service/entry.service';
 import { PendingContact } from './appdb/pendingContact';
-import { EmigoService } from './appdb/emigo.service';
+import { AmigoService } from './appdb/amigo.service';
 
 export enum PendingLayoutType {
   Basic,
@@ -29,24 +29,24 @@ export class PendingEntry {
 
   private maskSrc: ImageSource = null;
   private grid: GridLayout = null;
-  private emigoService: EmigoService;
+  private amigoService: AmigoService;
   private entryService: EntryService;
   private router: RouterExtensions;
   private zone: NgZone;
 
-  private emigoSet: boolean = false;
+  private amigoSet: boolean = false;
   private revision: number = null;
-  private emigoId: string = null;
+  private amigoId: string = null;
   private registry: string = null;
   private mode: PendingLayoutType = null;
 
-  constructor(emigoService: EmigoService, 
+  constructor(amigoService: AmigoService, 
         entryService: EntryService, 
         router: RouterExtensions, 
         zone: NgZone) {
 
     this.maskSrc = ImageSource.fromFileSync("~/assets/mask.png");
-    this.emigoService = emigoService;
+    this.amigoService = amigoService;
     this.entryService = entryService;
     this.router = router;  
     this.zone = zone;  
@@ -68,7 +68,7 @@ export class PendingEntry {
   public async setPending(e: PendingContact, mode: PendingLayoutType) {
 
     // reset on contact change
-    if(!this.emigoSet || mode != this.mode || 
+    if(!this.amigoSet || mode != this.mode || 
         (this.revision == null && e.revision != null) ||
         (this.revision != null && e.revision == null) ||
         (this.revision != null && e.revision != null && 
@@ -172,18 +172,18 @@ export class PendingEntry {
 
       // store fields
       this.mode = mode;
-      this.emigoSet = true;
+      this.amigoSet = true;
       this.revision = e.pendingData.revision;
-      this.emigoId = e.pendingData.emigoId;
+      this.amigoId = e.pendingData.amigoId;
       this.registry = e.pendingData.registry;
     }
   }
 
   private async selectContact(e: PendingContact) {
     this.zone.run(async () => {
-      if(this.emigoSet && e.pendingData != null) {
-        await this.emigoService.setContact(e.pendingData.emigoId);
-        this.router.navigate(["/contactprofile", this.emigoId, this.registry, true, false],
+      if(this.amigoSet && e.pendingData != null) {
+        await this.amigoService.setContact(e.pendingData.amigoId);
+        this.router.navigate(["/contactprofile", this.amigoId, this.registry, true, false],
           { clearHistory: false, animated: true, transition:
           { name: "slideLeft", duration: 300, curve: "easeIn" }});
       }

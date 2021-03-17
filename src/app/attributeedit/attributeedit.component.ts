@@ -15,7 +15,7 @@ import { SocialLink } from '../model/socialLink';
 
 import { AttributeUtil } from '../attributeUtil';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 
 import { LabelEntry } from '../appdb/labelEntry';
 import { Attribute } from '../appdb/attribute';
@@ -47,14 +47,14 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.iOS = (device.os == "iOS");
 
     // retrieve specified attribute
     this.route.params.forEach(p => {
 
       // retrieve attribute data
-      this.emigoService.getAttribute(p.id).then(a => {
+      this.amigoService.getAttribute(p.id).then(a => {
 
         // extract attribute data
         this.attributeId = a.attribute.attributeId;
@@ -117,7 +117,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
       application.android.on(application.AndroidApplication.activityBackPressedEvent, this.discard);
     }
 
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
   }
@@ -180,7 +180,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
   public onApply(): void {
     if(!this.busy && this.applySave) {
       this.busy = true;
-      this.emigoService.updateAttribute(this.attributeId, this.schema, JSON.stringify(this.attr)).then(e => {
+      this.amigoService.updateAttribute(this.attributeId, this.schema, JSON.stringify(this.attr)).then(e => {
         this.applySave = false;
         this.applyText = "";
         this.busy = false;
@@ -195,7 +195,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
           okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
         if(flag) {
           this.busy = true;
-          this.emigoService.removeAttribute(this.attributeId).then(e => {
+          this.amigoService.removeAttribute(this.attributeId).then(e => {
             this.applySave = false;
             this.applyText = "";
             this.busy = false;
@@ -220,7 +220,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
     if(this.labelSet != null) {
       if(this.labelSet.has(id)) {
         this.busy = true;
-        this.emigoService.clearAttributeLabel(this.attributeId, id).then(() => {
+        this.amigoService.clearAttributeLabel(this.attributeId, id).then(() => {
           this.busy = false;
           this.labelSet.delete(id);
         }).catch(err => {
@@ -230,7 +230,7 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
       }
       else {
         this.busy = true;
-        this.emigoService.setAttributeLabel(this.attributeId, id).then(() => {
+        this.amigoService.setAttributeLabel(this.attributeId, id).then(() => {
           this.busy = false;
           this.labelSet.add(id);
         }).catch(err => {

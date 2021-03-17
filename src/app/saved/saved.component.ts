@@ -14,12 +14,12 @@ import * as dialogs from "tns-core-modules/ui/dialogs";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { NgZone } from "@angular/core";
 
-import { getEmigoObject } from '../appdb/emigo.util';
-import { Emigo } from '../appdb/emigo';
+import { getAmigoObject } from '../appdb/amigo.util';
+import { Amigo } from '../appdb/amigo';
 import { BitmapService } from '../service/bitmap.service';
 import { EntryService } from '../service/entry.service';
-import { EmigoService } from '../appdb/emigo.service';
-import { EmigoContact } from '../appdb/emigoContact';
+import { AmigoService } from '../appdb/amigo.service';
+import { AmigoContact } from '../appdb/amigoContact';
 import { ContactEntry, ContactLayoutType } from '../contactEntry';
 
 @Component({
@@ -38,7 +38,7 @@ export class SavedComponent implements OnInit, OnDestroy {
   constructor(private router: RouterExtensions,
       private bitmapService: BitmapService,
       private entryService: EntryService,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private zone: NgZone) {
     this.grids = new Map<string, ContactEntry>();
     this.iOS = (device.os == "iOS");
@@ -49,7 +49,7 @@ export class SavedComponent implements OnInit, OnDestroy {
 
   ngAfterViewInit(): void {
 
-    // observe list of saved emigos
+    // observe list of saved amigos
     this.sub.push(this.entryService.savedContacts.subscribe(async c => {
 
       if(c.length == 0) {
@@ -62,10 +62,10 @@ export class SavedComponent implements OnInit, OnDestroy {
       let stack = <StackLayout>this.saved.nativeElement;
       stack.removeChildren();
       for(let i = 0; i < c.length; i++) {
-        let e: ContactEntry = this.grids.get(c[i].emigoId);
+        let e: ContactEntry = this.grids.get(c[i].amigoId);
         if(e == null) {
-          e = new ContactEntry(this.emigoService, this.entryService, this.router, this.zone);
-          this.grids.set(c[i].emigoId, e);
+          e = new ContactEntry(this.amigoService, this.entryService, this.router, this.zone);
+          this.grids.set(c[i].amigoId, e);
         }
         e.setContact(c[i], ContactLayoutType.Basic);
         stack.addChild(e.getLayout());

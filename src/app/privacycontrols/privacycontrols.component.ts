@@ -5,7 +5,7 @@ import { EventData } from 'tns-core-modules/data/observable';
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import { device, screen, platformNames } from 'tns-core-modules/platform';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { DikotaService } from '../service/dikota.service';
 import { Profile } from '../model/profile';
 
@@ -22,16 +22,16 @@ export class PrivacyControlsComponent implements OnInit, OnDestroy {
   private iOS: boolean;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private dikotaService: DikotaService) {
     this.iOS = (device.os == "iOS");
   }
 
   ngOnInit(): void {
-    this.emigoService.getAppProperty("dikota_profile").then(p => {
+    this.amigoService.getAppProperty("dikota_profile").then(p => {
       this.config = p;
     }).catch(err => {
-      console.log("EmigoService.getAppProperty failed");
+      console.log("AmigoService.getAppProperty failed");
     });
   }
 
@@ -87,8 +87,8 @@ export class PrivacyControlsComponent implements OnInit, OnDestroy {
 
   private setProfile(p: Profile): void {
     this.config = p;
-    this.emigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
-      console.log("EmigoService.setAppProperty failed");
+    this.amigoService.setAppProperty("dikota_profile", p).then(() => {}).catch(err => {
+      console.log("AmigoService.setAppProperty failed");
     });
   }
 }

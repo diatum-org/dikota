@@ -1,6 +1,6 @@
 /**
- * Digital Archive Emigo App Server API
- * An interface to a emigo app of distributed nodes for personal storage.
+ * Digital Archive Amigo App Server API
+ * An interface to a amigo app of distributed nodes for personal storage.
  *
  * OpenAPI spec version: 1.0.4
  * Contact: rosborne@coredb.org

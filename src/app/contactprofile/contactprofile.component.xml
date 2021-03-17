@@ -20,13 +20,13 @@
               verticalAlignment="top" height="36" translateY="8" translateX="-8" 
               (tap)="onOptions($event)"></Image>
         </GridLayout>
-        <Label *ngIf="emigo != null && emigo.name != null" [text]="emigo.name" class="text" 
+        <Label *ngIf="amigo != null && amigo.name != null" [text]="amigo.name" class="text" 
             fontSize="18" fontWeight="Bold" horizontalAlignment="center" paddingTop="4"></Label>
-        <Label *ngIf="emigo != null && emigo.handle != null" [text]="getHandle()" class="text" 
+        <Label *ngIf="amigo != null && amigo.handle != null" [text]="getHandle()" class="text" 
             fontSize="17" horizontalAlignment="center"></Label>
-        <Label *ngIf="emigo != null && emigo.location != null" [text]="emigo.location" class="text" 
+        <Label *ngIf="amigo != null && amigo.location != null" [text]="amigo.location" class="text" 
             fontSize="17" horizontalAlignment="center"></Label>
-        <Label *ngIf="emigo != null && emigo.description != null" [text]="emigo.description" class="text" 
+        <Label *ngIf="amigo != null && amigo.description != null" [text]="amigo.description" class="text" 
             fontSize="14" textWrap="true" paddingTop="8" paddingLeft="16" paddingRight="16" 
             horizontalAlignment="center"></Label>
 

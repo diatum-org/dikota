@@ -15,7 +15,7 @@ import { SocialLink } from '../model/socialLink';
 
 import { AttributeUtil } from '../attributeUtil';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { Attribute } from '../appdb/attribute';
 import { AttributeEntry } from '../appdb/attributeEntry';
 import { LabelEntry } from '../appdb/labelEntry';
@@ -43,7 +43,7 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
 
     this.labelSet = new Set<string>();    
     this.iOS = (device.os == "iOS");
@@ -90,7 +90,7 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
       application.android.on(application.AndroidApplication.activityBackPressedEvent, this.discard);
     }
 
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
   }
@@ -157,9 +157,9 @@ export class AttributeAddComponent implements OnInit, OnDestroy {
       // save attribute
       try {
         this.busy = true;
-        let a: AttributeEntry = await this.emigoService.addAttribute(this.schema, JSON.stringify(this.attr));
+        let a: AttributeEntry = await this.amigoService.addAttribute(this.schema, JSON.stringify(this.attr));
         for(let i = 0; i < ids.length; i++) {
-          await this.emigoService.setAttributeLabel(a.attribute.attributeId, ids[i]);
+          await this.amigoService.setAttributeLabel(a.attribute.attributeId, ids[i]);
         }
         this.busy = false;
         this.goBack();

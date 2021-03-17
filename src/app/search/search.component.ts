@@ -19,7 +19,7 @@ import { Contact } from '../model/contact';
 import { GpsLocation } from '../model/gpsLocation';
 import { SearchArea } from '../model/searchArea';
 import { DikotaService } from '../service/dikota.service';
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { ScaleService } from '../service/scale.service';
 
 @Component({
@@ -38,7 +38,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   public search: string = "";
   public stopId: any = null;
   public watchId: number = null;
-  @ViewChild("res", {static: false}) emigos: ElementRef;
+  @ViewChild("res", {static: false}) amigos: ElementRef;
   private ids: Set<string>;
   private iOS: boolean;
   private scaleMap: Map<string, Image>;
@@ -50,7 +50,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       private zone: NgZone,
       private scaleService: ScaleService,
       private dikotaService: DikotaService,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.scaleMap = new Map<string, Image>();
     this.ids = new Set<string>();
     this.iOS = (device.os == "iOS");
@@ -161,7 +161,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private clearEntries() {
     // clear previous list 
-    let stack = <StackLayout>this.emigos.nativeElement;
+    let stack = <StackLayout>this.amigos.nativeElement;
     while(stack.getChildrenCount() > 0) {
       let view = stack.getChildAt(0);
       stack.removeChild(view);
@@ -171,10 +171,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   private addEntries(c: Contact[]) {
     for(let i = 0; i < c.length; i++) {
-      if(!this.ids.has(c[i].emigoId)) {
-        let stack = <StackLayout>this.emigos.nativeElement;
+      if(!this.ids.has(c[i].amigoId)) {
+        let stack = <StackLayout>this.amigos.nativeElement;
         stack.addChild(this.getEntry(c[i]));
-        this.ids.add(c[i].emigoId);
+        this.ids.add(c[i].amigoId);
       }
     }
   }
@@ -242,7 +242,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     handle.fontSize = 16; 
     handle.className = "text";
 
-    let icon: Image = this.getIcon(e.emigoId, e.logo);
+    let icon: Image = this.getIcon(e.amigoId, e.logo);
     let mask: Image = this.getMask();
 
     let s: StackLayout = new StackLayout();
@@ -257,9 +257,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.zone.run(async () => { 
 
         // select contact for profile
-        await this.emigoService.setContact(e.emigoId);
+        await this.amigoService.setContact(e.amigoId);
   
-        this.router.navigate(["/contactprofile", e.emigoId, e.registry, e.available, false],
+        this.router.navigate(["/contactprofile", e.amigoId, e.registry, e.available, false],
           { clearHistory: false, animated: true, transition: 
           { name: "slideLeft", duration: 300, curve: "easeIn" }});
       });

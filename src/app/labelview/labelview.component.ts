@@ -18,7 +18,7 @@ import { device, screen, platformNames } from 'tns-core-modules/platform';
 import { AnimationCurve } from "tns-core-modules/ui/enums";
 
 import { AttributeUtil } from '../attributeUtil';
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -41,7 +41,7 @@ i
   public labeling: boolean = false;
   public notesActive: boolean = false;
   public notesHint: string = "";
-  public emigoId: string;
+  public amigoId: string;
   public shareId: string;
   public registry: string;
   public node: string;
@@ -63,7 +63,7 @@ i
   @ViewChild("rmu", {static: false}) menu: ElementRef;
 
   constructor(private router: RouterExtensions,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.iOS = (device.os == "iOS");
     this.application = require('application');
     this.orientation = (args) => { this.onOrientation(); };
@@ -74,7 +74,7 @@ i
     // load default logo
     this.avatarSrc = ImageSource.fromFileSync("~/assets/avatar.png");
 
-    this.emigoService.getAttributes().then(a => {
+    this.amigoService.getAttributes().then(a => {
       for(let i = 0; i < a.length; i++) {
 
         // construct label set
@@ -93,11 +93,11 @@ i
       }
     });
 
-    this.sub.push(this.emigoService.labels.subscribe(l => {
+    this.sub.push(this.amigoService.labels.subscribe(l => {
       this.labels = l;
     }));
 
-    this.sub.push(this.emigoService.identity.subscribe(i => {
+    this.sub.push(this.amigoService.identity.subscribe(i => {
       this.name = i.name;
       this.handle = i.handle;
       this.location = i.location;

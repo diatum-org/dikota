@@ -8,20 +8,20 @@ import * as utils from "tns-core-modules/utils/utils";
 
 import { AppSettings } from "../app.settings";
 
-import { EmigoUtil } from '../emigoUtil';
+import { AmigoUtil } from '../amigoUtil';
 import { AttributeUtil } from '../attributeUtil';
 
-import { getEmigoObject } from "../appdb/emigo.util";
+import { getAmigoObject } from "../appdb/amigo.util";
 import { RegistryService } from "../appdb/registry.service";
-import { EmigoService } from "../appdb/emigo.service";
-import { EmigoMessage } from "../appdb/emigoMessage";
+import { AmigoService } from "../appdb/amigo.service";
+import { AmigoMessage } from "../appdb/amigoMessage";
 
 import { DikotaService } from "../service/dikota.service";
 
-import { Emigo } from "../appdb/emigo";
+import { Amigo } from "../appdb/amigo";
 
 import { AppContext } from "../model/appContext";
-import { EmigoLogin } from "../model/emigoLogin";
+import { AmigoLogin } from "../model/amigoLogin";
 
 @Component({
     selector: "agree",
@@ -39,7 +39,7 @@ export class AgreeComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private registryService: RegistryService,
       private dikotaService: DikotaService) { 
     this.sub = [];
@@ -76,8 +76,8 @@ export class AgreeComponent implements OnInit, OnDestroy {
 
   async onAgree() {
 
-    let msg: EmigoMessage;
-    let login: EmigoLogin;
+    let msg: AmigoMessage;
+    let login: AmigoLogin;
     try {
       this.busy = true;
 
@@ -87,17 +87,17 @@ export class AgreeComponent implements OnInit, OnDestroy {
    
       // retrieve identity 
       msg = await this.registryService.getIdentity(reg, u[0]);
-      let e: Emigo = getEmigoObject(msg);
+      let e: Amigo = getAmigoObject(msg);
 
       // attach app to account
-      login = await this.dikotaService.attach(e.emigoId, e.node, this.code);
+      login = await this.dikotaService.attach(e.amigoId, e.node, this.code);
 
       // setup local store
-      let ctx: AppContext = { emigoId: login.account.emigoId, registry: reg, token: login.account.token,
+      let ctx: AppContext = { amigoId: login.account.amigoId, registry: reg, token: login.account.token,
           appNode: login.service.node, appToken: login.service.token, serviceToken: login.token };
-      await this.emigoService.setEmigo(ctx.emigoId, ctx.registry, ctx.token, ctx.appNode, ctx.appToken,
-          AttributeUtil.getSchemas(), [], null, EmigoUtil.getSearchableEmigo, s => {});
-      await this.emigoService.setAppContext(ctx);
+      await this.amigoService.setAmigo(ctx.amigoId, ctx.registry, ctx.token, ctx.appNode, ctx.appToken,
+          AttributeUtil.getSchemas(), [], null, AmigoUtil.getSearchableAmigo, s => {});
+      await this.amigoService.setAppContext(ctx);
       this.dikotaService.setToken(login.token);
 
       // nav to home page

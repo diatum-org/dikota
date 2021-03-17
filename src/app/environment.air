@@ -1,6 +1,6 @@
 export class Environment {
   public static REGISTRY="https://registry.air.coredb.org:8443/app";
-  public static EMIGO="https://emigo.air.coredb.org:8443/app";
+  public static AMIGO="https://amigo.air.coredb.org:8443/app";
   public static DB="air.";
   public static ENV="air";
 }

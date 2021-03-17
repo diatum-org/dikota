@@ -8,7 +8,7 @@ import { isIOS, device, screen, platformNames } from 'tns-core-modules/platform'
 
 import { AttributeUtil } from '../attributeUtil';
 
-import { EmigoService } from '../appdb/emigo.service';
+import { AmigoService } from '../appdb/amigo.service';
 import { LabelEntry } from '../appdb/labelEntry';
 
 @Component({
@@ -27,7 +27,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
-      private emigoService: EmigoService) {
+      private amigoService: AmigoService) {
     this.iOS = isIOS;
     this.labelMap = new Map<string, boolean>();
   }
@@ -36,12 +36,12 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
 
     // retrieve specified label
     this.route.params.forEach(p => {
-      this.emigoService.getLabel(p.id).then(l => {
+      this.amigoService.getLabel(p.id).then(l => {
         this.labelId = l.labelId;
         this.name = l.name;
     
         // construct map of attributes and thir labels
-        this.emigoService.getAttributes().then(a => {
+        this.amigoService.getAttributes().then(a => {
           // determine labeled state of attribute
           for(let i = 0; i < a.length; i++) {
             this.attributeData.push({ 
@@ -83,7 +83,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
         if(action.id == 1) {
           dialogs.prompt({ title: "Label Name", okButtonText: "Save", cancelButtonText: "Cancel", inputType: dialogs.inputType.text }).then(r => {
             if(r.result) {
-              this.emigoService.updateLabel(this.labelId, r.text).then(() => {
+              this.amigoService.updateLabel(this.labelId, r.text).then(() => {
                 this.name = r.text;
               }).catch(err => {
                 dialogs.alert({ message: "failed to save label name: " + JSON.stringify(err), okButtonText: "ok" });
@@ -96,7 +96,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
               okButtonText: "Yes, Delete", cancelButtonText: "No, Cancel" }).then(flag => {
             if(flag) {
               this.busy = true;
-              this.emigoService.removeLabel(this.labelId).then(() => {
+              this.amigoService.removeLabel(this.labelId).then(() => {
                 this.busy = false;
                 this.router.back();
               }).catch(err => {
@@ -209,7 +209,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
 
     if(this.labelId != null) {
       this.busy = true;
-      this.emigoService.setAttributeLabel(a.attributeId, this.labelId).then(v => {
+      this.amigoService.setAttributeLabel(a.attributeId, this.labelId).then(v => {
         this.busy = false;
         this.labelMap.set(a.attributeId, true);
       }).catch(err => {
@@ -223,7 +223,7 @@ export class LabelProfileComponent implements OnInit, OnDestroy {
 
     if(this.labelId != null) {
       this.busy = true;
-      this.emigoService.clearAttributeLabel(a.attributeId, this.labelId).then(v => {
+      this.amigoService.clearAttributeLabel(a.attributeId, this.labelId).then(v => {
         this.busy = false;
         this.labelMap.set(a.attributeId, false);
       }).catch(err => {

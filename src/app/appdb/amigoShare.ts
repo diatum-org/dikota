@@ -1,4 +1,4 @@
-export class EmigoShare {
+export class AmigoShare {
   shareId: string;
   status: string;
   token: string;

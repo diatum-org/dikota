@@ -1,4 +1,4 @@
-export interface EmigoAppData { 
+export interface AmigoAppData { 
     revision: number;
     hasPhone: boolean;
     hasText: boolean;

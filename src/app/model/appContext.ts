@@ -1,5 +1,5 @@
 export class AppContext {
-  emigoId: string;
+  amigoId: string;
   registry: string;
   token: string;        // token to communicate with account node server
   appNode: string;

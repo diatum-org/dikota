@@ -14,7 +14,7 @@ import { EventData } from 'tns-core-modules/data/observable';
 import { CameraService } from "../service/camera.service";
 import { GalleryService } from "../service/gallery.service";
 import { BitmapService } from "../service/bitmap.service";
-import { EmigoService } from "../appdb/emigo.service";
+import { AmigoService } from "../appdb/amigo.service";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import * as utils from "tns-core-modules/utils/utils";
 import * as application from "tns-core-modules/application";
@@ -78,7 +78,7 @@ export class ProfileImageComponent implements OnInit, OnDestroy {
       private bitmapService: BitmapService,
       private galleryService: GalleryService,
       private cameraService: CameraService,
-      private emigoService: EmigoService,
+      private amigoService: AmigoService,
       private page: Page) {
     this.iOS = (device.os == "iOS");
     this.clearVisible = "hidden";
@@ -132,7 +132,7 @@ export class ProfileImageComponent implements OnInit, OnDestroy {
     this.bound = <GridLayout>this.box.nativeElement;
     this.frame = <Label>this.frm.nativeElement;
 
-    this.sub.push(this.emigoService.identity.subscribe(i => {
+    this.sub.push(this.amigoService.identity.subscribe(i => {
       if(i == null || i.logo == null) {
         this.profile.imageSource = this.avatarSrc;
       }
@@ -439,14 +439,14 @@ export class ProfileImageComponent implements OnInit, OnDestroy {
       this.clearOverlay();
       this.bitmapService.resize(this.profile.imageSource, 1024, 1024).then(s => {
         let data: string = s.toBase64String("jpg", 25);
-        this.emigoService.setImage(data);
+        this.amigoService.setImage(data);
         this.profile.imageSource = s;
       }).catch(err => {
         dialogs.alert({ message: err, okButtonText: "ok" });
       });
     }
     else if(this.applyReset) {
-      this.emigoService.setImage(null);
+      this.amigoService.setImage(null);
       this.applyReset = false;
       this.applyText = "";
     }
