@@ -23,6 +23,7 @@ export class GalleryService {
           if(sel.length > 0) {
             let a = sel[0];
 
+console.log("ASSET:", a);
             // create image source
             a.options = { width: 1024, height: 1024, keepAspectRatio: true };
             let imgSource = new ImageSource();
