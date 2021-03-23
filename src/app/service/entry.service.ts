@@ -119,6 +119,7 @@ export class EntryService {
     // retrieve notified revision
     this.notified = await this.amigoService.getAppProperty("notified_revision");
     this.setNotified();
+
   }
 
   public clear() {
@@ -176,16 +177,11 @@ export class EntryService {
   }
 
   public getNotify(): boolean {
-    
-    if(this.notified == null && this.revision != null) {
+
+    if(this.notified != null && this.revision != null && this.notified < this.revision) {
       return true;
     }
-    else if(this.notified != null && this.revision != null && this.notified < this.revision) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return false;
   }
 
   private setNotifyRevision() {
