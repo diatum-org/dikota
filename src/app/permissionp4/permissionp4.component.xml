@@ -20,7 +20,7 @@
 
       <Label class="text" textWrap="true" fontSize="16" text="If you want to take a photo for your profile image, Dikota needs to access your device's camera."></Label>
 
-      <Label class="text" text="A message will appear to confirm the Location permission."
+      <Label class="text" text="A message will appear to confirm the Camera permission."
           textWrap="true" paddingTop="8" paddingBottom="16"></Label>
 
       <GridLayout *ngIf="block[0]" columns="auto,*" rows="auto,auto" (tap)="block[0]=false" backgroundColor="#cdd8ed"

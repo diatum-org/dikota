@@ -20,6 +20,6 @@ export class ContactMethodComponent implements OnInit {
   }
 
   onCommunication() {
-    utils.openUrl("https://diatum.org");
+    utils.openUrl("https://diatum.org/diatum-communication");
   }
 }

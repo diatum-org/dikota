@@ -21,7 +21,7 @@
       <Label class="text" fontSize="18" textWrap="true">
         <Span text="If you use the optional "></Span>
         <Span fontWeight="Bold" text="Find Nearby Users"></Span>
-        <Span text=" service, the GPS location coordinate data and your Digital Identity is temporarily stored in a separate Diatum registry to enable the feature. The location service is disabled after 5 minutes and the data is no longer used"></Span>
+        <Span text=" service, the GPS location coordinate data and your Digital Identity is temporarily stored in a separate Diatum registry to enable the feature. The location service is disabled after 5 minutes and the data is no longer used."></Span>
       </Label>
 
       <Label class="text" fontSize="18" paddingTop="16" textWrap="true" text="Diatum does not utilize this collected data for any purpose other than to provide the Find Nearby Users service."></Label>

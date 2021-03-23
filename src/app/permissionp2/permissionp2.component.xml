@@ -71,7 +71,7 @@
         <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Deny' means for you"
             verticalAlignment="center" paddingTop="4"></Label>
         <Label row="1" col="1" class="text" fontSize="16" textWrap="true" paddingBottom="4"
-            text="Deny this permission and the app will still funnction, but Dikota will not have the capability to temporarily find nearby users."></Label>
+            text="Deny this permission and the app will still function, but Dikota will not have the capability to temporarily find nearby users."></Label>
       </GridLayout>
       <GridLayout *ngIf="!block[2]" columns="auto,*" (tap)="block[2]=true" backgroundColor="#cdd8ed"
           paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">

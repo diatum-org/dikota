@@ -33,7 +33,7 @@
    
       <Label class="text" fontSize="18" fontWeight="Bold" paddingTop="16" text="Tracking"></Label>
 
-      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="Tracking refres to the ability to track you and your data across apps that are owned by other companies using device-based or other digital identifiers."></Label>
+      <Label class="text" textWrap="true" fontSize="18" paddingTop="8" text="Tracking refers to the ability to track you and your data across apps that are owned by other companies using device-based or other digital identifiers."></Label>
 
     </StackLayout>
   </ScrollView>

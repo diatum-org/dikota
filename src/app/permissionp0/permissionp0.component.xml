@@ -16,13 +16,16 @@
     <StackLayout padding="16">
 
       <Label class="text" fontSize="18" textWrap="true" paddingTop="16"
-          text="Beacuse we're on a mission to empower your privacy rights, we've tried to make the permission clearer and more specific than the vague descriptions normally used in apps."></Label>
+          text="Because we're on a mission to empower your privacy rights, we've tried to make the permissions clearer and more specific than the vague descriptions normally used in apps."></Label>
 
       <Label class="text" fontSize="18" textWrap="true" paddingTop="16">
         <Span fontWeight="Bold" text="What is a permission?"></Span>
         <Span text=" A permission allows Dikota to use a functionality of your device to provide a service - such as using the phone's location to find nearby users. All device permissions are optional and can be approved or denied in your device settings at any time."></Span>
       </Label>
     
+      <Label class="text" fontSize="18" textWrap="true" paddingTop="16"
+          text="The following are the permissions we ask for with Dikota. To learn more about data we collect, visit the Data Collection section."></Label>
+
     </StackLayout>
   </ScrollView>
 </GridLayout>

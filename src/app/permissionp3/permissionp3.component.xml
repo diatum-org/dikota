@@ -46,7 +46,7 @@
         <Label col="1" class="text" fontSize="16" fontWeight="Bold" text="What 'Allow' does not permit"
             verticalAlignment="center" paddingTop="4"></Label>
         <Label row="1" col="1" class="text" fontSize="16" textWrap="true" paddingBottom="4"
-            text="Does not permit Dikota to access your photos, media or files at anny other time than the image selection process, or to record or store this data anywhere other than your Diatabase. A copy of the image is stored with Dikota if you choose to be listed in the User Directory."></Label>
+            text="Does not permit Dikota to access your photos, media or files at any other time than the image selection process, or to record or store this data anywhere other than your Diatabase. A copy of the image is stored with Dikota if you choose to be listed in the User Directory."></Label>
       </GridLayout>
       <GridLayout *ngIf="!block[1]" columns="auto,*" (tap)="block[1]=true" backgroundColor="#cdd8ed"
           paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16" marginBottom="16">

@@ -17,6 +17,7 @@ import { AmigoService } from "../appdb/amigo.service";
 import { AmigoMessage } from "../appdb/amigoMessage";
 
 import { DikotaService } from "../service/dikota.service";
+import { EntryService } from "../service/entry.service";
 
 import { Amigo } from "../appdb/amigo";
 
@@ -40,6 +41,7 @@ export class AgreeComponent implements OnInit, OnDestroy {
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
       private amigoService: AmigoService,
+      private entryService: EntryService,
       private registryService: RegistryService,
       private dikotaService: DikotaService) { 
     this.sub = [];
@@ -99,6 +101,7 @@ export class AgreeComponent implements OnInit, OnDestroy {
           AttributeUtil.getSchemas(), [], null, AmigoUtil.getSearchableAmigo, s => {});
       await this.amigoService.setAppContext(ctx);
       this.dikotaService.setToken(login.token);
+      this.entryService.init();
 
       // nav to home page
       this.router.navigate(["/home"], { clearHistory: true });
