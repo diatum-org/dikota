@@ -1,7 +1,7 @@
 import { Environment } from './environment'
 
 export class AppSettings {
-  public static VER="0.2.83";
+  public static VER="0.2.90";
   
   public static REGISTRY=Environment.REGISTRY;
   public static AMIGO=Environment.AMIGO;
