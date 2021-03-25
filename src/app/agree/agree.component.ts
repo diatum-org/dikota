@@ -108,8 +108,11 @@ export class AgreeComponent implements OnInit, OnDestroy {
     }
     catch(err) {
       this.busy = false;
-      console.log(err);
-      if(msg == null) {
+      if(err.status == 503) {
+        let details: string = err.headers.get("details");
+        dialogs.alert({ message: "failed to attach identity: " + details, okButtonText: "ok" });
+      }
+      else if(msg == null) {
         dialogs.alert({ message: "failed to locate identity", okButtonText: "ok" });
       }
       else if(login == null) {
