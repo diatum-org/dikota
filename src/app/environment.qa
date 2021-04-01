@@ -1,7 +1,7 @@
 export class Environment {
   public static REGISTRY="https://registry.qa.coredb.org/app";
   public static AMIGO="https://dikota.qa.coredb.org/app";
-  public static PORTAL="https://portal.qa.coredb.org/app/#/account";
+  public static PORTAL="https://portal.qa.coredb.org/app";
   public static DB=".qa";
   public static ENV="qa";
 }
