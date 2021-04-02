@@ -60,37 +60,9 @@ export class DikotaService {
     }
   }
 
-  public getAvailable(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.httpClient.get<Result>(AppSettings.AMIGO + "/accounts/status",
-          { headers: this.headers, observe: 'body' }).toPromise().then(r => {
-        if(r != null) {
-          resolve(r.numValue);
-        }
-        else {
-          resolve(0);
-        }            
-      }).catch(err => {
-        console.log("DikotaService.getAvailable failed");
-        reject();
-      });
-    });
-  }
-
-  public amigoIdLogin(amigoId: string, password: string): Promise<AmigoLogin> {
-    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?amigoId=" + amigoId +
-        "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
-  }
-
-  public emailLogin(email: string, password: string): Promise<AmigoLogin> {
-    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?email=" + email +
-        "&password=" + password, { headers: this.headers, observe: 'body' }).toPromise();
-  }
- 
-  public phoneLogin(phone: string, password: string): Promise<AmigoLogin> {
-    return this.httpClient.get<AmigoLogin>(AppSettings.AMIGO + "/accounts/token?phone=" + 
-        phone.replace(/\+/g, "%2B") + "&password=" + password, 
-        { headers: this.headers, observe: 'body' }).toPromise();
+  public report(amigoId: string): Promise<void> {
+    return this.httpClient.put<void>(AppSettings.AMIGO + "/accounts/amigos/" + amigoId + "/flag?token=" + this.token,
+      { headers: this.headers, observe: 'body' }).toPromise();
   }
 
   public attach(amigoId: string, node: string, code: string): Promise<AmigoLogin> {

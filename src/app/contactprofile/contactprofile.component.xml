@@ -16,7 +16,7 @@
       <StackLayout>
         <GridLayout columns="*,3*,*" height="128">
           <Image (loaded)="onImageLoaded($event)" col="1"></Image>
-          <Image *ngIf="contact!=null" col="2" src="~/assets/vmenu.png" horizontalAlignment="right"
+          <Image col="2" src="~/assets/vmenu.png" horizontalAlignment="right"
               verticalAlignment="top" height="36" translateY="8" translateX="-8" 
               (tap)="onOptions($event)"></Image>
         </GridLayout>

@@ -7,6 +7,8 @@ import { Page } from "tns-core-modules/ui/page";
 import { isIOS, device, screen, platformNames } from 'tns-core-modules/platform';
 import * as utils from "tns-core-modules/utils/utils";
 import { RegistryService } from '../appdb/registry.service';
+import { NgZone } from "@angular/core";
+
 
 import { getAmigoObject } from "../appdb/amigo.util";
 import { AmigoMessage } from "../appdb/amigoMessage";
@@ -33,6 +35,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(private router: RouterExtensions,
       private registryService: RegistryService,
+      private zone: NgZone,
       private page: Page) { 
     this.page.actionBarHidden = true;
     this.version = "Version: " + AppSettings.VER + " " + AppSettings.ENV;
@@ -114,32 +117,33 @@ export class LoginComponent implements OnInit, OnDestroy {
         message: "Use your portal login to generate an attachment code.",
         okButtonText: "Ok",
         cancelButtonText: "Cancel",
-        userName: this.login,
-        password: this.password
-    }).then(async r => {
+        userName: this.login
+    }).then(r => {
+      if(r.result) {
+        this.zone.run(async () => {
+          this.busy = true;
+          try {
+            // get registry params
+            let u: string[] = r.userName.split("@");
+            let reg: string = u.length > 1 ? "https://registry." + u[1] + "/app" : AppSettings.REGISTRY;
 
-      if(r) {
-        this.busy = true;
-        try {
-          // get registry params
-          let u: string[] = r.userName.split("@");
-          let reg: string = u.length > 1 ? "https://registry." + u[1] + "/app" : AppSettings.REGISTRY;
+            // retrieve identity
+            let msg: AmigoMessage = await this.registryService.getIdentity(reg, u[0]);
+            let e: Amigo = getAmigoObject(msg);
 
-          // retrieve identity
-          let msg: AmigoMessage = await this.registryService.getIdentity(reg, u[0]);
-          let e: Amigo = getAmigoObject(msg);
-
-          // retrieve code
-          this.code = await this.registryService.getPassCode(AppSettings.PORTAL, e.amigoId, r.password);
-          
-          // set login
-          this.login = r.userName;
-          this.username = r.userName;
-        }
-        catch(err) {
-          dialogs.alert({ message: "failed to retrieve attachment code", okButtonText: "ok" });
-        }
-       this.busy = false;
+            // retrieve code
+            this.code = await this.registryService.getPassCode(AppSettings.PORTAL, e.amigoId, r.password);
+            
+            // set login
+            this.login = r.userName;
+            this.username = r.userName;
+            this.password = this.code;
+          }
+          catch(err) {
+            dialogs.alert({ message: "failed to retrieve attachment code", okButtonText: "ok" });
+          }
+         this.busy = false;
+        });
       }
     });
   }

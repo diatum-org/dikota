@@ -28,6 +28,7 @@ import { AppSettings } from '../app.settings';
 import { AmigoEntry } from '../appdb/amigoEntry';
 import { AmigoView } from '../appdb/amigoView';
 import { AmigoContact } from '../appdb/amigoContact';
+import { DikotaService } from '../service/dikota.service';
 
 @Component({
     selector: "contactprofile",
@@ -73,6 +74,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   constructor(private router: RouterExtensions,
       private route: ActivatedRoute,
       private registryService: RegistryService,
+      private dikotaService: DikotaService,
       private amigoService: AmigoService) {
 
     this.application = require('application');
@@ -449,6 +451,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       actions.push({ id: 0, title: "Delete Contact" });
       actions.push({ id: 2, title: "Refresh Contact" });
     }
+    actions.push({ id: 3, title: "Report Profile" });
     Menu.popup({ view: ev.view, actions: actions, cancelButtonText: "Dismiss" }).then(action => {
       if(action.id == 0) {
         dialogs.confirm({ message: "Are you sure you want to delete this contact?",
@@ -492,6 +495,21 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       }
       if(action.id == 2) {
         this.amigoService.refreshContact(this.contact.amigoId);
+      }
+      if(action.id == 3) {
+        dialogs.confirm({ message: "Are you sure you want to report this profile?",
+            okButtonText: "Yes, Report", cancelButtonText: "No, Cancel" }).then(flag => {
+          if(flag) {
+            this.busy = true;
+            this.dikotaService.report(this.amigoId).then(() => {
+              this.busy = false;
+            }).catch(err => {
+              this.busy = false;
+              console.log(err);
+              dialogs.alert({ message: "failed to report profile", okButtonText: "ok" });
+            });
+          }
+        });
       }
     });
   }
