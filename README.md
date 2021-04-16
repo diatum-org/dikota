@@ -5,7 +5,7 @@
   </a>
 </p>
 
-Dikota is a contact app built for your digital identity. The app allows you to connect with other digital identities and automatically synchronize their contact information. The app is written with Nativescript+Angular and is available on <a href="https://play.google.com/store/apps/details?id=org.diatum.dikota">Google Play Store<a> and <a href="https://apps.apple.com/us/app/dikota/id1526510086">Apple App Store<a>. An overview of the Diatum identity network is given <a href="https://diatum.org/developers/technical-intro/">here</a>. 
+Dikota is a contact app built for your digital identity. The app allows you to connect with other digital identities and automatically synchronize their contact information. The app is written with Nativescript+Angular and is available on <a href="https://play.google.com/store/apps/details?id=org.diatum.dikota">Google Play Store<a> and <a href="https://apps.apple.com/us/app/dikota/id1526510086">Apple App Store<a>. An overview of the Diatum identity network is given <a href="https://diatum.org/getinvolved/technical-intro/">here</a>. 
 
 # System HowTo
 <p align="center"><b>CoreDB</b>: &nbsp Install a node &nbsp OR &nbsp Find someone hosting a node</p>
