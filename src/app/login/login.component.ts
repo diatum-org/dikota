@@ -22,11 +22,10 @@ import { AppSettings } from "../app.settings";
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
+  public show: boolean = false;
   public busy: boolean = false;
   public loginFocus: boolean = false;
   public passFocus: boolean = false;
-  public username: string = "";
-  public code: string = "";
   public login: string = "";
   public password: string = "";
   @ViewChild("lgn", {static: false}) loginRef: ElementRef;
@@ -48,10 +47,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onUpdateLogin(value: string) {
+    if(value == null) {
+      value = "";
+    }
     this.login = value;
   }
 
   onUpdatePassword(value: string) {
+    if(value == null) {
+      value = "";
+    }
     this.password = value;
   }
 
@@ -113,45 +118,40 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onPortal() {
     dialogs.login({
-        title: "portal.diatum.net",
-        message: "Use your portal login to generate an attachment code.",
+        title: "Diatum Attachment Code",
+        message: "Set attachment code generated with your Diatabase.",
         okButtonText: "Ok",
         cancelButtonText: "Cancel",
         userName: this.login
     }).then(r => {
       if(r.result) {
-        this.zone.run(async () => {
-          this.busy = true;
-          try {
-            // get registry params
-            let u: string[] = r.userName.split("@");
-            let reg: string = u.length > 1 ? "https://registry." + u[1] + "/app" : AppSettings.REGISTRY;
-
-            // retrieve identity
-            let msg: AmigoMessage = await this.registryService.getIdentity(reg, u[0]);
-            let e: Amigo = getAmigoObject(msg);
-
-            // retrieve code
-            this.code = await this.registryService.getPassCode(AppSettings.PORTAL, e.amigoId, r.password);
-            
-            // set login
-            this.login = r.userName;
-            this.username = r.userName;
-            this.password = this.code;
-          }
-          catch(err) {
-            dialogs.alert({ message: "failed to retrieve attachment code", okButtonText: "ok" });
-          }
-         this.busy = false;
-        });
+        this.router.navigate(["/agree", r.userName, r.password], { clearHistory: false });
       }
     });
   }
 
-  onAttach() {
+  async onAttach() {
     if(this.login != "" && this.password != "") {
-      this.router.navigate(["/agree", this.login, this.password], 
-          { clearHistory: false });
+      this.busy = true;
+      try {
+        // get registry params
+        let u: string[] = this.login.split("@");
+        let reg: string = u.length > 1 ? "https://registry." + u[1] + "/app" : AppSettings.REGISTRY;
+
+        // retrieve identity
+        let msg: AmigoMessage = await this.registryService.getIdentity(reg, u[0]);
+        let e: Amigo = getAmigoObject(msg);
+
+        // retrieve code
+        let code: string = await this.registryService.getPassCode(AppSettings.PORTAL, e.amigoId, this.password);
+        
+        this.busy = false;
+        this.router.navigate(["/agree", this.login, code], { clearHistory: false });
+      }
+      catch(err) {
+        this.busy = false;
+        dialogs.alert({ message: "failed to retrieve attachment code", okButtonText: "ok" });
+      }
     }
   }
 

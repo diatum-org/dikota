@@ -7,8 +7,7 @@
 
   <Label row="9" fontSize="16" textAlignment="center" textWrap="true" marginLeft="32" marginRight="32"
       verticalAlignment="center" (tap)="onPortal()">
-    <Span class="text" text="New or logged-out users can create an attachment code in your"></Span>
-    <Span class="link" text=" Diatabase Portal. "></Span>
+    <Span class="link" text="Advanced: set an attachment code."></Span>
   </Label>
   <Label row="11" class="text-light" [text]="version" fontSize="12" paddingBottom="16"
       verticalAlignment="bottom" horizontalAlignment="center"></Label>
@@ -23,13 +22,16 @@
     <TextField #lgn color="#51512E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatum Username"
         autocapitalizationType="none" fontSize="18" textAlignment="center" (textChange)="onUpdateLogin($event.value)" returnKeyType="next"
         (returnPress)="onLoginSet($event)" (focus)="onLoginFocus()" (blur)="onLoginBlur()" borderBottomWidth="1" borderColor="#DDDDDD"
-        (tap)="onLoginFocus()" [text]="username"></TextField>
+        (tap)="onLoginFocus()" [text]="login"></TextField>
   </GridLayout>
   <GridLayout row="5" rows="auto" marginLeft="32" marginRight="32">
-    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Attachment Code"
+    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Portal Password" [secure]="!show"
         fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
         autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
         (tap)="onPassFocus()" [text]="code"></TextField>
+
+    <Image *ngIf="!show" width="32" height="32" src="~/assets/view.png" horizontalAlignment="right" (tap)="show=true"></Image>
+    <Image *ngIf="show" width="32" height="32" src="~/assets/look.png" horizontalAlignment="right" (tap)="show=false"></Image>
   </GridLayout>
 
 </GridLayout>
