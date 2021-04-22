@@ -9,7 +9,7 @@
 
 <GridLayout rows="*,auto,*,auto,*,auto,*,auto,*" paddingLeft="16" paddingRight="16" backgroundColor="#ffffff">
 
-  <Label row="1" class="text" text="I agreee to the Dikota Terms of Service and Privacy Policy."
+  <Label row="1" class="text" text="I agree to the Dikota Terms of Service and Privacy Policy."
       fontSize="18" fontWeight="Bold" textWrap="true" textAlignment="center"></Label>
 
   <GridLayout row="3" rows="auto" columns="*,*" paddingLeft="32" paddingRight="32">
