@@ -234,8 +234,8 @@
       <StackLayout *ngIf="isSocialLink()" paddingLeft="32" paddingRight="32">
         <ActivityIndicator color="#1172FE" [busy]="busy" marginTop="4" marginBottom="4" width="32" height="32"></ActivityIndicator>
         <GridLayout rows="auto" paddingBottom="16">
-          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Username" fontSize="16"
-              [text]="attr.link" (textChange)="updateField('link', $event.value)" autocapitalizationType="none"
+          <TextField color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Display Name, Username or Handle" 
+              fontSize="16" [text]="attr.link" (textChange)="updateField('link', $event.value)" autocapitalizationType="none"
               borderBottomWidth="1" borderColor="#DDDDDD"></TextField>
           <Image src="~/assets/clear.png" horizontalAlignment="right" (tap)="clearField('link')" width="24" height="24"></Image>
         </GridLayout>
