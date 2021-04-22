@@ -117,6 +117,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
           // load identity
           this.amigoService.getContactIdentity(this.amigoId).then(e => {
+
             if(e != null) {
               this.amigo = e;
               this.setImage(this.amigo.logo);
@@ -213,7 +214,10 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public getHandle(): string {
-    return "";
+    if(this.amigo == null) {
+      return null;
+    }
+    return this.amigo.handle;
   }
 
   public canSave(): boolean {
