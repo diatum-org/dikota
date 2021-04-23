@@ -1,0 +1,677 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		189432D2818D491CB7664EEB /* ic_label_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A0E0C8720C1438297062695 /* ic_label_3x.png */; };
+		1D4401068CFB401AB13EF609 /* ic_crop_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3336DBADD2334E95A01CA17D /* ic_crop_3x.png */; };
+		284FFDC3D91745BAADD9ED86 /* ic_crop.png in Resources */ = {isa = PBXBuildFile; fileRef = C58FAE30F7A647F9900524F2 /* ic_crop.png */; };
+		2C87DD9D6EFA4794B373E261 /* build.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = AA1F753667EF44CCAD601613 /* build.xcconfig */; };
+		4AF473F6F4394E57AB71E496 /* ic_label_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 75AFDCCB035B4946AC41E429 /* ic_label_2x.png */; };
+		4F3D30FB1D58475E830EDBC3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E03EB4DB9424D0FB5CEE168 /* Assets.xcassets */; };
+		5916D5CFE61930F23E838BAA /* Pods_dikota.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B5E548542B07C2E093C3C9F /* Pods_dikota.framework */; };
+		6FC6473667B34946AB55B931 /* TNSWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC6B8517F1274DFEA5207C56 /* TNSWidgets.framework */; };
+		716C0434201B46FA8826B3E4 /* ic_menu.png in Resources */ = {isa = PBXBuildFile; fileRef = C2D83A62AE9542FE9884C6F5 /* ic_menu.png */; };
+		7907FBBFCBA34FF8ABDDCEEE /* ic_nenu_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2013E90385EB4C6DA47BF276 /* ic_nenu_3x.png */; };
+		858B842D18CA22B800AB12DE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 858B833A18CA111C00AB12DE /* InfoPlist.strings */; };
+		8DD0F1EA92A948AAAC3425A0 /* ic_nenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C90BE5484664CFDAA777638 /* ic_nenu.png */; };
+		A0618524CCFE49D3BF1911A4 /* ic_save.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE26D3198DC4BE1B1B449F2 /* ic_save.png */; };
+		A6E0F4AD00694125AFD9DD82 /* ic_nenu_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 47C2DD2244084C36BB963221 /* ic_nenu_2x.png */; };
+		C45079F022A84A7B87001E67 /* ic_label.png in Resources */ = {isa = PBXBuildFile; fileRef = 83373C8398024ABF93165B71 /* ic_label.png */; };
+		C455126CEAD7480088866696 /* ic_save_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = FBF590E30062468E882E538B /* ic_save_3x.png */; };
+		C5692E85F4DA4FF1803CE0E8 /* ic_menu_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 91716832728D4A388BA79FE7 /* ic_menu_2x.png */; };
+		C6A73D45388B424AB96C73A6 /* TNSWidgets.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC6B8517F1274DFEA5207C56 /* TNSWidgets.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		CD45EE7C18DC2D5800FB50C0 /* app in Resources */ = {isa = PBXBuildFile; fileRef = CD45EE7A18DC2D5800FB50C0 /* app */; };
+		CD62955D1BB2678900AE3A93 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD62955C1BB2678900AE3A93 /* main.m */; };
+		E9696B3E1C264EE787E2DCAA /* ic_crop_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6A97B33C09B84A0896869DFA /* ic_crop_2x.png */; };
+		F53FE3851C10482AACE72E55 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 42B60BF98D6246E9892CBE6E /* LaunchScreen.storyboard */; };
+		F5F0B83B540A4BE2A8492C03 /* ic_save_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 16862E3F780548ECB574B4A1 /* ic_save_2x.png */; };
+		F83D32E3F45A4B178CC2447A /* NativeScriptEmbedder.m in Sources */ = {isa = PBXBuildFile; fileRef = DEB54ED299524FBE94F4800B /* NativeScriptEmbedder.m */; };
+		FE4A8846BEE3468E9809CBE9 /* ic_menu_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A9ECBA4801647BCBDD65677 /* ic_menu_3x.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		85F5BDFC1A9363BE006B9701 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C6A73D45388B424AB96C73A6 /* TNSWidgets.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		16862E3F780548ECB574B4A1 /* ic_save_2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_save_2x.png; path = dikota/Resources/ic_save_2x.png; sourceTree = "<group>"; };
+		1A0E0C8720C1438297062695 /* ic_label_3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_label_3x.png; path = dikota/Resources/ic_label_3x.png; sourceTree = "<group>"; };
+		1B5E548542B07C2E093C3C9F /* Pods_dikota.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_dikota.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2013E90385EB4C6DA47BF276 /* ic_nenu_3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_nenu_3x.png; path = dikota/Resources/ic_nenu_3x.png; sourceTree = "<group>"; };
+		2AF7F2863C6049D99A652E89 /* NativeScriptEmbedder.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = NativeScriptEmbedder.h; path = "../../node_modules/@nativescript/core/platforms/ios/src/NativeScriptEmbedder.h"; sourceTree = "<group>"; };
+		3336DBADD2334E95A01CA17D /* ic_crop_3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_crop_3x.png; path = dikota/Resources/ic_crop_3x.png; sourceTree = "<group>"; };
+		391174B321F1CBD300BA2583 /* TNSDebugging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TNSDebugging.h; path = internal/TNSDebugging.h; sourceTree = SOURCE_ROOT; };
+		391174B421F1CBD300BA2583 /* TNSExceptionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TNSExceptionHandler.h; path = internal/TNSExceptionHandler.h; sourceTree = SOURCE_ROOT; };
+		391174B521F1D7BF00BA2583 /* nativescript-build.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "nativescript-build.xcconfig"; path = "internal/nativescript-build.xcconfig"; sourceTree = SOURCE_ROOT; };
+		391174B721F1D99900BA2583 /* plugins-release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "plugins-release.xcconfig"; sourceTree = SOURCE_ROOT; };
+		391174B821F1D99900BA2583 /* plugins-debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "plugins-debug.xcconfig"; sourceTree = SOURCE_ROOT; };
+		3A9ECBA4801647BCBDD65677 /* ic_menu_3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_menu_3x.png; path = dikota/Resources/ic_menu_3x.png; sourceTree = "<group>"; };
+		42B60BF98D6246E9892CBE6E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = LaunchScreen.storyboard; path = dikota/Resources/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		42C751E2232B769100186695 /* nativescript-pre-link */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "nativescript-pre-link"; path = "internal/nativescript-pre-link"; sourceTree = SOURCE_ROOT; };
+		42C751E3232B769100186695 /* strip-dynamic-framework-architectures.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-dynamic-framework-architectures.sh"; path = "internal/strip-dynamic-framework-architectures.sh"; sourceTree = SOURCE_ROOT; };
+		42C751E4232B769100186695 /* nsld.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = nsld.sh; path = internal/nsld.sh; sourceTree = SOURCE_ROOT; };
+		42C751E5232B769100186695 /* nativescript-post-build */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "nativescript-post-build"; path = "internal/nativescript-post-build"; sourceTree = SOURCE_ROOT; };
+		42C751E6232B769100186695 /* nativescript-pre-build */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "nativescript-pre-build"; path = "internal/nativescript-pre-build"; sourceTree = SOURCE_ROOT; };
+		47C2DD2244084C36BB963221 /* ic_nenu_2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_nenu_2x.png; path = dikota/Resources/ic_nenu_2x.png; sourceTree = "<group>"; };
+		49C86ACDABB546C38651EB16 /* module.modulemap */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = "../../node_modules/@nativescript/core/platforms/ios/src/module.modulemap"; sourceTree = "<group>"; };
+		4C90BE5484664CFDAA777638 /* ic_nenu.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_nenu.png; path = dikota/Resources/ic_nenu.png; sourceTree = "<group>"; };
+		4E03EB4DB9424D0FB5CEE168 /* Assets.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = dikota/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		5BD1B0209A30888213A84D16 /* Pods-dikota.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dikota.release.xcconfig"; path = "Target Support Files/Pods-dikota/Pods-dikota.release.xcconfig"; sourceTree = "<group>"; };
+		6A97B33C09B84A0896869DFA /* ic_crop_2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_crop_2x.png; path = dikota/Resources/ic_crop_2x.png; sourceTree = "<group>"; };
+		75AFDCCB035B4946AC41E429 /* ic_label_2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_label_2x.png; path = dikota/Resources/ic_label_2x.png; sourceTree = "<group>"; };
+		7FE26D3198DC4BE1B1B449F2 /* ic_save.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_save.png; path = dikota/Resources/ic_save.png; sourceTree = "<group>"; };
+		83373C8398024ABF93165B71 /* ic_label.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_label.png; path = dikota/Resources/ic_label.png; sourceTree = "<group>"; };
+		858B832E18CA111C00AB12DE /* dikota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dikota.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		858B833918CA111C00AB12DE /* Dikota-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Dikota-Info.plist"; sourceTree = "<group>"; };
+		858B833B18CA111C00AB12DE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		858B833F18CA111C00AB12DE /* Dikota-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Dikota-Prefix.pch"; sourceTree = "<group>"; };
+		858B843318CA22B800AB12DE /* Dikota.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dikota.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		91716832728D4A388BA79FE7 /* ic_menu_2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_menu_2x.png; path = dikota/Resources/ic_menu_2x.png; sourceTree = "<group>"; };
+		930F05DB22671AE300D269DC /* Swift-ObjC-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Swift-ObjC-Bridging-Header.h"; path = "internal/Swift-ObjC-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
+		AA1F753667EF44CCAD601613 /* build.xcconfig */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.xcconfig; name = build.xcconfig; path = dikota/Resources/build.xcconfig; sourceTree = "<group>"; };
+		C2D83A62AE9542FE9884C6F5 /* ic_menu.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_menu.png; path = dikota/Resources/ic_menu.png; sourceTree = "<group>"; };
+		C58FAE30F7A647F9900524F2 /* ic_crop.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_crop.png; path = dikota/Resources/ic_crop.png; sourceTree = "<group>"; };
+		CD45EE7A18DC2D5800FB50C0 /* app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = app; sourceTree = "<group>"; };
+		CD62955C1BB2678900AE3A93 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = internal/main.m; sourceTree = SOURCE_ROOT; };
+		CDD59A261BB43B5D00EC2671 /* build-debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "build-debug.xcconfig"; sourceTree = "<group>"; };
+		CDD59A271BB43B5D00EC2671 /* build-release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "build-release.xcconfig"; sourceTree = "<group>"; };
+		CDF4743E1BA4855C0087EA85 /* build.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = build.xcconfig; sourceTree = "<group>"; };
+		D67C01E3D6CB386043D07485 /* Pods-dikota.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dikota.debug.xcconfig"; path = "Target Support Files/Pods-dikota/Pods-dikota.debug.xcconfig"; sourceTree = "<group>"; };
+		DC6B8517F1274DFEA5207C56 /* TNSWidgets.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = TNSWidgets.framework; path = "$(SRCROOT)/../../node_modules/tns-core-modules-widgets/platforms/ios/TNSWidgets.framework"; sourceTree = "<group>"; };
+		DEB54ED299524FBE94F4800B /* NativeScriptEmbedder.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = NativeScriptEmbedder.m; path = "../../node_modules/@nativescript/core/platforms/ios/src/NativeScriptEmbedder.m"; sourceTree = "<group>"; };
+		FBF590E30062468E882E538B /* ic_save_3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = image.png; name = ic_save_3x.png; path = dikota/Resources/ic_save_3x.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		858B83F418CA22B800AB12DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6FC6473667B34946AB55B931 /* TNSWidgets.framework in Frameworks */,
+				5916D5CFE61930F23E838BAA /* Pods_dikota.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0517D28E3C304F7CA37C7F68 /* nativescript-imagepicker */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-imagepicker";
+			sourceTree = "<group>";
+		};
+		0EFD450AB84843ADA49839ED /* @nativescript/core */ = {
+			isa = PBXGroup;
+			children = (
+				2AF7F2863C6049D99A652E89 /* NativeScriptEmbedder.h */,
+				DEB54ED299524FBE94F4800B /* NativeScriptEmbedder.m */,
+				49C86ACDABB546C38651EB16 /* module.modulemap */,
+			);
+			name = "@nativescript/core";
+			sourceTree = "<group>";
+		};
+		3766145C1C844B5ABC8DC0BF /* tns-core-modules-widgets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "tns-core-modules-widgets";
+			sourceTree = "<group>";
+		};
+		3971DD4F115A3EB7AED9BEB8 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D67C01E3D6CB386043D07485 /* Pods-dikota.debug.xcconfig */,
+				5BD1B0209A30888213A84D16 /* Pods-dikota.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		3EBFDE2243414CFFAF76103A /* nativescript-geolocation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-geolocation";
+			sourceTree = "<group>";
+		};
+		42C751E1232B767700186695 /* Build Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				42C751E5232B769100186695 /* nativescript-post-build */,
+				42C751E6232B769100186695 /* nativescript-pre-build */,
+				42C751E2232B769100186695 /* nativescript-pre-link */,
+				42C751E4232B769100186695 /* nsld.sh */,
+				42C751E3232B769100186695 /* strip-dynamic-framework-architectures.sh */,
+			);
+			name = "Build Scripts";
+			sourceTree = "<group>";
+		};
+		593E685531174B19BDECCE7E /* nativescript-toolbox */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-toolbox";
+			sourceTree = "<group>";
+		};
+		858B832518CA111C00AB12DE = {
+			isa = PBXGroup;
+			children = (
+				E070579D1B39A9D000214BF1 /* Resources */,
+				858B833718CA111C00AB12DE /* dikota */,
+				858B833018CA111C00AB12DE /* Frameworks */,
+				858B832F18CA111C00AB12DE /* Products */,
+				A435D68B792B4FFF836E6B9C /* TNSNativeSource */,
+				C9EEC71978D24BB5B1B33985 /* nativescript-camera */,
+				3EBFDE2243414CFFAF76103A /* nativescript-geolocation */,
+				0517D28E3C304F7CA37C7F68 /* nativescript-imagepicker */,
+				DEE3C540CF0146D6B7DFABB4 /* nativescript-sha */,
+				8A7BECCAFE174D128ABDD8AA /* nativescript-sqlite */,
+				593E685531174B19BDECCE7E /* nativescript-toolbox */,
+				0EFD450AB84843ADA49839ED /* @nativescript/core */,
+				3766145C1C844B5ABC8DC0BF /* tns-core-modules-widgets */,
+				3971DD4F115A3EB7AED9BEB8 /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		858B832F18CA111C00AB12DE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				858B832E18CA111C00AB12DE /* dikota.app */,
+				858B843318CA22B800AB12DE /* Dikota.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		858B833018CA111C00AB12DE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DC6B8517F1274DFEA5207C56 /* TNSWidgets.framework */,
+				1B5E548542B07C2E093C3C9F /* Pods_dikota.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		858B833718CA111C00AB12DE /* dikota */ = {
+			isa = PBXGroup;
+			children = (
+				CD45EE7A18DC2D5800FB50C0 /* app */,
+				858B833818CA111C00AB12DE /* Supporting Files */,
+			);
+			path = dikota;
+			sourceTree = "<group>";
+		};
+		858B833818CA111C00AB12DE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				42C751E1232B767700186695 /* Build Scripts */,
+				391174B821F1D99900BA2583 /* plugins-debug.xcconfig */,
+				391174B721F1D99900BA2583 /* plugins-release.xcconfig */,
+				391174B321F1CBD300BA2583 /* TNSDebugging.h */,
+				391174B421F1CBD300BA2583 /* TNSExceptionHandler.h */,
+				CDF4743E1BA4855C0087EA85 /* build.xcconfig */,
+				CDD59A261BB43B5D00EC2671 /* build-debug.xcconfig */,
+				CDD59A271BB43B5D00EC2671 /* build-release.xcconfig */,
+				391174B521F1D7BF00BA2583 /* nativescript-build.xcconfig */,
+				858B833918CA111C00AB12DE /* Dikota-Info.plist */,
+				858B833A18CA111C00AB12DE /* InfoPlist.strings */,
+				CD62955C1BB2678900AE3A93 /* main.m */,
+				858B833F18CA111C00AB12DE /* Dikota-Prefix.pch */,
+				930F05DB22671AE300D269DC /* Swift-ObjC-Bridging-Header.h */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8A7BECCAFE174D128ABDD8AA /* nativescript-sqlite */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-sqlite";
+			sourceTree = "<group>";
+		};
+		A435D68B792B4FFF836E6B9C /* TNSNativeSource */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = TNSNativeSource;
+			sourceTree = "<group>";
+		};
+		C9EEC71978D24BB5B1B33985 /* nativescript-camera */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-camera";
+			sourceTree = "<group>";
+		};
+		DEE3C540CF0146D6B7DFABB4 /* nativescript-sha */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "nativescript-sha";
+			sourceTree = "<group>";
+		};
+		E070579D1B39A9D000214BF1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4E03EB4DB9424D0FB5CEE168 /* Assets.xcassets */,
+				42B60BF98D6246E9892CBE6E /* LaunchScreen.storyboard */,
+				AA1F753667EF44CCAD601613 /* build.xcconfig */,
+				C58FAE30F7A647F9900524F2 /* ic_crop.png */,
+				6A97B33C09B84A0896869DFA /* ic_crop_2x.png */,
+				3336DBADD2334E95A01CA17D /* ic_crop_3x.png */,
+				83373C8398024ABF93165B71 /* ic_label.png */,
+				75AFDCCB035B4946AC41E429 /* ic_label_2x.png */,
+				1A0E0C8720C1438297062695 /* ic_label_3x.png */,
+				C2D83A62AE9542FE9884C6F5 /* ic_menu.png */,
+				91716832728D4A388BA79FE7 /* ic_menu_2x.png */,
+				3A9ECBA4801647BCBDD65677 /* ic_menu_3x.png */,
+				4C90BE5484664CFDAA777638 /* ic_nenu.png */,
+				47C2DD2244084C36BB963221 /* ic_nenu_2x.png */,
+				2013E90385EB4C6DA47BF276 /* ic_nenu_3x.png */,
+				7FE26D3198DC4BE1B1B449F2 /* ic_save.png */,
+				16862E3F780548ECB574B4A1 /* ic_save_2x.png */,
+				FBF590E30062468E882E538B /* ic_save_3x.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		858B83EF18CA22B800AB12DE /* Dikota */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 858B843018CA22B800AB12DE /* Build configuration list for PBXNativeTarget "Dikota" */;
+			buildPhases = (
+				330CCFBDB379BB6698057140 /* [CP] Check Pods Manifest.lock */,
+				C97FD7AC1ADE5369004DB2A4 /* NativeScript PreBuild */,
+				858B83F218CA22B800AB12DE /* Sources */,
+				CD62955B1BB2651D00AE3A93 /* NativeScript PreLink */,
+				858B83F418CA22B800AB12DE /* Frameworks */,
+				858B842C18CA22B800AB12DE /* Resources */,
+				85F5BDFC1A9363BE006B9701 /* Embed Frameworks */,
+				CD3EAD351B05FF060042DBFC /* NativeScript PostBuild */,
+				73E91D2A44987A1531B3A825 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Dikota;
+			productName = JDBridgeApp;
+			productReference = 858B843318CA22B800AB12DE /* Dikota.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		858B832618CA111C00AB12DE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TNS;
+				LastUpgradeCheck = 500;
+				ORGANIZATIONNAME = Diatum;
+				TargetAttributes = {
+					858B83EF18CA22B800AB12DE = {
+						DevelopmentTeam = 655FZP4H22;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 858B832918CA111C00AB12DE /* Build configuration list for PBXProject "Dikota" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+			);
+			mainGroup = 858B832518CA111C00AB12DE;
+			productRefGroup = 858B832F18CA111C00AB12DE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				858B83EF18CA22B800AB12DE /* Dikota */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		858B842C18CA22B800AB12DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD45EE7C18DC2D5800FB50C0 /* app in Resources */,
+				858B842D18CA22B800AB12DE /* InfoPlist.strings in Resources */,
+				4F3D30FB1D58475E830EDBC3 /* Assets.xcassets in Resources */,
+				F53FE3851C10482AACE72E55 /* LaunchScreen.storyboard in Resources */,
+				2C87DD9D6EFA4794B373E261 /* build.xcconfig in Resources */,
+				284FFDC3D91745BAADD9ED86 /* ic_crop.png in Resources */,
+				E9696B3E1C264EE787E2DCAA /* ic_crop_2x.png in Resources */,
+				1D4401068CFB401AB13EF609 /* ic_crop_3x.png in Resources */,
+				C45079F022A84A7B87001E67 /* ic_label.png in Resources */,
+				4AF473F6F4394E57AB71E496 /* ic_label_2x.png in Resources */,
+				189432D2818D491CB7664EEB /* ic_label_3x.png in Resources */,
+				716C0434201B46FA8826B3E4 /* ic_menu.png in Resources */,
+				C5692E85F4DA4FF1803CE0E8 /* ic_menu_2x.png in Resources */,
+				FE4A8846BEE3468E9809CBE9 /* ic_menu_3x.png in Resources */,
+				8DD0F1EA92A948AAAC3425A0 /* ic_nenu.png in Resources */,
+				A6E0F4AD00694125AFD9DD82 /* ic_nenu_2x.png in Resources */,
+				7907FBBFCBA34FF8ABDDCEEE /* ic_nenu_3x.png in Resources */,
+				A0618524CCFE49D3BF1911A4 /* ic_save.png in Resources */,
+				F5F0B83B540A4BE2A8492C03 /* ic_save_2x.png in Resources */,
+				C455126CEAD7480088866696 /* ic_save_3x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		330CCFBDB379BB6698057140 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-dikota-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		73E91D2A44987A1531B3A825 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-dikota/Pods-dikota-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/MDFInternationalization/MDFInternationalization.framework",
+				"${BUILT_PRODUCTS_DIR}/MaterialComponents/MaterialComponents.framework",
+				"${BUILT_PRODUCTS_DIR}/QBImagePickerController/QBImagePickerController.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MDFInternationalization.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MaterialComponents.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QBImagePickerController.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-dikota/Pods-dikota-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C97FD7AC1ADE5369004DB2A4 /* NativeScript PreBuild */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "NativeScript PreBuild";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/internal/nativescript-pre-build\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CD3EAD351B05FF060042DBFC /* NativeScript PostBuild */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "NativeScript PostBuild";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/internal/nativescript-post-build\"";
+			showEnvVarsInLog = 0;
+		};
+		CD62955B1BB2651D00AE3A93 /* NativeScript PreLink */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "NativeScript PreLink";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/internal/nativescript-pre-link\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		858B83F218CA22B800AB12DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD62955D1BB2678900AE3A93 /* main.m in Sources */,
+				F83D32E3F45A4B178CC2447A /* NativeScriptEmbedder.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		858B833A18CA111C00AB12DE /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				858B833B18CA111C00AB12DE /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		858B835818CA111C00AB12DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRIP_SWIFT_SYMBOLS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/internal/Swift-ObjC-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		858B835918CA111C00AB12DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				SDKROOT = iphoneos;
+				STRIP_SWIFT_SYMBOLS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/internal/Swift-ObjC-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		858B843118CA22B800AB12DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CDD59A261BB43B5D00EC2671 /* build-debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CURRENT_PROJECT_VERSION = 96;
+				DEVELOPMENT_TEAM = 655FZP4H22;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../node_modules/tns-core-modules-widgets/platforms/ios\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "dikota/Dikota-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$SRCROOT/internal/Swift-Modules\"",
+					"\"$(SRCROOT)/internal\"",
+					"\"$(SRCROOT)/../../App_Resources/iOS/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-camera/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-geolocation/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-imagepicker/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-sha/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-sqlite/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-toolbox/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/@nativescript/core/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/tns-core-modules-widgets/platforms/ios/src\"",
+				);
+				INFOPLIST_FILE = "dikota/Dikota-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = org.diatum.dikota;
+				PRODUCT_NAME = Dikota;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		858B843218CA22B800AB12DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CDD59A271BB43B5D00EC2671 /* build-release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CURRENT_PROJECT_VERSION = 96;
+				DEVELOPMENT_TEAM = 655FZP4H22;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../node_modules/tns-core-modules-widgets/platforms/ios\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "dikota/Dikota-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$SRCROOT/internal/Swift-Modules",
+					"$(SRCROOT)/internal",
+					"\"$(SRCROOT)/../../App_Resources/iOS/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-camera/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-geolocation/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-imagepicker/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-sha/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-sqlite/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/nativescript-toolbox/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/@nativescript/core/platforms/ios/src\"",
+					"\"$(SRCROOT)/../../node_modules/tns-core-modules-widgets/platforms/ios/src\"",
+				);
+				INFOPLIST_FILE = "dikota/Dikota-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = org.diatum.dikota;
+				PRODUCT_NAME = Dikota;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		858B832918CA111C00AB12DE /* Build configuration list for PBXProject "Dikota" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				858B835818CA111C00AB12DE /* Debug */,
+				858B835918CA111C00AB12DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		858B843018CA22B800AB12DE /* Build configuration list for PBXNativeTarget "Dikota" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				858B843118CA22B800AB12DE /* Debug */,
+				858B843218CA22B800AB12DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 858B832618CA111C00AB12DE /* Project object */;
+}

@@ -1,0 +1,14 @@
+NSLocationAlwaysAndWhenInUseUsageDescription
+NSLocationWhenInUseUsageDescription
+Enables finding other users nearby and not used for any other purpose.
+
+Photo
+Enables selecting a photo for your profile and not used for any other purpose.
+
+Camera
+Enables taking a picture for your profile and not used for any other purpose.
+
+URL Types
+schemes: dikota
+id: org.diatum.dikota
+role: viewer
