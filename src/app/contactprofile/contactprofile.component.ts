@@ -108,7 +108,7 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
       this.available = p.available == "true";
       this.pending = p.pending != "false";
       this.shareId = p.pending;
-     
+    
       // subscribe to selected contact 
       this.sub.push(this.amigoService.selectedContact.subscribe(c => {
         

@@ -180,10 +180,11 @@ export class PendingEntry {
   }
 
   private async selectContact(e: PendingContact) {
+
     this.zone.run(async () => {
       if(this.amigoSet && e.pendingData != null) {
         await this.amigoService.setContact(e.pendingData.amigoId);
-        this.router.navigate(["/contactprofile", this.amigoId, this.registry, true, false],
+        this.router.navigate(["/contactprofile", this.amigoId, this.registry, true, e.shareId],
           { clearHistory: false, animated: true, transition:
           { name: "slideLeft", duration: 300, curve: "easeIn" }});
       }
