@@ -25,7 +25,7 @@
         (tap)="onLoginFocus()" [text]="login"></TextField>
   </GridLayout>
   <GridLayout row="5" rows="auto" marginLeft="32" marginRight="32">
-    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Portal Password" [secure]="!show"
+    <TextField #pas color="#51515E" style.placeholderColor="#A1A1AE" class="input" autocorrect="false" hint="Diatabase Password" [secure]="!show"
         fontSize="18" textAlignment="center" (textChange)="onUpdatePassword($event.value)" returnKeyType="done" (returnPress)="onPasswordSet($event)"
         autocapitalizationType="none" borderBottomWidth="1" borderColor="#DDDDDD" (focus)="onPassFocus()" (blur)="onPassBlur()"
         (tap)="onPassFocus()" [text]="code"></TextField>
