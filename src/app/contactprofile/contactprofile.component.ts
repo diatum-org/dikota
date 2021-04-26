@@ -247,8 +247,13 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
   public canRequest(): boolean {
 
+    // can request even if not saved
+    if(this.contact == null) {
+      return true;
+    }
+
     // request not an option if needs to be saved
-    if(this.contact == null || this.pending == true) {
+    if(this.pending == true) {
       return false;
     }
 
@@ -260,39 +265,34 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  public onRequest(): void {
+  public async onRequest() {
 
-    if(this.contact != null && !this.busy) {
-   
-      if(this.contact.shareId == null) {
-        // add and request
-        this.busy = true;
-        this.amigoService.addConnection(this.amigoId).then(e => {
-          this.amigoService.openConnection(this.amigoId, e.shareId, this.contact.node).then(s => {
-            this.busy = false;
-          }).catch(err => {
-            this.busy = false;
-            console.log(err);
-            dialogs.alert({ message: "failed to request contact", okButtonText: "ok" });
-          });
-        }).catch(err => {
-          this.busy = false;
-          console.log(err);
-          dialogs.alert({ message: "failed to add connection", okButtonText: "ok" });
-        });
-      }
-      else {
-        // request only
-        this.busy = true;
-        this.amigoService.openConnection(this.amigoId, this.contact.shareId, this.contact.node).then(s => {
-          this.busy = false;
-        }).catch(err => {
-          this.busy = false;
-          console.log(err);
-          dialogs.alert({ message: "failed to request contact", okButtonText: "ok" });
-        });
-      }
+    if(this.busy) {
+      return;
     }
+
+    this.busy = true;   
+    try { 
+
+      // add contact if not yet added
+      if(this.contact == null) {
+        await this.amigoService.addAmigo(this.amigoMessage);
+      }
+
+      // add connection to contact if not yet added
+      if(this.contact.shareId == null) {
+        let e = await this.amigoService.addConnection(this.amigoId);
+        this.contact.shareId = e.shareId;
+      }
+
+      // send connection request
+      this.amigoService.openConnection(this.amigoId, this.contact.shareId, this.contact.node);
+    }
+    catch(err) {
+      console.log(err);
+      dialogs.alert({ message: "failed to request contact", okButtonText: "ok" });
+    }
+    this.busy = false;
   }
 
   public canAccept(): boolean {
