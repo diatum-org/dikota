@@ -178,9 +178,14 @@ export class EntryService {
 
   public getNotify(): boolean {
 
-    if(this.notified != null && this.revision != null && this.notified < this.revision) {
+    if(this.notified == null && this.revision != null) {
       return true;
     }
+
+    if(this.revision != null && this.notified < this.revision) {
+      return true;
+    }
+
     return false;
   }
 

@@ -247,14 +247,14 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
   public canRequest(): boolean {
 
-    // can request even if not saved
-    if(this.contact == null) {
-      return true;
-    }
-
     // request not an option if needs to be saved
     if(this.pending == true) {
       return false;
+    }
+
+    // can request even if not saved
+    if(this.contact == null) {
+      return true;
     }
 
     // states in which can request
