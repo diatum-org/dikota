@@ -190,12 +190,17 @@ export class EntryService {
   }
 
   private setNotifyRevision() {
+    let d: Date = new Date();
+    let cur = d.getTime() / 1000;
+
     let r: number = null;
     for(let i = 0; i < this.received.length; i++) {
       let c: AmigoContact = this.received[i];
       if(c.shareData == null || c.shareData.notified != c.shareRevision) {
         if(r == null || c.shareRevision > r) {
-          r = c.shareRevision;
+          if(cur < c.updated + 2419200) {
+            r = c.shareRevision;
+          }
         }
       }
     }
@@ -203,7 +208,9 @@ export class EntryService {
       let c: AmigoContact = this.connected[i];
       if(c.shareData == null || c.shareData.notified != c.shareRevision) {
         if(r == null || c.shareRevision > r) {
-          r = c.shareRevision;
+          if(cur < c.updated + 2419200) {
+            r = c.shareRevision;
+          }
         }
       }
     }
@@ -211,7 +218,9 @@ export class EntryService {
       let c: PendingContact = this.pending[i];
       if(c.pendingData == null || c.pendingData.notified != c.revision) {
         if(r == null || c.revision > r) {
-          r = c.revision;
+          if(cur < c.updated + 2419200) {
+            r = c.revision;
+          }
         }
       }
     }
