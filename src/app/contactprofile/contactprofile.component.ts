@@ -222,6 +222,10 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
 
   public canSave(): boolean {
 
+    if(this.busy) {
+      return false;
+    }
+
     if(this.contact == null && this.amigoMessage != null) {
       if(this.pending == true || this.available == true) {
         return true;
@@ -246,6 +250,10 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public canRequest(): boolean {
+
+    if(this.busy) {
+      return false;
+    }
 
     // request not an option if needs to be saved
     if(this.pending == true) {
@@ -296,7 +304,11 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public canAccept(): boolean {
-  
+
+    if(this.busy) {
+      return false;
+    }  
+
     if(this.contact == null && this.pending == true && this.amigoMessage != null) {
       return true;
     }
@@ -354,7 +366,11 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public canDeny(): boolean {
-  
+
+    if(this.busy) {
+      return false;
+    } 
+ 
     if(this.contact == null && this.pending == true) {
       return true;
     }
@@ -405,7 +421,11 @@ export class ContactProfileComponent implements OnInit, OnDestroy {
   }
 
   public canCancel(): boolean {
-    
+
+    if(this.busy) {
+      return false;
+    }   
+ 
     if(this.contact != null && this.contact.status == "requested") {
       return true;
     }
