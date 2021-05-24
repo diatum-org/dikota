@@ -66,34 +66,34 @@ export class AttributeEditComponent implements OnInit, OnDestroy {
         for(let i = 0; i < a.labels.length; i++) {
           this.labelSet.add(a.labels[i]);
         }
+
+        // configure for each type of attribute
+        if(AttributeUtil.EMAIL == this.schema) {
+          this.name = "Email";
+        }
+        else if(AttributeUtil.PHONE == this.schema) {
+          this.name = "Phone";
+        }
+        else if(AttributeUtil.HOME == this.schema) {
+          this.name = "Home Address";
+        }
+        else if(AttributeUtil.WORK == this.schema) {
+          this.name = "Workplace";
+        }
+        else if(AttributeUtil.SOCIAL == this.schema) {
+          this.name = "Social & Messaging";
+        }
+        else if(AttributeUtil.WEBSITE == this.schema) {
+          this.name = "Website";
+        }
+        else if(AttributeUtil.CARD == this.schema) {
+          this.name = "Business Card";
+        }
+        else {
+          this.name = "Attribute";
+        }
       });
     });
-
-    // configure for each type of attribute
-    if(AttributeUtil.WEBSITE == this.schema) {
-      this.name = "Email";
-    }
-    else if(AttributeUtil.PHONE == this.schema) {
-      this.name = "Phone";
-    }
-    else if(AttributeUtil.HOME == this.schema) {
-      this.name = "Home Address";
-    }
-    else if(AttributeUtil.WORK == this.schema) {
-      this.name = "Workplace";
-    }
-    else if(AttributeUtil.SOCIAL == this.schema) {
-      this.name = "Social & Messaging";
-    }
-    else if(AttributeUtil.WEBSITE == this.schema) {
-      this.name = "Website";
-    }
-    else if(AttributeUtil.CARD == this.schema) {
-      this.name = "Business Card";
-    }
-    else {
-      this.name = "Attribute";
-    }
   }
 
   ngOnInit(): void {
