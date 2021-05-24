@@ -742,8 +742,9 @@ export class AmigoService {
 
               // update any entry with different revision
               let entry: AttributeEntry = await this.profileService.getAttribute(this.node, this.token, key);
+
               await this.storeService.updateAttribute(this.amigoId, entry.attribute);
-              await this.storeService.clearAmigoLabels(this.amigoId, entry.attribute.attributeId);
+              await this.storeService.clearAttributeLabels(this.amigoId, entry.attribute.attributeId);
               for(let i = 0; i < entry.labels.length; i++) {
                 await this.storeService.setAttributeLabel(this.amigoId, entry.attribute.attributeId, entry.labels[i]);
               }
@@ -1348,7 +1349,7 @@ export class AmigoService {
   }
 
   public async setAttributeLabels(attributeId: string, labelIds: string[]): Promise<AttributeEntry> {
-    
+   
     let entry: AttributeEntry = await this.profileService.setAttributeLabels(this.node, this.token, attributeId, labelIds);
     await this.syncProfile();
     return entry;
