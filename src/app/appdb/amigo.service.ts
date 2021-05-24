@@ -914,8 +914,6 @@ export class AmigoService {
         let r = await this.shareService.getRevision(this.node, this.token);
         if(this.revision.share != r) {
 
-console.log("SYNC SHARE");
-
           // if contact should refresh
           let refresh: boolean = false;
       
@@ -936,10 +934,7 @@ console.log("SYNC SHARE");
           // add remote entry not in local
           await this.asyncForEach(remoteMap, async (value, key) => {
 
-console.log("FOR EACH: " + key);
-
             if(!localMap.has(key)) {
-console.log("ADD");
 
               let entry: ShareEntry = await this.shareService.getConnection(this.node, this.token, key);
               await this.storeService.addConnection(this.amigoId, entry);
@@ -949,7 +944,6 @@ console.log("ADD");
             else if(localMap.get(key) != value) {
 
               let entry: ShareEntry = await this.shareService.getConnection(this.node, this.token, key);
-console.log("UPDATE: ", entry);
               await this.storeService.updateConnection(this.amigoId, entry);
               await this.refreshContact(entry.amigoId);
               refresh = true;
@@ -970,7 +964,6 @@ console.log("UPDATE: ", entry);
 
           // if contacts should refresh
           if(refresh) {
-console.log("REFRESH!");
 
             this.refreshAmigos();
             this.refreshContacts();
